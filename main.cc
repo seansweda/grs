@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <sys/param.h>
 #include "pitcher.h"
 #include "player.h"
 #include "team.h"
@@ -13,7 +15,7 @@
 
 // variables used outside of main()
 
-char VER[8] = "2.7.2";
+char VER[12] = "3.0.0beta1";
 
 FILE 	*pbpfp,		// play-by-play output file
 	*stsfp,		// stats output file
@@ -26,7 +28,7 @@ char *ops= "w+";
 
 frame *f0;		// f0 is the current frame to be decoded
 
-char filename[80];	// prefix for all output files
+char filename[MAXPATHLEN];	// prefix for all output files
 
 char *buffer;		// output buffer
 
@@ -50,7 +52,6 @@ int **linescore;	// linescore array;
 
 int** build_linescore(int);
 
-int openfile(int, char*[]);
 void setup();
 void setup(int);
 
@@ -59,109 +60,112 @@ void quit(void);
 
 void outbuf(FILE*,char*,char*);
 
+    int
 main(int argc, char *argv[])
 {
 
-int flag = 0;		// are there flags? if so set to 1
-int input_home = 0,
-    input_away = 0;	// set if home/away team's linups are to be
-			// read in from a file
+    int c;
+    char *afile = NULL;
+    char *hfile = NULL;
+    char *cfile = NULL;
+    int usage = 0;
 
-int input_file = 0;	// is there an input file? if so set to 1
-			// use these flags to determine the position
-			// of elements in the argv array, e.g.
-			// output file = flag + input_file + ... + 1
-
-if (argc < 2) {fprintf(stderr,
-	"Usage: grs [-ahfv] [afile] [hfile] [infile] outfile\n"); exit(0);}
-
-char *flags = argv[1];
-
-if (*flags++ == '-') {
-   flag = 1;
-   while (*flags)
-     switch(*flags++) {
-	case 'a':	input_away = 1;
+    while ((c = getopt(argc, argv, "a:h:f:v")) != EOF)
+    switch (c) {
+	case 'a':	afile = (char *) malloc(sizeof(MAXPATHLEN));
+	    		strncpy( afile, optarg, MAXPATHLEN );
 			break;
-	case 'h':	input_home = 1;
+	case 'h':	hfile = (char *) malloc(sizeof(MAXPATHLEN));	
+	    		strncpy( hfile, optarg, MAXPATHLEN );
+			break;
+	case 'f':	cfile = (char *) malloc(sizeof(MAXPATHLEN));	
+	    		strncpy( cfile, optarg, MAXPATHLEN );
 			break;
 	case 'v':	fprintf(stderr,"%s\n",VER);
 			exit(0);
-	case 'f':	input_file = 1;
-			break;
-	default	:	fprintf(stderr,
-	"Usage: grs [-ahfv] [afile] [hfile] [infile] outfile\n");
-			exit(0);
+	case '?':	usage++;
+    }
+
+
+    // can't specify -a|-h and -f
+    if ( cfile && ( afile || hfile ) ) {
+	usage++;
+    }
+
+    // no output filename
+    if ( !(argv[optind]) ) {
+	usage++;
+    }
+    else {
+	strncpy( filename, argv[optind], MAXPATHLEN - 4 );
+	if ( openfile(filename) ) {
+	    fprintf( stderr, "cannot open %s\n", filename );
+	    exit(1);
 	}
-}
+    }
 
-if (argc != flag + input_away + input_home + input_file + 2) {
-     fprintf(stderr, "Usage: grs [-ahfv] [afile] [hfile] [infile] outfile\n"); 
-     exit(0);
-     }
+    if ( usage ) {
+	fprintf(stderr,
+	    "Usage: grs [ ([-a afile] [-h hfile]) or ([-f cmdfile]) ] outfile\n");
+	exit(1);
+    }
 
-if ((input_file) && (input_away || input_home)) {
-   fprintf(stderr,"You cannot specify both the -f and -a or -h flags.\n");
-   exit(0);
-   }
-
-
-strcpy(filename,argv[flag+input_away+input_home+input_file+1]);
-
-if (openfile(argc,filename)) {
-   fprintf(stderr,"Input file %s not found\n",argv[flag+input_away+input_home+input_file+1]);
-   exit(0);
-   }
-
-if (!(input_file)) {		// no input file case
-   if (!(input_away) || 
-	(input = fopen(argv[flag+input_away],"r")) == NULL) {
-	input = stdin;
-	output = stdout;}	// no away team files
-   else 
+    if ( cfile ) {
+	input = fopen(cfile,"r");
 	output = fopen("/dev/null","w");
+	if (input == NULL) {
+	    fprintf( stderr, "cannot open %s\n", cfile );
+	    exit(1);
+	}
+	setup(0);			// gets lineups for visitors
+	setup(1);			// gets lineups for home team
+	setup();			// sets up pbpfp, etc.
+	play();
+	fclose(input);
+    }
+    else {
+	if ( afile ) {
+	    if (input == NULL) {
+		fprintf( stderr, "cannot open %s\n", afile );
+		exit(1);
+	    }
+	}
+	if ( hfile ) {
+	    if (input == NULL) {
+		fprintf( stderr, "cannot open %s\n", hfile );
+		exit(1);
+	    }
+	}
+	if ( afile ) {
+	    input = fopen(afile,"r");
+	    output = fopen("/dev/null","w");
+	}
+	setup(0);
+	if (input != stdin) fclose(input);
 
-   setup(0);			// gets lineups for visitors
-   if (input != stdin) fclose(input);
-	
-   if (!(input_home) || 
-      (input = fopen(argv[flag+input_away+input_home],"r")) == NULL) {
-	   input = stdin;
-	   output = stdout;} 	// no home team files
-      else
-	   output = fopen("/dev/null","w");
-   
-   setup(1);			// gets lineups for home team
-   if (input != stdin) fclose(input);
-   
-   input = stdin;
-   output = stdout;
-   setup();			// sets up pbpfp, etc.
-   }		// end of no input file "if"
-   
-else {		// input file exists
-   if ((input = fopen(argv[flag+input_away+input_home+input_file],
-		   "r")) == NULL) {
-	   fprintf(stderr,"Could not open file %s.\n",
-		   argv[flag+input_away+input_home+input_file]);
-	   exit(0);
-           } 
-   else
-	   output = fopen("/dev/null","w");   // input file ok
-   setup(0);			// gets lineups for visitors
-   setup(1);			// gets lineups for home team
-   setup();			// sets up pbpfp, etc.
-   play();
-   fclose(input);}
-   
-input = stdin;
-output = stdout;
-play();
-quit();
+	input = stdin;
+	output = stdout;
+	if ( hfile ) {
+	    input = fopen(afile,"r");
+	    output = fopen("/dev/null","w");
+	}
+	setup(1);
+	if (input != stdin) fclose(input);
 
-fclose(pbpfp);
-fclose(stsfp);
-fclose(cmdfp);
+	input = stdin;
+	output = stdout;
+	setup();
+    }
+
+    input = stdin;
+    output = stdout;
+    play();
+    quit();
+
+    fclose(pbpfp);
+    fclose(stsfp);
+    fclose(cmdfp);
+
 }
 
 void play()
@@ -170,7 +174,7 @@ void play()
 cont = 1;		// obviously we want to execute at least once!
 
 char tempstr[80];
-char cmdfile[80];
+char cmdfile[MAXPATHLEN];
 strcpy(cmdfile,filename);
 strcat(cmdfile,".cmd");
 
@@ -353,40 +357,6 @@ ibl[tm]->make_lineups();
 
 }
 
-int openfile(int argc, char *argv)
-{
-int result;
-char pbpfile[80];
-
-	result=argc;
-        result=0;
-        // if (DEBUG) cmdfp=pbpfp=stsfp=stdout;
-        // else {
-        strcpy(pbpfile,argv);
-        strcat(pbpfile,".pbp");
-        if ((pbpfp=fopen(pbpfile,ops)) == NULL)
-                {
-                fprintf(stderr,"can't open play-by-play file\n");
-                result=1;
-                }
-        strcpy(pbpfile,argv);
-        strcat(pbpfile,".sts");
-        if ((stsfp=fopen(pbpfile,ops)) == NULL)
-                {
-                fprintf(stderr,"can't open stats fIle\n");
-                result=1;
-                }
-        strcpy(pbpfile,argv);
-        strcat(pbpfile,".cmd");
-        if ((cmdfp=fopen(pbpfile,ops)) == NULL)
-                {
-                fprintf(stderr,"can't open commands file\n");
-                result=1;
-                }
-        // } /* end of debug else claue */
-return(result);
-}
-
 void outbuf(FILE *fp,char *str,char *punc)
 {
 
@@ -424,5 +394,24 @@ else {
 	strcat(buffer,str);
 	}
 
+}
+
+    int
+openfile( char *prefix )
+{
+    char filename[MAXPATHLEN];
+    int result;
+
+    strncpy( filename, prefix, MAXPATHLEN - 4 );
+    if ( ( pbpfp=fopen(strcat( filename, ".pbp"), ops) ) == NULL )
+	result++;
+    strncpy( filename, prefix, MAXPATHLEN - 4 );
+    if ( ( stsfp=fopen(strcat( filename, ".sts"), ops) ) == NULL )
+	result++;
+    strncpy( filename, prefix, MAXPATHLEN - 4 );
+    if ( ( cmdfp=fopen(strcat( filename, ".cmd"), ops) ) == NULL )
+	result++;
+
+    return (result);
 }
 

@@ -1,4 +1,5 @@
 // extern.h
+#include <sys/param.h>
 
 #ifndef __EXTERN_H
 #define __EXTERN_H
@@ -7,7 +8,7 @@
 
 extern FILE *stsfp,*pbpfp,*undofp,*cmdfp,*output,*input;
 
-extern char filename[80];
+extern char filename[MAXPATHLEN];
 
 extern char* buffer;
 
@@ -22,7 +23,7 @@ extern int **linescore;
 extern void play();
 extern void setup();
 extern void setup(int);
-extern int openfile(int,char*);
+extern int openfile(char*);
 
 extern void outbuf(FILE*,char*,char *punc ="\0");
 

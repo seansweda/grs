@@ -118,6 +118,7 @@ char tempstr[80];
 char *str;
 
 pitcher *run_charged_to;
+int somebody_out=0;
 
 b[1]="to first";
 b[2]="to second";
@@ -137,6 +138,7 @@ while (*str) {
         switch (*str) {
             case 'o' :			// If runner made an out
 		   pit->mound->out++;
+		   somebody_out++;
                    if ((i == 0) && (fc > 0)) {
                         sprintf(tempstr,"%s out",onbase[i]->nout());
                         outbuf(pbpfp,tempstr,", ");}
@@ -170,6 +172,10 @@ while (*str) {
     str++;
     }
 outbuf(pbpfp,"",". ");
+
+// if this is a fc play where nobody is out, we need to queue a pitcher
+if ((fc==1) && !(somebody_out)) runners->add(pit->mound);
+
 return;
 }
 

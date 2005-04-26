@@ -150,7 +150,7 @@ else if (!(strcmp(event,"un")))
         	strcpy(tempstr,filename);
 		strcat(tempstr,out_ext);
         	undofp=fopen(tempstr,"r");
-		openfile(4,filename);
+		openfile(filename);
 		output = fopen("/dev/null","w");
 		input = undofp;
 //fprintf(stderr,"setting up: ");
