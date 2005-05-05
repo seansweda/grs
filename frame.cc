@@ -427,8 +427,12 @@ void frame::cleanup()
 	delete(ibl[1]);
 	ibl[1] = 0;
 	delete(runners);
-	delete(linescore);
-	delete(buffer);
+
+	free(linescore[0]);
+	free(linescore[1]);
+	free(linescore);
+
+	free(buffer);
 }
 
 int frame::decode()

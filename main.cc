@@ -10,14 +10,12 @@
 #include "player.h"
 #include "team.h"
 #include "frame.h"
-#define DEBUG 1
-#define DEBUG2 0
 
 // variables used outside of main()
 
 char VER[12] = "3.0.0beta1";
 
-FILE 	*pbpfp,		// play-by-play output file
+FILE	*pbpfp,		// play-by-play output file
 	*stsfp,		// stats output file
 	*cmdfp,		// commands output file
 	*undofp;	// undo output file
@@ -50,15 +48,248 @@ int undo     = 0, 	// if in the process of undo, set = 1
 
 int **linescore;	// linescore array;
 
-int** build_linescore(int);
 
-void setup();
-void setup(int);
 
-void play();
-void quit(void);
+    void 
+play()
+{
+    cont = 1;		// obviously we want to execute at least once!
 
-void outbuf(FILE*,char*,char*);
+    char tempstr[80];
+
+    char cmdfile[MAXPATHLEN];
+    strcpy(cmdfile,filename);
+    strcat(cmdfile,".cmd");
+
+    while (cont) {
+#ifdef DEBUG
+#if DEBUG == 2
+	ibl[0]->box_score(stderr); 
+	ibl[1]->box_score(stderr);
+#endif
+#endif
+	fclose(cmdfp);
+	fgets(tempstr,100,input);
+	cmdfp=fopen(cmdfile,"a");
+
+	// extra inning, grow the linescore
+	if (inning > linesize) {
+	    linescore[0] = (int *) realloc(linescore[0], inning * sizeof(int));
+	    linescore[1] = (int *) realloc(linescore[1], inning * sizeof(int));
+	    linescore[0][linesize] = 0;
+	    linescore[1][linesize] = 0;
+	    linesize = inning;
+	}
+
+	//if (output != stdout) fprintf(stderr,"%s",tempstr);
+	f0=new frame(tempstr);
+
+	if (!(feof(input)) && (strlen(tempstr) > 1) && (tempstr[0] != 'u')
+		&& (f0->decode()))
+	   fprintf(cmdfp,"%s",tempstr);
+
+	switch ( f0->update() ) {
+	    case 0:
+		    tempstr[strlen(tempstr)-1] = '\0';
+		    f0->help(tempstr);
+	    case 1:
+		    delete(f0);
+		    break;
+	}
+
+#ifdef DEBUG
+    runners->dump();
+#endif
+    }
+}
+
+    void 
+quit()
+{
+    int x, y;
+    int val;
+
+    y = 16 + (3 * inning);
+
+
+    fprintf(stsfp,"    ");
+    for (x = 1; x <= inning; x++)
+	fprintf(stsfp,"%3d",x);
+    fprintf(stsfp,"     R  H  E\n");
+
+    for (x = 1; x <= y; x++)
+	fprintf(stsfp,"-");
+    fprintf(stsfp,"\n");
+
+    fprintf(stsfp,"%s ",ibl[0]);
+    for (x = 0; x < inning; x++)
+	fprintf(stsfp,"%3d",linescore[0][x]);
+    fprintf(stsfp,"   %3d%3d%3d",ibl[0]->score,ibl[0]->team_hits(),
+				 ibl[0]->errors);
+    fprintf(stsfp,"\n");
+
+    fprintf(stsfp,"%s ",ibl[1]);
+    for (x = 0; x < inning; x++)
+	fprintf(stsfp,"%3d",linescore[1][x]);
+    fprintf(stsfp,"   %3d%3d%3d",ibl[1]->score,ibl[1]->team_hits(),
+				 ibl[1]->errors);
+    fprintf(stsfp,"\n");
+
+    for (x = 1; x <= y; x++)
+	fprintf(stsfp,"-");
+    fprintf(stsfp,"\n");
+    for (val=0; val<2; val++) {
+	ibl[val]->box_score(stsfp);
+	fprintf(stsfp,"LOB: %d\n",ibl[val]->lob);
+	fprintf(stsfp,"E: ");
+	ibl[val]->printstat(stsfp,0);
+	fprintf(stsfp,"PB: ");
+	ibl[val]->printstat(stsfp,1);
+	fprintf(stsfp,"GIDP: ");
+	ibl[val]->printstat(stsfp,2);
+	fprintf(stsfp,"SH: ");
+	ibl[val]->printstat(stsfp,3);
+	fprintf(stsfp,"SF: ");
+	ibl[val]->printstat(stsfp,4);
+	fprintf(stsfp,"HBP: ");
+	ibl[val]->printstat(stsfp,5);
+	fprintf(stsfp,"WP: ");
+	ibl[val]->printstat(stsfp,6);
+	fprintf(stsfp,"IBB: ");
+	ibl[val]->printstat(stsfp,7);
+	fprintf(stsfp,"BALK: ");
+	ibl[val]->printstat(stsfp,8);
+    }
+    fprintf(stsfp,"\n");
+    fprintf(pbpfp,"\n");
+}
+
+    void 
+setup()
+{
+    linescore = (int **) malloc (2 * sizeof(int));
+    linescore[0] = (int *) calloc (linesize, sizeof(int));
+    linescore[1] = (int *) calloc (linesize, sizeof(int));
+	
+    char tempstr[80];
+	
+    ibl[0]->make_lineups_pit();
+    ibl[1]->make_lineups_pit();
+	
+    runners = new queue;
+
+    fprintf(output,"\nEnter one line description of game conditions.\n");
+    fgets(tempstr,100,input);
+    fprintf(cmdfp,"%s",tempstr);
+    fprintf(pbpfp,"grs version %s\n",VER);
+    fprintf(pbpfp,"%s at %s \n",ibl[0]->nout(),ibl[1]->nout());
+    fprintf(pbpfp,"%s\n",tempstr);
+    fprintf(pbpfp,"Starting pitchers - %s for %s, and %s for %s\n",
+	ibl[0]->mound->nout(),ibl[0]->nout(),ibl[1]->mound->nout(),ibl[1]->nout());
+
+    f0=new frame(ibl[0],ibl[1],pbpfp);
+    buffer=(char*)malloc(160);
+    *buffer='\0';
+    sprintf(tempstr,"\n%s %d: ",ibl[atbat]->nout(),inning);
+    outbuf(pbpfp,tempstr);
+}
+ 
+    void 
+setup(int tm)
+{
+    char tempstr[80];
+	
+    int i;
+    int flag = 1;
+
+    char nm[2][6];
+    strcpy(nm[0],"away\0");
+    strcpy(nm[1],"home\0");
+ 
+    tempstr[0]='\0';
+
+    while (flag) {
+	fprintf(output,"Enter a 3 letter name for %s team:\n",nm[tm]);
+	fgets(tempstr,100,input);
+	if (strlen(tempstr) == 4) {
+	    flag=0;
+	    i = 0;
+	    while (!(flag) && (i < 3)) {
+		if (!(tempstr[i] >= 'A' && tempstr[i] <= 'Z')) {
+		    fprintf(stderr,"Use all caps only\n");
+		    if (input == stdin) flag=1; else exit(0);
+		}
+		i++;
+	    }
+	}
+	else {
+	    fprintf(stderr,"Team name must be 3 letters!\n");
+	    if (input == stdin) flag=1; else exit(0);
+	}
+    }
+    fprintf(cmdfp,"%s",tempstr);
+
+    //if (ibl[tm]) delete(ibl[tm]);
+    ibl[tm] =new team(tempstr);
+    ibl[tm]->make_lineups();
+}
+
+    void 
+outbuf(FILE *fp,char *str,char *punc)
+{
+    char tempstr[160];
+    char *ptr = tempstr;
+    int count=0;
+
+    if (*punc == '\n') {
+	strcat(buffer, punc);
+	fputs(buffer,fp);
+	fputs(str,fp);
+	*buffer=(char)0;
+    }
+    else if (strlen(str)+strlen(buffer) > 75) {
+	strcpy(tempstr, buffer);
+	strcat(tempstr, punc);
+	strcat(tempstr, str);
+
+	strncpy(buffer, tempstr, 65);
+
+	while (count != 65) { count++; ptr++; }
+	while (!(isspace(*ptr)))
+	    buffer[count++] = *(ptr++);
+
+	buffer[count]='\0';
+	ptr++;
+
+	buffer=strcat(buffer,"\n");
+	fputs(buffer,fp);
+
+	strcpy(buffer, ptr);
+    }
+    else {
+	strcat(buffer,punc);
+	strcat(buffer,str);
+    }
+}
+
+    int
+openfile( char *prefix )
+{
+    char filename[MAXPATHLEN];
+    int result;
+
+    strncpy( filename, prefix, MAXPATHLEN - 4 );
+    if ( ( pbpfp=fopen(strcat( filename, ".pbp"), ops) ) == NULL )
+	result++;
+    strncpy( filename, prefix, MAXPATHLEN - 4 );
+    if ( ( stsfp=fopen(strcat( filename, ".sts"), ops) ) == NULL )
+	result++;
+    strncpy( filename, prefix, MAXPATHLEN - 4 );
+    if ( ( cmdfp=fopen(strcat( filename, ".cmd"), ops) ) == NULL )
+	result++;
+
+    return (result);
+}
 
     int
 main(int argc, char *argv[])
@@ -162,256 +393,11 @@ main(int argc, char *argv[])
     play();
     quit();
 
+    free(afile);
+    free(hfile);
+    free(cfile);
+
     fclose(pbpfp);
     fclose(stsfp);
     fclose(cmdfp);
-
 }
-
-void play()
-{
-
-cont = 1;		// obviously we want to execute at least once!
-
-char tempstr[80];
-char cmdfile[MAXPATHLEN];
-strcpy(cmdfile,filename);
-strcat(cmdfile,".cmd");
-
-while (cont) {
-if (DEBUG2) ibl[0]->box_score(stderr); 
-if (DEBUG2) ibl[1]->box_score(stderr); 
-	fclose(cmdfp);
-	fgets(tempstr,100,input);
-	cmdfp=fopen(cmdfile,"a");
-	
-	if (inning > linesize) {
-	   int **temp = build_linescore(inning);
-	   for (int x = 0; x <= 1; x++)
-		for (int y = 0; y < linesize; y++)
-			temp[x][y] = linescore[x][y];
-	   temp[0][linesize] = 0;
-	   temp[1][linesize] = 0;
-	   delete(linescore);
-	   linesize = inning;
-	   linescore = temp;}
-
-//	if (output != stdout) fprintf(stderr,"%s",tempstr);
-	f0=new frame(tempstr);
-
-	if (!(feof(input)) && (strlen(tempstr) > 1) && (tempstr[0] != 'u')
-		&& (f0->decode()))
-	   fprintf(cmdfp,"%s",tempstr);
-
-	if (!(f0->update())) {
-		tempstr[strlen(tempstr)-1] = '\0';
-		f0->help(tempstr);
-		}
-
-	delete(f0);
-
-//	runners->dump();
-	}
-}
-
-void quit()
-{
-int x, y;
-int val;
-
-y = 16 + (3 * inning);
-
-
-fprintf(stsfp,"    ");
-for (x = 1; x <= inning; x++)
-    fprintf(stsfp,"%3d",x);
-fprintf(stsfp,"     R  H  E\n");
-
-for (x = 1; x <= y; x++)
-    fprintf(stsfp,"-");
-fprintf(stsfp,"\n");
-
-fprintf(stsfp,"%s ",ibl[0]);
-for (x = 0; x < inning; x++)
-    fprintf(stsfp,"%3d",linescore[0][x]);
-fprintf(stsfp,"   %3d%3d%3d",ibl[0]->score,ibl[0]->team_hits(),
-			     ibl[0]->errors);
-fprintf(stsfp,"\n");
-
-fprintf(stsfp,"%s ",ibl[1]);
-for (x = 0; x < inning; x++)
-    fprintf(stsfp,"%3d",linescore[1][x]);
-fprintf(stsfp,"   %3d%3d%3d",ibl[1]->score,ibl[1]->team_hits(),
-			     ibl[1]->errors);
-fprintf(stsfp,"\n");
-
-for (x = 1; x <= y; x++)
-    fprintf(stsfp,"-");
-fprintf(stsfp,"\n");
-for (val=0; val<2; val++) {
-	ibl[val]->box_score(stsfp);
-	fprintf(stsfp,"LOB: %d\n",ibl[val]->lob);
-	fprintf(stsfp,"E: ");
-	ibl[val]->printstat(stsfp,0);
-	fprintf(stsfp,"PB: ");
-	ibl[val]->printstat(stsfp,1);
-	fprintf(stsfp,"GIDP: ");
-	ibl[val]->printstat(stsfp,2);
-	fprintf(stsfp,"SH: ");
-	ibl[val]->printstat(stsfp,3);
-	fprintf(stsfp,"SF: ");
-	ibl[val]->printstat(stsfp,4);
-	fprintf(stsfp,"HBP: ");
-	ibl[val]->printstat(stsfp,5);
-	fprintf(stsfp,"WP: ");
-	ibl[val]->printstat(stsfp,6);
-	fprintf(stsfp,"IBB: ");
-	ibl[val]->printstat(stsfp,7);
-        fprintf(stsfp,"BALK: ");
-        ibl[val]->printstat(stsfp,8);
-	}
-fprintf(stsfp,"\n");
-fprintf(pbpfp,"\n");
-}
-
-int** build_linescore(int inn)
-{
- 
-int **temp;
- 
-temp = (int **) malloc (2 * sizeof(int));
-temp[0] = (int *) malloc (inn * sizeof(int));
-temp[1] = (int *) malloc (inn * sizeof(int));
- 
-return (temp);
-}
-
-void setup()
-{
-
-char tempstr[80];
-	
-linescore = build_linescore(9);
-for (int x = 0; x <= 1; x++)
-   for (int y = 0; y <= 8; y++)
-        linescore[x][y] = 0;
-linesize = 9;
-
-ibl[0]->make_lineups_pit();
-ibl[1]->make_lineups_pit();
-	
-runners = new queue;
-
-fprintf(output,"\nEnter one line description of game conditions.\n");
-fgets(tempstr,100,input);
-fprintf(cmdfp,"%s",tempstr);
-fprintf(pbpfp,"grs version %s\n",VER);
-fprintf(pbpfp,"%s at %s \n",ibl[0]->nout(),ibl[1]->nout());
-fprintf(pbpfp,"%s\n",tempstr);
-fprintf(pbpfp,"Starting pitchers - %s for %s, and %s for %s\n",
-    ibl[0]->mound->nout(),ibl[0]->nout(),ibl[1]->mound->nout(),ibl[1]->nout());
-
-f0=new frame(ibl[0],ibl[1],pbpfp);
-buffer=(char*)malloc(160);
-*buffer='\0';
-sprintf(tempstr,"\n%s %d: ",ibl[atbat]->nout(),inning);
-outbuf(pbpfp,tempstr);
-}
- 
-void setup(int tm)
-{
-
-char tempstr[80];
-	
-int i;
-int flag = 1;
-	
-char nm[2][6];
-strcpy(nm[0],"away\0");
-strcpy(nm[1],"home\0");
- 
-tempstr[0]='\0';
-
-   while (flag) {
-	fprintf(output,"Enter a 3 letter name for %s team:\n",nm[tm]);
-	fgets(tempstr,100,input);
-	if (strlen(tempstr) == 4) {
-	    flag=0;
-	    i = 0;
-	    while (!(flag) && (i < 3)) {
-		 if (!(tempstr[i] >= 'A' && tempstr[i] <= 'Z')) {
-		    fprintf(stderr,"Use all caps only\n");
-		    if (input == stdin) flag=1; else exit(0);}
-		i++;
-	    }
-	}
-	else {
-		fprintf(stderr,"Team name must be 3 letters!\n");
-		if (input == stdin) flag=1; else exit(0);}
-    }
-fprintf(cmdfp,"%s",tempstr);
-
-//if (ibl[tm]) delete(ibl[tm]);
-ibl[tm] =new team(tempstr);
-ibl[tm]->make_lineups();
-
-}
-
-void outbuf(FILE *fp,char *str,char *punc)
-{
-
-char tempstr[160];
-char *ptr = tempstr;
-int count=0;
-
-if (*punc == '\n') {
-        strcat(buffer, punc);
-        fputs(buffer,fp);
-	fputs(str,fp);
-        *buffer=(char)0;
-	}
-else if (strlen(str)+strlen(buffer) > 75) {
-	strcpy(tempstr, buffer);
-	strcat(tempstr, punc);
-	strcat(tempstr, str);
-
-	strncpy(buffer, tempstr, 65);
-
-	while (count != 65) { count++; ptr++; }
-	while (!(isspace(*ptr)))
-	   buffer[count++] = *(ptr++);
-
-	buffer[count]='\0';
-	ptr++;
-
-	buffer=strcat(buffer,"\n");
-	fputs(buffer,fp);
-
-	strcpy(buffer, ptr);
-	}
-else {
-	strcat(buffer,punc);
-	strcat(buffer,str);
-	}
-
-}
-
-    int
-openfile( char *prefix )
-{
-    char filename[MAXPATHLEN];
-    int result;
-
-    strncpy( filename, prefix, MAXPATHLEN - 4 );
-    if ( ( pbpfp=fopen(strcat( filename, ".pbp"), ops) ) == NULL )
-	result++;
-    strncpy( filename, prefix, MAXPATHLEN - 4 );
-    if ( ( stsfp=fopen(strcat( filename, ".sts"), ops) ) == NULL )
-	result++;
-    strncpy( filename, prefix, MAXPATHLEN - 4 );
-    if ( ( cmdfp=fopen(strcat( filename, ".cmd"), ops) ) == NULL )
-	result++;
-
-    return (result);
-}
-

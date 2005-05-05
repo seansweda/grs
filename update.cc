@@ -153,19 +153,27 @@ else if (!(strcmp(event,"un")))
 		openfile(filename);
 		output = fopen("/dev/null","w");
 		input = undofp;
-//fprintf(stderr,"setting up: ");
+#ifdef DEBUG
+    fprintf(stderr,"setting up: ");
+#endif
 		setup(0);
-//fprintf(stderr,"1 ");
+#ifdef DEBUG
+    fprintf(stderr,"1 ");
+#endif
 		setup(1);
-//fprintf(stderr,"2 ");
+#ifdef DEBUG
+    fprintf(stderr,"2 ");
+#endif
 		setup();
-//fprintf(stderr,"\nreloading\n");
+#ifdef DEBUG
+    fprintf(stderr,"\nreloading\n");
+#endif
 		play();
 		output = stdout;
 		input = stdin;
 		undo=0;
 		cont=1;
-		return 1;}
+		return 2;}
 	} 
 else if (!(strcmp(event,"en"))) 
 	{
