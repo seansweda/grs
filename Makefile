@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = -g -Wall -Wextra -Wconversion
-LDFLAGS = 
+CFLAGS = -g -Wall -Wextra -Wconversion #-DDEBUG
+LDFLAGS =
 
 all: grs
 
