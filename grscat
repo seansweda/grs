@@ -1,0 +1,22 @@
+#!/bin/sh
+
+game=1
+
+if [ $# -ne 1 ]; then
+	echo "usage: $0 <prefix>"
+	exit 1
+fi
+
+if [ -f $1 ]; then
+	echo "$1 exists"
+	exit 1
+fi
+
+cat .grscat > $1
+
+while [ -f ${1}-${game}.pbp -a -f ${1}-${game}.sts ]; do
+	echo "Game $game" >> $1
+	cat -s ${1}-${game}.pbp ${1}-${game}.sts >> $1
+	game=`expr $game + 1`
+done
+
