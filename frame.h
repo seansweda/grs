@@ -19,7 +19,7 @@ private :
 	char event[3];
 	char location[20];
 	char baserunning[20];
-	char comment[80];
+	char comment[MAX_INPUT];
 
 	team *bat,*pit;		// Dynamic batting/pitching team vars
 	int runadv();		// Advances runners . . .
@@ -30,7 +30,7 @@ private :
 	void runcat(int);	// Does default baserunner advances
 	int three();		// Checks for three operands
 
-	char error[80];		// Error string
+	char error[MAX_INPUT];		// Error string
 
 	void batterup();	// brings the next batter up 
 
@@ -47,8 +47,11 @@ public :
 	void frameput(void);		// Outpus info useful to user
 	void who_stat(int);
 
-//	~frame() {if (output != stdout) fprintf(stderr,"%s %s %s\n",
-//			event,location,baserunning);}
+#ifdef DEBUG
+	~frame() { 
+	    fprintf(stderr,"~frame: %s %s %s\n", event,location,baserunning);
+	}
+#endif
 };
 
 #endif

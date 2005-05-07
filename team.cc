@@ -6,13 +6,13 @@
 
 team::team()
 {
-char str[80];
+char str[MAX_INPUT];
 int flag=1;
 int i; 
 
    while (flag) {
 	fprintf(output,"\nEnter the three letter team name:");
-	fgets(str,100,input);
+	fgets(str,MAX_INPUT,input);
 	if (strlen(str) == 3) {
  	    flag=0; 
 	    for (i=0; i< 3; i++) {
@@ -76,7 +76,7 @@ int j = 0;
 
 pl_list *oldpl = lineup;
 char pos[3];
-char comment[80];
+char comment[MAX_INPUT];
 
 char tempstr[512];
 char *ptr = tempstr;
@@ -84,7 +84,7 @@ char *ptr = tempstr;
 while (oldpl->next && oldpl->next->ord <= i) oldpl = oldpl->next;
 
 fprintf(output,"Enter new position for %d - ",i);
-fgets(tempstr,100,input);
+fgets(tempstr,MAX_INPUT,input);
 while (*ptr != '\n') pos[j++]=*ptr++; 
 pos[j]='\0';
 fprintf(cmdfp,"%d\n",i);
@@ -105,7 +105,7 @@ char* team::insert(int i, char *def, char *tempstr)
     char name[20];
     char mlb[4];
     char pos[3];
-    char comment[80];
+    char comment[MAX_INPUT];
     char str[512];
     
     newpl=(struct pl_list *)malloc(sizeof (struct pl_list));
@@ -119,7 +119,7 @@ char* team::insert(int i, char *def, char *tempstr)
     	while (flag) {
 		fprintf(output,"Player, MLB team & Position for %d - ",i);
 		flag=0;
-		fgets(str,100,input);
+		fgets(str,MAX_INPUT,input);
 		if (strcmp(def,"ph"))	
 		   fprintf(cmdfp,"%d\n",i);
 		fprintf(cmdfp,"%s",str);
@@ -206,7 +206,7 @@ int team::make_lineups()
 	while (flag) {
 	    fprintf(output,"Player, MLB team & Position for %d - ",i);
 	    flag=0;
-	    fgets(str,100,input);
+	    fgets(str,MAX_INPUT,input);
 	    fprintf(cmdfp,"%s",str);
 	    tempstr=str;
 	    j=0;
@@ -246,7 +246,7 @@ int team::make_lineups_pit()
     while (flag) {
 	fprintf(output,"Starting pitcher for %s, MLB team & Throws - ",ibl);
 	flag=0;
-	fgets(str,100,input);
+	fgets(str,MAX_INPUT,input);
 	fprintf(cmdfp,"%s",str);
 	tempstr=str;
 	j=0;
@@ -377,7 +377,7 @@ int team::new_pit()
     while (flag) {
 	fprintf(output,"Relief Pitcher, MLB team & Throws - ");
 	flag=0;
-	fgets(str,100,input);
+	fgets(str,MAX_INPUT,input);
 	fprintf(cmdfp,"%s",str);
 	j=0;
 	while ((name[j]=*tempstr++) != ' ' && j++ < 20) ;
@@ -559,12 +559,12 @@ void team::decisions()
 {
 
 struct pit_list *curr = pitchers;
-char wls[100];
+char wls[MAX_INPUT];
 
 fprintf(output,"\nEnter W/L/S for appropriate %s pitcher.  <CR> if none.\n",ibl);
 while (curr) {
 	fprintf(output,"%s :",curr->head->nout());
-	fgets(wls,80,input);
+	fgets(wls,MAX_INPUT,input);
 	fprintf(cmdfp,"%s",wls);
 	switch (*wls) {
 		case 'w' :
@@ -584,7 +584,7 @@ void team::unearned(int inning)
 {
 int numout=0;
 int ur=0;
-char urstr[100];
+char urstr[MAX_INPUT];
 
 struct pit_list *curr = pitchers;
 
@@ -593,13 +593,13 @@ while (curr)
       if (curr->head->out + numout >= (inning-1)*3)
               {
               fprintf(output,"Enter unearned runs for %s ",curr->head->nout());
-              fgets(urstr,80,input);
+              fgets(urstr,MAX_INPUT,input);
 	      fprintf(cmdfp,"%s",urstr);
               ur=atoi(urstr);
 	      while (ur < 0 || ur > curr->head->er) {
                 fprintf(stderr,"Invalid unearned runs total.\n");
               	fprintf(output,"Enter unearned runs for %s ",curr->head->nout());
-              	fgets(urstr,80,input);
+              	fgets(urstr,MAX_INPUT,input);
 	      	fprintf(cmdfp,"%s",urstr);
               	ur=atoi(urstr);
 	      }

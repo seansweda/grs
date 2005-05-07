@@ -1,5 +1,5 @@
 // extern.h
-#include <sys/param.h>
+#include "limits.h"
 
 #ifndef __EXTERN_H
 #define __EXTERN_H
@@ -8,9 +8,9 @@
 
 extern FILE *stsfp,*pbpfp,*undofp,*cmdfp,*output,*input;
 
-extern char filename[MAXPATHLEN];
+extern char filename[PATH_MAX];
 
-extern char* buffer;
+extern char *buffer;
 
 extern team *ibl[2];
 extern queue *runners;

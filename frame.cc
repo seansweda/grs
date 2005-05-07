@@ -114,7 +114,7 @@ void frame::runstats(int fc)
 {
 int i,j;
 char *(b[4]);
-char tempstr[80];
+char tempstr[MAX_INPUT];
 char *str;
 
 pitcher *run_charged_to;
@@ -422,16 +422,16 @@ void frame::who_stat(int stat)
 
 void frame::cleanup()
 {
+	delete(runners);
+
 	delete(ibl[0]);
 	ibl[0] = 0;
 	delete(ibl[1]);
 	ibl[1] = 0;
-	delete(runners);
 
 	free(linescore[0]);
 	free(linescore[1]);
 	free(linescore);
-
 	free(buffer);
 }
 

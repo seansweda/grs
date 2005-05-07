@@ -6,7 +6,7 @@
 int frame::update()
 {
 int i,j;
-char tempstr[80];
+char tempstr[MAX_INPUT];
 char spc;
 
 if (location[0] == '\0')
@@ -36,7 +36,7 @@ if (!(strcmp(event,"ph")))
 /*	ibl[atbat]->print_lineup();
 	while (location[0] < '0' || location[0] > '9')  {
 		fprintf(output,"Enter batting order of player to be replaced:");
-		fgets(location,100,input);
+		fgets(location,MAX_INPUT,input);
 		fprintf(output,"\n");
 		} */
 	strcpy(comment,
@@ -56,7 +56,7 @@ else if (!(strcmp(event,"pr")))
 	ibl[atbat]->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
 		fprintf(output,"Enter batting order of player to be replaced:");
-		fgets(location,100,input);
+		fgets(location,MAX_INPUT,input);
 		fprintf(output,"\n");
 		}
 	for (i=1; i<4; i++) {
@@ -96,7 +96,7 @@ else if (!(strcmp(event,"dr")) || !(strcmp(event,"dc")))
 	pit->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
 		fprintf(output,"Enter batting order of player:");
-		fgets(location,100,input);
+		fgets(location,MAX_INPUT,input);
 		fprintf(output,"\n");
 		}
 	if (location[0] > '0') {
@@ -226,7 +226,7 @@ else if (!(strcmp(event,"eg")))
 else if (!(strcmp(event,"cm"))) 
 	{
 	fprintf(output,"Input a one line comment\n");
-	fgets(comment,100,input);
+	fgets(comment,MAX_INPUT,input);
 	fprintf(cmdfp,"%s",comment);
 	frameput();
 	comment[strlen(comment)-1] = ' ';
@@ -923,8 +923,8 @@ int frame::backup(char *infile, char *outfile)
 {
 
    int result;
-   char tempstr[80];
-   char nextstr[80];
+   char tempstr[MAX_INPUT];
+   char nextstr[MAX_INPUT];
 
    frame *test;
 
@@ -938,13 +938,13 @@ int frame::backup(char *infile, char *outfile)
        	strcpy(tempstr,filename);
 	strcat(tempstr,infile);
 	cmdfp=fopen(tempstr,"r");
-	fgets(tempstr,80,cmdfp);
-	fgets(nextstr,80,cmdfp);
+	fgets(tempstr,MAX_INPUT,cmdfp);
+	fgets(nextstr,MAX_INPUT,cmdfp);
 	while (!(feof(cmdfp)))
 		{
 		fputs(tempstr,undofp);
 		strcpy(tempstr,nextstr);
-		fgets(nextstr,80,cmdfp);
+		fgets(nextstr,MAX_INPUT,cmdfp);
 		}
 	test=new frame(tempstr);
 	result=test->decode();
