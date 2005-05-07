@@ -1,0 +1,127 @@
+7/25/94
+grs version 2.7.2
+
+This is the latest and greatest grs construction program.
+
+The files are have been tar'd and compressed.
+Use the following commands to extract grs:
+
+uncompress grs.tar.Z
+tar -xvf grs.tar
+
+grs has been successfully compiled with:
+CC (DEC, SGI Indigo)
+gnu's g++ (Sun)
+(I will add to this list if you send me a message)
+
+Make sure to edit the makefile accordingly.
+Then type "make"
+
+VERSION HISTORY
+-----------------------------------------------------------------------
+2.7.2	Fixed several known bugs.  Made pbp output nicer.
+
+2.7.1	Added double steals.  Fixed bug which caused incorrect
+	first batter of the game.
+
+2.7.0	(skipped various incarnations between versions)
+	Undo now universal, and hopefully bug-free.
+
+2.6.4	Fixed more bugs with -f flag.
+
+2.6.3	Added "nj" and "fa" codes.
+
+2.6.2	Bug fixes to 2.6.x, which was never released.  GRS now more
+	flexible in dealing with file input, using -a -h and -f.
+
+2.5.0	Prompts for unearned runs.
+
+2.4.4	bug fix for some stupid mistakes created in v2.4.2
+
+2.4.3	added a couple of event codes (kc, la, lh, fp), fixed W/L/S
+	code so that it is recorded in .cmd file
+
+2.4.2	added default baserunning for events that previously required
+	baserunning to be entered (cs, sb, dp, etc.)
+
+2.4.1	changed a variable name that conflicts with Visual C++
+
+2.4.0	Made GRS adhere to unix rules of flags, operands.  Thus,
+	loading lineups now requires -f filename.  The output
+	file prefix is always the last item.  Now it is again
+	possible to re-direct output (e.g. grs test < oldcmd.cmd),
+	as GRS no longer assumes the output prefix will be
+	operand X.
+
+2.3.0	Fixed stupid bug in v2.2.0, where runner on base by error
+	would not get queued into the runners queue, thus causing
+	the dreaded "segmentation fault".
+	Also, added the -v flag to output the version of grs.
+
+2.2.0   Changed play-by-play output to remove redundancies, after
+	incessant whining by Richard Dunlap (Macon Peaches).  :-)
+
+2.1.2	Fixed bug in "np" which would not output correct MLB team
+	for pitcher inserted by method added in version 2.1.0.
+
+2.1.1	Fixed minor formatting problem with "cm".  Also added and
+	documented some additional event codes: "dp" and "hb".
+
+2.1.0	A "np" command will allow the user to optionally place the
+	pitcher in the batting order.
+
+2.0.3	Lineups may now be read in from an external file, but they
+	must be in the same format as they are written to the .cmd
+	file.
+
+2.0.2	Made redo quieter, by redirecting output to /dev/null.
+
+2.0.1	User now prompted for wins, losses, and saves.
+
+2.0.0	Undo now a "redo" command.  Works better than undo.
+
+1.1.1	Starting pitchers now listed in .pbp file.
+
+1.1.0	Inherited runners now charged to correct pitcher.  
+
+1.0.0 	Undo semi-functional.  Also, the "eg" command works.  
+	LOB now tabulated.
+
+0.90 the extra stats (E, PB, GIDP, etc.) no longer have to be entered
+     manually, grs prints each stat in the following format:
+     STAT: # - players.  example:  E: 2 - Harper, King.
+
+0.88 grs now generates linescores automatically, including team runs
+     hits and errors.
+
+0.87 added a defensive position change command "dc", added multiple
+     position output to the stats
+
+0.86 fixed bug that would not recognize a home run with runners on base
+     unless the user inputted the baserunning manually, also added a
+     default baserunning advance of 1 base that does not put the batter
+     on base
+
+0.85 made locations for all events optional
+
+0.84 fixed bug that advanced all baserunners on a walk
+
+0.83 .cmd file now contains all user input, including comments and
+     player changes
+
+0.8  added default baserunning advances for most events, and eliminated
+     multiple baserunning advances
+
+0.75 added the .cmd file, to record user input and make it easier to
+     debug the program
+
+0.7  changed .pbp output to the format:
+     [player name] [event] [location], [baserunning].
+
+0.6  code from Greg Speegle
+-----------------------------------------------------------------------
+
+Sean Sweda, MCM
+Greg Speegle, TEX
+
+special thanks to Richard "Mr. Typo" Dunlap for beta testing.
