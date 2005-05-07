@@ -1,19 +1,19 @@
 // main.cc
 
+#define VER "3.0.0beta2"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <sys/param.h>
+#include "limits.h"
 #include "pitcher.h"
 #include "player.h"
 #include "team.h"
 #include "frame.h"
 
 // variables used outside of main()
-
-char VER[12] = "3.0.0beta1";
 
 FILE	*pbpfp,		// play-by-play output file
 	*stsfp,		// stats output file
@@ -22,11 +22,10 @@ FILE	*pbpfp,		// play-by-play output file
 
 FILE *output=stdout;	// where to direct output (default = stdout)
 FILE *input=stdin;	// where to read in data
-char *ops= "w+";
 
 frame *f0;		// f0 is the current frame to be decoded
 
-char filename[MAXPATHLEN];	// prefix for all output files
+char filename[PATH_MAX];	// prefix for all output files
 
 char *buffer;		// output buffer
 
@@ -35,7 +34,7 @@ queue *runners;		// queue to handle inherited runners
 player *onbase[4];	// array of pointers to batter & runners
 
 
-int errflag =0;         // error flag; true if an error was committed 
+int errflag  = 0;       // error flag; true if an error was committed 
                         // in the half inning
 
 int undo     = 0, 	// if in the process of undo, set = 1
@@ -48,17 +47,16 @@ int undo     = 0, 	// if in the process of undo, set = 1
 
 int **linescore;	// linescore array;
 
-
-
     void 
 play()
 {
     cont = 1;		// obviously we want to execute at least once!
 
-    char tempstr[80];
+    char tempstr[MAX_INPUT];
 
-    char cmdfile[MAXPATHLEN];
-    strcpy(cmdfile,filename);
+    char cmdfile[PATH_MAX];
+    strncpy(cmdfile, filename, PATH_MAX - 5);
+    cmdfile[PATH_MAX - 4] = '\0';
     strcat(cmdfile,".cmd");
 
     while (cont) {
@@ -69,7 +67,7 @@ play()
 #endif
 #endif
 	fclose(cmdfp);
-	fgets(tempstr,100,input);
+	fgets(tempstr,MAX_INPUT,input);
 	cmdfp=fopen(cmdfile,"a");
 
 	// extra inning, grow the linescore
@@ -81,7 +79,10 @@ play()
 	    linesize = inning;
 	}
 
-	//if (output != stdout) fprintf(stderr,"%s",tempstr);
+#ifdef DEBUG
+	if (output != stdout) fprintf(stderr,"%s",tempstr);
+	runners->dump();
+#endif
 	f0=new frame(tempstr);
 
 	if (!(feof(input)) && (strlen(tempstr) > 1) && (tempstr[0] != 'u')
@@ -110,7 +111,6 @@ quit()
     int val;
 
     y = 16 + (3 * inning);
-
 
     fprintf(stsfp,"    ");
     for (x = 1; x <= inning; x++)
@@ -167,125 +167,142 @@ quit()
     void 
 setup()
 {
+    buffer=(char*) calloc(MAX_INPUT * 2, sizeof(char));
+    *buffer='\0';
+
     linescore = (int **) malloc (2 * sizeof(int));
     linescore[0] = (int *) calloc (linesize, sizeof(int));
     linescore[1] = (int *) calloc (linesize, sizeof(int));
 	
-    char tempstr[80];
+    char tempstr[MAX_INPUT];
 	
     ibl[0]->make_lineups_pit();
     ibl[1]->make_lineups_pit();
 	
     runners = new queue;
 
-    fprintf(output,"\nEnter one line description of game conditions.\n");
-    fgets(tempstr,100,input);
-    fprintf(cmdfp,"%s",tempstr);
-    fprintf(pbpfp,"grs version %s\n",VER);
-    fprintf(pbpfp,"%s at %s \n",ibl[0]->nout(),ibl[1]->nout());
-    fprintf(pbpfp,"%s\n",tempstr);
-    fprintf(pbpfp,"Starting pitchers - %s for %s, and %s for %s\n",
-	ibl[0]->mound->nout(),ibl[0]->nout(),ibl[1]->mound->nout(),ibl[1]->nout());
+    fprintf(output, "\nEnter one line description of game conditions.\n");
+    fgets(tempstr, MAX_INPUT, input);
+    fprintf(cmdfp, "%s", tempstr);
+    fprintf(pbpfp, "grs version %s\n", VER);
+    fprintf(pbpfp, "%s at %s \n", ibl[0]->nout(), ibl[1]->nout());
+    fprintf(pbpfp, "%s\n", tempstr);
+    fprintf(pbpfp, "Starting pitchers - %s for %s, and %s for %s\n",
+	ibl[0]->mound->nout(), ibl[0]->nout(), ibl[1]->mound->nout(),
+	ibl[1]->nout());
 
-    f0=new frame(ibl[0],ibl[1],pbpfp);
-    buffer=(char*)malloc(160);
-    *buffer='\0';
-    sprintf(tempstr,"\n%s %d: ",ibl[atbat]->nout(),inning);
-    outbuf(pbpfp,tempstr);
+    f0 = new frame(ibl[0], ibl[1], pbpfp);
+
+    sprintf(tempstr, "\n%s %d: ", ibl[atbat]->nout(), inning);
+    outbuf(pbpfp, tempstr);
 }
  
     void 
 setup(int tm)
 {
-    char tempstr[80];
+    char tempstr[MAX_INPUT];
 	
     int i;
     int flag = 1;
 
     char nm[2][6];
-    strcpy(nm[0],"away\0");
-    strcpy(nm[1],"home\0");
+    strcpy(nm[0], "away\0");
+    strcpy(nm[1], "home\0");
  
     tempstr[0]='\0';
 
-    while (flag) {
-	fprintf(output,"Enter a 3 letter name for %s team:\n",nm[tm]);
-	fgets(tempstr,100,input);
+    while ( flag ) {
+	fprintf(output, "Enter a 3 letter name for %s team:\n", nm[tm]);
+	fgets(tempstr, MAX_INPUT, input);
 	if (strlen(tempstr) == 4) {
-	    flag=0;
+	    flag = 0;
 	    i = 0;
-	    while (!(flag) && (i < 3)) {
-		if (!(tempstr[i] >= 'A' && tempstr[i] <= 'Z')) {
-		    fprintf(stderr,"Use all caps only\n");
-		    if (input == stdin) flag=1; else exit(0);
+	    while ( !(flag) && (i < 3) ) {
+		if ( !(tempstr[i] >= 'A' && tempstr[i] <= 'Z') ) {
+		    fprintf(stderr, "Use all caps only\n");
+		    if ( input == stdin ) 
+			flag=1; 
+		    else 
+			exit(0);
 		}
 		i++;
 	    }
 	}
 	else {
-	    fprintf(stderr,"Team name must be 3 letters!\n");
-	    if (input == stdin) flag=1; else exit(0);
+	    fprintf(stderr, "Team name must be 3 letters!\n");
+	    if (input == stdin) 
+		flag=1; 
+	    else 
+	    	exit(0);
 	}
     }
-    fprintf(cmdfp,"%s",tempstr);
+    fprintf(cmdfp, "%s", tempstr);
 
-    //if (ibl[tm]) delete(ibl[tm]);
-    ibl[tm] =new team(tempstr);
+    ibl[tm] = new team(tempstr);
     ibl[tm]->make_lineups();
 }
 
     void 
-outbuf(FILE *fp,char *str,char *punc)
+outbuf( FILE *fp, char *str, char *punc )
 {
-    char tempstr[160];
+    int count;
+    char tempstr[MAX_INPUT * 2];
     char *ptr = tempstr;
-    int count=0;
 
-    if (*punc == '\n') {
-	strcat(buffer, punc);
-	fputs(buffer,fp);
-	fputs(str,fp);
-	*buffer=(char)0;
+    if ( *punc == '\n' ) {
+	strncat( buffer, punc, 2 );
+	fputs( buffer, fp );
+	fputs( str, fp );
+	*buffer = (char) 0;
     }
-    else if (strlen(str)+strlen(buffer) > 75) {
-	strcpy(tempstr, buffer);
-	strcat(tempstr, punc);
-	strcat(tempstr, str);
+    else if ( strlen(str) + strlen(buffer) > 75 ) {
+	strncpy(tempstr, buffer, MAX_INPUT);
+	strncat(tempstr, punc, 2);
+	strncat(tempstr, str, MAX_INPUT);
 
-	strncpy(buffer, tempstr, 65);
+	while ( strlen(tempstr) > 75 ) {
+	    count = 0;
+	    strncpy( buffer, tempstr, 65);
 
-	while (count != 65) { count++; ptr++; }
-	while (!(isspace(*ptr)))
-	    buffer[count++] = *(ptr++);
+	    while ( count != 65 ) { 
+		count++; 
+		ptr++; 
+	    }
+	    while ( !(isspace(*ptr)) )
+		buffer[count++] = *(ptr++);
 
-	buffer[count]='\0';
-	ptr++;
+	    buffer[count] = '\0';
+	    ptr++;
 
-	buffer=strcat(buffer,"\n");
-	fputs(buffer,fp);
-
-	strcpy(buffer, ptr);
+	    buffer = strcat( buffer, "\n" );
+	    fputs( buffer, fp );
+	    strncpy( tempstr, ptr, MAX_INPUT * 2 );
+	}
+	strncpy( buffer, tempstr, MAX_INPUT );
     }
     else {
-	strcat(buffer,punc);
-	strcat(buffer,str);
+	strncat( buffer, punc, 2 );
+	strncat( buffer, str, MAX_INPUT );
     }
 }
 
     int
 openfile( char *prefix )
 {
-    char filename[MAXPATHLEN];
-    int result;
+    char filename[PATH_MAX];
+    int result = 0;
 
-    strncpy( filename, prefix, MAXPATHLEN - 4 );
-    if ( ( pbpfp=fopen(strcat( filename, ".pbp"), ops) ) == NULL )
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( ( pbpfp=fopen(strcat( filename, ".pbp"), "w+" ) ) == NULL )
 	result++;
-    strncpy( filename, prefix, MAXPATHLEN - 4 );
-    if ( ( stsfp=fopen(strcat( filename, ".sts"), ops) ) == NULL )
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( ( stsfp=fopen(strcat( filename, ".sts"), "w+" ) ) == NULL )
 	result++;
-    strncpy( filename, prefix, MAXPATHLEN - 4 );
-    if ( ( cmdfp=fopen(strcat( filename, ".cmd"), ops) ) == NULL )
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( ( cmdfp=fopen(strcat( filename, ".cmd"), "w+" ) ) == NULL )
 	result++;
 
     return (result);
@@ -303,14 +320,14 @@ main(int argc, char *argv[])
 
     while ((c = getopt(argc, argv, "a:h:f:v")) != EOF)
     switch (c) {
-	case 'a':	afile = (char *) malloc(sizeof(MAXPATHLEN));
-	    		strncpy( afile, optarg, MAXPATHLEN );
+	case 'a':	afile = (char *) malloc(sizeof(PATH_MAX));
+	    		strncpy( afile, optarg, PATH_MAX );
 			break;
-	case 'h':	hfile = (char *) malloc(sizeof(MAXPATHLEN));	
-	    		strncpy( hfile, optarg, MAXPATHLEN );
+	case 'h':	hfile = (char *) malloc(sizeof(PATH_MAX));	
+	    		strncpy( hfile, optarg, PATH_MAX );
 			break;
-	case 'f':	cfile = (char *) malloc(sizeof(MAXPATHLEN));	
-	    		strncpy( cfile, optarg, MAXPATHLEN );
+	case 'f':	cfile = (char *) malloc(sizeof(PATH_MAX));	
+	    		strncpy( cfile, optarg, PATH_MAX );
 			break;
 	case 'v':	fprintf(stderr,"%s\n",VER);
 			exit(0);
@@ -328,16 +345,17 @@ main(int argc, char *argv[])
 	usage++;
     }
     else {
-	strncpy( filename, argv[optind], MAXPATHLEN - 4 );
+	strncpy( filename, argv[optind], PATH_MAX - 5 );
+	filename[PATH_MAX - 4] = '\0';
 	if ( openfile(filename) ) {
-	    fprintf( stderr, "cannot open %s\n", filename );
+	    fprintf( stderr, "cannot open %s.*\n", filename );
 	    exit(1);
 	}
     }
 
     if ( usage ) {
 	fprintf(stderr,
-	    "Usage: grs [ ([-a afile] [-h hfile]) or ([-f cmdfile]) ] outfile\n");
+	    "Usage: grs [ (-a afile) (-h hfile) | (-f cmdfile) ] outfile\n");
 	exit(1);
     }
 
