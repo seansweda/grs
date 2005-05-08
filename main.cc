@@ -1,6 +1,6 @@
 // main.cc
 
-#define VER "3.0.0beta2"
+#define VER "3.0.0beta3"
 
 #include <stdio.h>
 #include <stdlib.h>

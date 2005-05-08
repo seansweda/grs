@@ -6,13 +6,14 @@
 #include <stdio.h>
 #include <string.h>
 #include "player.h"
+#include "limits.h"
 
 class player {
 private :
-	char name[20];
-	char team[4];
-	char rtn[4];
-	char pos[15];
+	char name[NAMELEN];
+	char team[TEAMLEN];
+	char rtn[TEAMLEN];
+	char pos[POSLEN * 5];
 public :
 	player(char*);
 	player(char*, char*, char*, char*);

@@ -8,12 +8,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "pitcher.h"
+#include "limits.h"
 
 class pitcher {
 private :
-	char name[20];
-	char team[4];
-	char rtn[4];
+	char name[NAMELEN];
+	char team[TEAMLEN];
+	char rtn[TEAMLEN];
 public :
 	pitcher(char*);
 	pitcher(char*, char*, char*, char);

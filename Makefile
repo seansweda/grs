@@ -22,10 +22,10 @@ team.o: team.cc team.h player.h pitcher.h limits.h
 queue.o: queue.cc queue.h pitcher.h
 	$(CC) $(CFLAGS) -c queue.cc
 
-player.o: player.cc player.h 
+player.o: player.cc player.h limits.h
 	$(CC) $(CFLAGS) -c player.cc
 
-pitcher.o: pitcher.cc pitcher.h
+pitcher.o: pitcher.cc pitcher.h limits.h
 	$(CC) $(CFLAGS) -c pitcher.cc
 
 clean: 

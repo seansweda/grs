@@ -52,8 +52,8 @@ public :
 	char *posout(int);	
 	player *next_up();
 	player *up();
-	char* insert(int, char* ="", char* ="");
-	char* pos_change(int);
+	void insert(int, char**, char* ="", char* ="");
+	void pos_change(int, char**);
 	int new_pit();
 	char *nout();
 	int score;

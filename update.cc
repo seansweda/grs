@@ -39,15 +39,17 @@ if (!(strcmp(event,"ph")))
 		fgets(location,MAX_INPUT,input);
 		fprintf(output,"\n");
 		} */
-	strcpy(comment,
-		ibl[atbat]->insert(bat->what_ord(onbase[0]),"ph"));
+
+	ibl[atbat]->insert( bat->what_ord(onbase[0]), &comment, "ph" );
 	onbase[0]=bat->up();
 	runadv();
 	frameput();
         strcat(comment," ");	// from update
         outbuf(pbpfp,comment);  // from update
-//        sprintf(comment,"%s now batting %c for %s.",
-//	     bat->findord(location[0]-'0')->nout(),location[0],bat->nout());
+#ifdef DEBUG
+        fprintf(stderr, "%s now batting %c for %s.",
+	bat->findord(location[0]-'0')->nout(),location[0],bat->nout());
+#endif
 	return 1;}  
 else if (!(strcmp(event,"pr"))) 
 	{
@@ -60,15 +62,17 @@ else if (!(strcmp(event,"pr")))
 		fprintf(output,"\n");
 		}
 	for (i=1; i<4; i++) {
-	   if (onbase[i]==ibl[atbat]->findord(location[0]-'0')){
-		strcpy(comment,ibl[atbat]->insert((int)location[0]-'0',"pr"));
+	    if (onbase[i]==ibl[atbat]->findord(location[0]-'0')){
+		ibl[atbat]->insert( (int)location[0]-'0', &comment, "pr" );
 		onbase[i]=ibl[atbat]->findord(location[0]-'0');
 		runadv();
 		frameput();
         	strcat(comment," ");	// from update
         	outbuf(pbpfp,comment);  // from update
-//      	sprintf(comment,"%s now running on %d for %s.",
-//	 	onbase[i]->nout(),i,bat->nout());
+#ifdef DEBUG
+	      	fprintf(stderr, "%s now running on %d for %s.",
+	 	onbase[i]->nout(),i,bat->nout());
+#endif
 		return 1;  }
 		}
 	return 0;
@@ -78,12 +82,12 @@ else if (!(strcmp(event,"np")))
 	int bats = pit->new_pit();
 //	printf("batting %d",bats);
 	if ((bats < 1) || (bats > 9))
-           sprintf(comment,"%s now pitching for %s. ",
+	    sprintf(comment,"%s now pitching for %s. ",
 			pit->mound->nout(),pit->nout());
 	else {
-	   sprintf(tempstr,"%s %s p",pit->mound->nout(),pit->mound->tout());
-	   strcpy(comment,pit->insert(bats,"",tempstr));}
-
+	    sprintf(tempstr,"%s %s p",pit->mound->nout(),pit->mound->tout());
+	    pit->insert( bats, &comment, "", tempstr );
+	}
 	runadv();
 	frameput();
         strcat(comment," ");	// from update
@@ -101,12 +105,15 @@ else if (!(strcmp(event,"dr")) || !(strcmp(event,"dc")))
 		}
 	if (location[0] > '0') {
 	   if (!(strcmp(event,"dr")))  
-		strcpy(comment,pit->insert(location[0]-'0'));
+		pit->insert( (location[0]-'0'), &comment );
 	   else
-		strcpy(comment,pit->pos_change(location[0]-'0'));}
+		pit->pos_change( (location[0]-'0'), &comment );
+	    }
 	runadv();
-//        sprintf(comment,"%s now batting %c for %s.",
-//	     pit->findord(location[0]-'0')->nout(),location[0],pit->nout());
+#ifdef DEBUG
+        fprintf(stderr, "%s now batting %c for %s.",
+	pit->findord(location[0]-'0')->nout(),location[0],pit->nout());
+#endif
 	frameput();
         strcat(comment," ");	// from update
         outbuf(pbpfp,comment);  // from update

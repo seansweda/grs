@@ -32,6 +32,7 @@ cont=1;
 frame::frame(char *str)
 {
 
+   comment = (char*) calloc(MAX_INPUT, sizeof(char));
    error[0] = '\0';
    char *temp;
    temp = str;

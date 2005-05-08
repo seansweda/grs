@@ -20,7 +20,7 @@ private :
 	char event[3];
 	char location[20];
 	char baserunning[20];
-	char comment[MAX_INPUT];
+	char *comment;
 
 	team *bat,*pit;		// Dynamic batting/pitching team vars
 	int runadv();		// Advances runners . . .
