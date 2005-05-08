@@ -4,60 +4,59 @@
 
 // Constructor which initializes the static fields
 
-frame::frame(team *away,team *home, FILE *fp)
+frame::frame(team *away, team *home, FILE *fp)
 {
-errflag=0;
-error[0] = '\0';
+    errflag=0;
+    error[0] = '\0';
 
-bat=away;
-pit=home;
+    bat=away;
+    pit=home;
 
-atbat=0;
-inning=1;
-outs=0;
-runs=0;
-pbpfp=fp;
-event[0]='&';
+    atbat=0;
+    inning=1;
+    outs=0;
+    runs=0;
+    pbpfp=fp;
+    event[0]='&';
 
-int i;
-for (i=0; i<4; i++) onbase[i]=NULL;
-onbase[0]=ibl[atbat]->up();
+    for ( int i=0; i<4; i++ ) 
+	onbase[i]=NULL;
+    onbase[0]=ibl[atbat]->up();
 
-frameput();
-cont=1;
+    frameput();
+    cont=1;
 }
 
 // Constructor call in all other cases
 
 frame::frame(char *str)
 {
+    comment = (char*) calloc(MAX_INPUT, sizeof(char));
+    error[0] = '\0';
+    char *temp;
+    temp = str;
+    int i = 0;
 
-   comment = (char*) calloc(MAX_INPUT, sizeof(char));
-   error[0] = '\0';
-   char *temp;
-   temp = str;
-   int i = 0;
+    while (*temp == ' ') temp++;
+    while (*temp != ' ' && *temp != '\n' && i < CMDLEN )
+	event[i++] = *temp++;
+    event[i] = '\0';
 
-   while (*temp == ' ') temp++;
-   while (*temp != ' ' && *temp != '\n' && i < 3)
-      event[i++] = *temp++;
-   event[i] = '\0';
+    i = 0;
+    while (*temp == ' ') temp++;
+    while (*temp != ' ' && *temp != '\n' && *temp && i < LOCLEN )
+	location[i++] = *temp++;
+    location[i] = '\0';
 
-   i = 0;
-   while (*temp == ' ') temp++;
-   while (*temp != ' ' && *temp != '\n' && *temp && i < 20)
-      location[i++] = *temp++;
-   location[i] = '\0';
+    i = 0;
+    while (*temp == ' ') temp++;
+    while (*temp != ' ' && *temp != '\n' && *temp && i < BRUNLEN )
+	baserunning[i++] = *temp++;
+    baserunning[i] = '\0';
 
-   i = 0;
-   while (*temp == ' ') temp++;
-   while (*temp != ' ' && *temp != '\n' && *temp && i < 20)
-      baserunning[i++] = *temp++;
-   baserunning[i] = '\0';
-
-   cont=1;
-   bat=ibl[atbat];
-   pit=ibl[(atbat+1)%2];
+    cont=1;
+    bat=ibl[atbat];
+    pit=ibl[(atbat+1)%2];
 }
 
 int frame::runadv()
@@ -234,7 +233,7 @@ int flag=1, done[4];
 for (int j=0;j<=3;j++)
    done[j]=0;
 
-char temp[20];
+char temp[NAMELEN];
 
 temptr=temp;
 *temptr = '\0';
@@ -325,7 +324,7 @@ void frame::runcat(int adv)
 {
 int test = 0;
 int i;
-char temp[20];
+char temp[NAMELEN];
 char *temptr;
 
 temptr=temp;

@@ -1,6 +1,6 @@
 // main.cc
 
-#define VER "3.0.0beta3"
+#define VER "3.0.0beta4"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -254,16 +254,16 @@ outbuf( FILE *fp, char *str, char *punc )
 	fputs( str, fp );
 	*buffer = (char) 0;
     }
-    else if ( strlen(str) + strlen(buffer) > 75 ) {
+    else if ( strlen(str) + strlen(buffer) > LINEWIDTH ) {
 	strncpy(tempstr, buffer, MAX_INPUT);
 	strncat(tempstr, punc, 2);
 	strncat(tempstr, str, MAX_INPUT);
 
-	while ( strlen(tempstr) > 75 ) {
+	while ( strlen(tempstr) > LINEWIDTH ) {
 	    count = 0;
-	    strncpy( buffer, tempstr, 65);
+	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
 
-	    while ( count != 65 ) { 
+	    while ( count != (LINEWIDTH - 10) ) { 
 		count++; 
 		ptr++; 
 	    }

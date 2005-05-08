@@ -29,13 +29,13 @@ struct pit_list {
 // Linked list of names
 struct stat_list {
 	int ord;
-	char name[80];
+	char name[NAMELEN];
 	stat_list *next;
 	};
 
 class team {
 private :
-	char ibl[4];
+	char ibl[TEAMLEN];
 	struct pl_list *lineup;			// ptr to linked list
 	struct pl_list *current;		// ptr to current batter
 	struct pit_list *pitchers;		// ptr to linked list

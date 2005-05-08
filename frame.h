@@ -17,9 +17,9 @@
 class frame {
 private :
 
-	char event[3];
-	char location[20];
-	char baserunning[20];
+	char event[CMDLEN];
+	char location[LOCLEN];
+	char baserunning[BRUNLEN];
 	char *comment;
 
 	team *bat,*pit;		// Dynamic batting/pitching team vars
@@ -48,11 +48,14 @@ public :
 	void frameput(void);		// Outpus info useful to user
 	void who_stat(int);
 
-#ifdef DEBUG
 	~frame() { 
+	    if (comment) {
+		free(comment);
+	    }
+#ifdef DEBUG
 	    fprintf(stderr,"~frame: %s %s %s\n", event,location,baserunning);
-	}
 #endif
+	}
 };
 
 #endif
