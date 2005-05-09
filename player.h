@@ -13,7 +13,7 @@ private :
 	char name[NAMELEN];
 	char team[TEAMLEN];
 	char rtn[TEAMLEN];
-	char pos[POSLEN * 5];
+	char pos[POSLEN * 9];
 public :
 	player(char*);
 	player(char*, char*, char*, char*);
@@ -38,7 +38,12 @@ public :
 	char *pout();
 	void pa(char);
 	void new_pos(char*);
-//	~player() {fprintf(stderr,"deleted %s\n",this->nout());}
+	~player() {
+#ifdef DEBUG
+	    fprintf(stderr,"deleted %s\n",this->nout());
+#endif
+	}
+
 };
 
 #endif

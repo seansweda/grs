@@ -3,84 +3,80 @@
 #include "frame.h"
 #include "queue.h"
 
-int frame::update()
+    int 
+frame::update()
 {
-int i,j;
-char tempstr[MAX_INPUT];
-char spc;
+    int i,j;
+    char tempstr[MAX_INPUT];
+    char spc;
 
-if (location[0] == '\0')
+    if (location[0] == '\0')
         spc = '\0';
-else
+    else
         spc = ' ';
  
+#ifdef DEBUG
+    fprintf( stderr, "ev=%s lc=%s br=%s\n",event,location,baserunning);
+#endif
 
-// printf("ev=%s lc=%s br=%s\n",event,location,baserunning);
-
-if ((input != stdin) && feof(input))
-	{
+    if ((input != stdin) && feof(input)) {
 	cont = 0;
 	output = stdout;
 	frameput();
 	return 1;
-	}
+    }
 
-if (event[0] == '\0') {
+    if (event[0] == '\0') {
 	frameput();
-	return 1;} 			// No event to decode, ignore.
+	return 1; 			// No event to decode, ignore.
+    }
 
-if (!(strcmp(event,"ph")))
-	{
+    if (!(strcmp(event,"ph"))) {
 	location[0]='\0';
 	baserunning[0]='\0';
-/*	ibl[atbat]->print_lineup();
-	while (location[0] < '0' || location[0] > '9')  {
-		fprintf(output,"Enter batting order of player to be replaced:");
-		fgets(location,MAX_INPUT,input);
-		fprintf(output,"\n");
-		} */
-
 	ibl[atbat]->insert( bat->what_ord(onbase[0]), &comment, "ph" );
 	onbase[0]=bat->up();
 	runadv();
 	frameput();
-        strcat(comment," ");	// from update
-        outbuf(pbpfp,comment);  // from update
+        strcat(comment," ");
+        outbuf(pbpfp,comment);
 #ifdef DEBUG
         fprintf(stderr, "%s now batting %c for %s.",
 	bat->findord(location[0]-'0')->nout(),location[0],bat->nout());
 #endif
-	return 1;}  
-else if (!(strcmp(event,"pr"))) 
-	{
+	return 1;  
+    }
+    else if (!(strcmp(event,"pr"))) {
 	location[0]='\0';
 	baserunning[0]='\0';
 	ibl[atbat]->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
-		fprintf(output,"Enter batting order of player to be replaced:");
-		fgets(location,MAX_INPUT,input);
-		fprintf(output,"\n");
-		}
+	    fprintf(output,"Enter batting order of player to be replaced:");
+	    fgets(location,MAX_INPUT,input);
+	    fprintf(output,"\n");
+	}
 	for (i=1; i<4; i++) {
-	    if (onbase[i]==ibl[atbat]->findord(location[0]-'0')){
+	    if (onbase[i]==ibl[atbat]->findord(location[0]-'0')) {
 		ibl[atbat]->insert( (int)location[0]-'0', &comment, "pr" );
 		onbase[i]=ibl[atbat]->findord(location[0]-'0');
 		runadv();
 		frameput();
-        	strcat(comment," ");	// from update
-        	outbuf(pbpfp,comment);  // from update
+        	strcat(comment," ");
+        	outbuf(pbpfp,comment);
 #ifdef DEBUG
 	      	fprintf(stderr, "%s now running on %d for %s.",
 	 	onbase[i]->nout(),i,bat->nout());
 #endif
-		return 1;  }
-		}
+		return 1;
+	    }
+	}	
 	return 0;
-	}
-else if (!(strcmp(event,"np"))) 
-	{
+    }
+    else if (!(strcmp(event,"np"))) {
 	int bats = pit->new_pit();
-//	printf("batting %d",bats);
+#ifdef DEBUG
+	printf("batting %d",bats);
+#endif
 	if ((bats < 1) || (bats > 9))
 	    sprintf(comment,"%s now pitching for %s. ",
 			pit->mound->nout(),pit->nout());
@@ -90,23 +86,23 @@ else if (!(strcmp(event,"np")))
 	}
 	runadv();
 	frameput();
-        strcat(comment," ");	// from update
-        outbuf(pbpfp,comment);  // from update
-	return 1;} 
-else if (!(strcmp(event,"dr")) || !(strcmp(event,"dc"))) 
-	{
+        strcat(comment," ");
+        outbuf(pbpfp,comment);
+	return 1; 
+    }
+    else if (!(strcmp(event,"dr")) || !(strcmp(event,"dc"))) {
 	location[0]='\0';
 	baserunning[0]='\0';
 	pit->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
-		fprintf(output,"Enter batting order of player:");
-		fgets(location,MAX_INPUT,input);
-		fprintf(output,"\n");
-		}
+	    fprintf(output,"Enter batting order of player:");
+	    fgets(location,MAX_INPUT,input);
+	    fprintf(output,"\n");
+	}	
 	if (location[0] > '0') {
-	   if (!(strcmp(event,"dr")))  
+	    if (!(strcmp(event,"dr")))  
 		pit->insert( (location[0]-'0'), &comment );
-	   else
+	    else
 		pit->pos_change( (location[0]-'0'), &comment );
 	    }
 	runadv();
@@ -115,75 +111,75 @@ else if (!(strcmp(event,"dr")) || !(strcmp(event,"dc")))
 	pit->findord(location[0]-'0')->nout(),location[0],pit->nout());
 #endif
 	frameput();
-        strcat(comment," ");	// from update
-        outbuf(pbpfp,comment);  // from update
-	return 1;} 
-else if (!(strcmp(event,"la")))
-	{
+        strcat(comment," ");
+        outbuf(pbpfp,comment);
+	return 1;
+    }
+    else if (!(strcmp(event,"la"))) {
 	ibl[0]->print_lineup();
 	frameput();
-	return 1;}
-else if (!(strcmp(event,"lh")))
-        {
+	return 1;
+    }
+    else if (!(strcmp(event,"lh"))) {
         ibl[1]->print_lineup();
 	frameput();
-        return 1;}
-else if (!(strcmp(event,"un"))) 
-	{
-
+        return 1;
+    }
+    else if (!(strcmp(event,"un"))) {
 	char in_ext[5], out_ext[5];
 	int times = 1;
 
 	if (undo) {cont=0;return 1;} else {
-		undo=1;
-		fclose(pbpfp);
-		fclose(stsfp);
-		fclose(cmdfp);
+	    undo=1;
+	    fclose(pbpfp);
+	    fclose(stsfp);
+	    fclose(cmdfp);
 
-		cleanup();
+	    cleanup();
 
-		sprintf(in_ext,".cmd");
-		sprintf(out_ext,".un%d",times);
+	    sprintf(in_ext,".cmd");
+	    sprintf(out_ext,".un%d",times);
 
-		while (!(backup(in_ext,out_ext))) {
-			strcpy(in_ext,out_ext);
-			sprintf(out_ext,".un%d",++times);
-			fclose (cmdfp);
-			fclose (undofp);}
+	    while (!(backup(in_ext,out_ext))) {
+		strcpy(in_ext,out_ext);
+		sprintf(out_ext,".un%d",++times);
+		fclose (cmdfp);
+		fclose (undofp);
+	    }
 
-		fputs("un",undofp);
-		fclose(undofp);
-		fclose(cmdfp);
-        	strcpy(tempstr,filename);
-		strcat(tempstr,out_ext);
-        	undofp=fopen(tempstr,"r");
-		openfile(filename);
-		output = fopen("/dev/null","w");
-		input = undofp;
+	    fputs("un",undofp);
+	    fclose(undofp);
+	    fclose(cmdfp);
+	    strcpy(tempstr,filename);
+	    strcat(tempstr,out_ext);
+	    undofp=fopen(tempstr,"r");
+	    openfile(filename);
+	    output = fopen("/dev/null","w");
+	    input = undofp;
 #ifdef DEBUG
-    fprintf(stderr,"setting up: ");
+	    fprintf(stderr,"setting up: ");
 #endif
-		setup(0);
+	    setup(0);
 #ifdef DEBUG
-    fprintf(stderr,"1 ");
+	    fprintf(stderr,"1 ");
 #endif
-		setup(1);
+	    setup(1);
 #ifdef DEBUG
-    fprintf(stderr,"2 ");
+	    fprintf(stderr,"2 ");
 #endif
-		setup();
+	    setup();
 #ifdef DEBUG
-    fprintf(stderr,"\nreloading\n");
+	    fprintf(stderr,"\nreloading\n");
 #endif
-		play();
-		output = stdout;
-		input = stdin;
-		undo=0;
-		cont=1;
-		return 2;}
-	} 
-else if (!(strcmp(event,"en"))) 
-	{
+	    play();
+	    output = stdout;
+	    input = stdin;
+	    undo=0;
+	    cont=1;
+	    return 2;
+	}
+    }
+    else if (!(strcmp(event,"en"))) {
 	if (errflag && runs) pit->unearned(inning);
 
 	sprintf(tempstr,"%s %d %s %d\n",ibl[0]->nout(),ibl[0]->score,
@@ -210,9 +206,9 @@ else if (!(strcmp(event,"en")))
 //	runadv();
 	onbase[0]=bat->up();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"eg"))) 
-	{
+	return 1; 
+    }
+    else if (!(strcmp(event,"eg"))) {
 	cont=0;
 	if (errflag && runs) pit->unearned(inning);
 
@@ -220,7 +216,7 @@ else if (!(strcmp(event,"eg")))
                                         ibl[1]->nout(),ibl[1]->score);
         outbuf(pbpfp,tempstr,"\n");
         outbuf(pbpfp,"","\n");
-	outbuf(pbpfp," ");	// from update
+	outbuf(pbpfp," ");
 
 	linescore[atbat][inning-1] = runs;
 	for (i=1; i<4; i++)
@@ -229,22 +225,20 @@ else if (!(strcmp(event,"eg")))
 	ibl[0]->decisions();
 	ibl[1]->decisions();
 
-	return 1;} 
-else if (!(strcmp(event,"cm"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"cm"))) {
 	fprintf(output,"Input a one line comment\n");
 	fgets(comment,MAX_INPUT,input);
 	fprintf(cmdfp,"%s",comment);
 	frameput();
 	comment[strlen(comment)-1] = ' ';
-//        strcat(comment," ");	// from update
-        outbuf(pbpfp,comment);  // from update
-	return 1;} 
-else if (!(strcmp(event,"so"))) 
-	{
+        outbuf(pbpfp,comment);
+	return 1;
+    }
+    else if (!(strcmp(event,"so"))) {
 	runcat(0);
 	if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s K%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
@@ -252,16 +246,14 @@ else if (!(strcmp(event,"so")))
         onbase[0]->k++;
         onbase[0]->ab++;
         onbase[0]->pa(pit->mound->throws);
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"kd"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"kd"))) {
 	runcat(1);
 	if (!(runchck(baserunning))) return 0;
-// all from update 
 	sprintf(tempstr,"%s dropped K%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats(2);
@@ -269,16 +261,14 @@ else if (!(strcmp(event,"kd")))
         onbase[0]->k++;
         onbase[0]->ab++;
         onbase[0]->pa(pit->mound->throws);
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"bb"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"bb"))) {
 	runcat(-1);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s BB",onbase[0]->nout());
         outbuf(pbpfp,tempstr);
         runstats();
@@ -286,16 +276,14 @@ else if (!(strcmp(event,"bb")))
         onbase[0]->bb++;
         onbase[0]->pa(pit->mound->throws);
         rbi();
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"iw"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"iw"))) {
         runcat(-1);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s IBB",onbase[0]->nout());
         outbuf(pbpfp,tempstr);
         runstats();
@@ -304,142 +292,125 @@ else if (!(strcmp(event,"iw")))
         onbase[0]->bb++;
         onbase[0]->pa(pit->mound->throws);
         rbi();
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"ci"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"ci"))) {
         runcat(1);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s CI",onbase[0]->nout());
         outbuf(pbpfp,tempstr);
         runstats(2);
         pit->errors++;
         pit->newstat(pit->posout(2),0);
         onbase[0]->pa(pit->mound->throws);
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"hp")) || !(strcmp(event,"hb"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"hp")) || !(strcmp(event,"hb"))) {
         runcat(-1);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s HBP",onbase[0]->nout());
         outbuf(pbpfp,tempstr);
         runstats();
         bat->newstat(onbase[0]->nout(),5);
         onbase[0]->pa(pit->mound->throws);
         rbi();
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"wp"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"wp"))) {
 	runcat(-2);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"WP");
         outbuf(pbpfp,tempstr);
         runstats();
         pit->newstat(pit->mound->nout(),6);
-// until here
 	runadv();
 	frameput();
-	return 1;}
-else if (!(strcmp(event,"pb")))
-        {
+	return 1;
+    }
+    else if (!(strcmp(event,"pb"))) {
         runcat(-2);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"PB");
         outbuf(pbpfp,tempstr);
         runstats();
-// until here
         runadv();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"bk"))) 
-	{
+        return 1;
+    }
+    else if (!(strcmp(event,"bk"))) {
 	runcat(-2);
 	if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"Balk");
         outbuf(pbpfp,tempstr);
         runstats();
         pit->newstat(pit->mound->nout(),8);
-// until here
 	runadv();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"sb"))) 
-	{
-//	if (!(three())) return 0;
+	return 1;
+    }
+    else if (!(strcmp(event,"sb"))) {
+	// if (!(three())) return 0;
 	if (!(*baserunning))
-	   runcat(-4);
+	    runcat(-4);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"SB");
         outbuf(pbpfp,tempstr);
         runstats();
         onbase[baserunning[0]-'0']->sb++;
-// Double steal check
+
+	// Double steal check
 	if (strlen(baserunning) > 2)
-	   if (((i=baserunning[2]-'0') > 0) && (i < 4)) 
+	    if (((i=baserunning[2]-'0') > 0) && (i < 4)) 
 		onbase[i]->sb++;
-// Triple steal check
+	// Triple steal check
 	if (strlen(baserunning) > 4)
-	   if (((j=baserunning[4]-'0') > 0) && (j < 4)) 
+	    if (((j=baserunning[4]-'0') > 0) && (j < 4)) 
 		onbase[j]->sb++;
-// until here
 	runadv();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"th"))) 
-	{
-//	if (!(three())) return 0;
+	return 1;
+    }
+    else if (!(strcmp(event,"th"))) {
+	// if (!(three())) return 0;
 	if (!(*baserunning))
-	   runcat(-2);
+	    runcat(-2);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"On throw");
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
-// until here
 	runadv();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"cs"))) 
-	{
-//	if (!(three())) return 0;
+	return 1;
+    }
+    else if (!(strcmp(event,"cs"))) {
+	// if (!(three())) return 0;
 	if (!(*baserunning))
-	   runcat(-3);
+	    runcat(-3);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"CS%c%s",spc,location);
         outbuf(pbpfp,tempstr);
         if (!(runners->queue_empty())) runners->dequeue();
         runstats();
         onbase[baserunning[0]-'0']->cs++;
-// until here
 	runadv();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"kc")))
-        {
+	return 1;
+    }
+    else if (!(strcmp(event,"kc"))) {
         if (!(*baserunning))
-           runcat(-3);
+	    runcat(-3);
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s K, CS%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
@@ -449,18 +420,16 @@ else if (!(strcmp(event,"kc")))
         onbase[0]->k++;
         onbase[0]->ab++;
         onbase[0]->pa(pit->mound->throws);
-// until here
         runadv();
         batterup();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"ks"))) 
-	{
+        return 1;
+    }
+    else if (!(strcmp(event,"ks"))) {
 	if (!(*baserunning))
-	   runcat(-4);
+	    runcat(-4);
 	if (!(runchck(baserunning))) return 0;
 	runcat(0);
-// all from update 
         sprintf(tempstr,"%s K, SB%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
@@ -469,52 +438,47 @@ else if (!(strcmp(event,"ks")))
         onbase[0]->ab++;
         onbase[0]->pa(pit->mound->throws);
         onbase[baserunning[0]-'0']->sb++;
-// Double steal check
-	{int i;
-	if (((i=baserunning[2]-'0') > 0) && (i < 4)) onbase[i]->sb++;
-// Triple steal check
-	if (((i=baserunning[4]-'0') > 0) && (i < 4)) onbase[i]->sb++;
+	{ 
+	    int i;
+	    // Double steal check
+	    if (((i=baserunning[2]-'0') > 0) && (i < 4)) onbase[i]->sb++;
+	    // Triple steal check
+	    if (((i=baserunning[4]-'0') > 0) && (i < 4)) onbase[i]->sb++;
 	}
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"pk"))) 
-	{
-//	if (!(three())) return 0;
+	return 1;
+    }
+    else if (!(strcmp(event,"pk"))) {
+	// if (!(three())) return 0;
 	if (!(*baserunning))
-	   runcat(-3);
+	    runcat(-3);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"Pickoff%c%s",spc,location);
         outbuf(pbpfp,tempstr);
         if (!(runners->queue_empty())) runners->dequeue();
         runstats();
-// until here
 	runadv();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"oa"))) 
-	{
-//	if (!(three())) return 0;
+	return 1;
+    }
+    else if (!(strcmp(event,"oa"))) {
+	// if (!(three())) return 0;
 	if (!(*baserunning))
-	   runcat(-3);
+	    runcat(-3);
 	if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"Trying to advance%c%s",spc,location);
         outbuf(pbpfp,tempstr);
         if (!(runners->queue_empty())) runners->dequeue();
         runstats();
-// until here
 	runadv();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"1b"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"1b"))) {
 	runcat(1);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s 1b%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
@@ -523,16 +487,14 @@ else if (!(strcmp(event,"1b")))
         onbase[0]->pa(pit->mound->throws);
         rbi();
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"2b"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"2b"))) {
 	runcat(2);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s 2b%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
@@ -542,16 +504,14 @@ else if (!(strcmp(event,"2b")))
         onbase[0]->pa(pit->mound->throws);
         rbi();
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"3b"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"3b"))) {
 	runcat(3);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s 3b%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
@@ -561,16 +521,14 @@ else if (!(strcmp(event,"3b")))
         onbase[0]->pa(pit->mound->throws);
         rbi();
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"hr"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"hr"))) {
 	runcat(4);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s HR%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
@@ -581,18 +539,16 @@ else if (!(strcmp(event,"hr")))
         onbase[0]->pa(pit->mound->throws);
         rbi();
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"gd")) || !(strcmp(event,"dp"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"gd")) || !(strcmp(event,"dp"))) {
 	if (!(*baserunning))
-	   strcat(baserunning,"1o");
+	    strcat(baserunning,"1o");
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s GDP%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         if (!(runners->queue_empty())) runners->dequeue();
@@ -600,276 +556,242 @@ else if (!(strcmp(event,"gd")) || !(strcmp(event,"dp")))
         bat->newstat(onbase[0]->nout(),2);
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"fd"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"fd"))) {
 	if (!(*baserunning))
-	   strcat(baserunning,"1o");
+	    strcat(baserunning,"1o");
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s FDP%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         if (!(runners->queue_empty())) runners->dequeue();
         runstats();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"ld"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"ld"))) {
 	if (!(*baserunning))
-	   strcat(baserunning,"1o");
+	    strcat(baserunning,"1o");
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s LDP%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         if (!(runners->queue_empty())) runners->dequeue();
         runstats();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"lo"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"lo"))) {
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s line drive%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"fc"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"fc"))) {
 	if (!(*baserunning))
-	   strcat(baserunning,"b11o");
+	    strcat(baserunning,"b11o");
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s FC%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats(1);
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"hg"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"hg"))) {
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s HG%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"rg"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"rg"))) {
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s RG%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"go")))
-        {
+	return 1;
+    }
+    else if (!(strcmp(event,"go"))) {
         runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s ground out%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
         runadv();
         batterup();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"sg"))) 
-	{
+        return 1;
+    }
+    else if (!(strcmp(event,"sg"))) {
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s SG%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"hf")))
-        {
+	return 1;
+    }
+    else if (!(strcmp(event,"hf"))) {
         runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s HF%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
         batterup();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"po")))
-        {
+        return 1;
+    }
+    else if (!(strcmp(event,"po"))) {
         runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s PO%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
         batterup();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"fp")) || !(strcmp(event,"pf")))
-        {
+        return 1;
+    }
+    else if (!(strcmp(event,"fp")) || !(strcmp(event,"pf"))) {
         runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s foul PO%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         rbi();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
         runadv();
         batterup();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"sf"))) 
-	{
+        return 1;
+    }
+    else if (!(strcmp(event,"sf"))) {
 	strcat(baserunning,"3h");
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s SF%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         bat->newstat(onbase[0]->nout(),4);
         rbi();
         onbase[0]->pa(pit->mound->throws);
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"sh"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"sh"))) {
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s Sac%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats(2);
         bat->newstat(onbase[0]->nout(),3);
         rbi();
         onbase[0]->pa(pit->mound->throws);
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"lf"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"lf"))) {
 	runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s LF%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"df")) || !(strcmp(event,"wt")))
-        {
+	return 1;
+    }
+    else if (!(strcmp(event,"df")) || !(strcmp(event,"wt"))) {
         runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"%s WT%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
         runadv();
         batterup();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"fo")))
-        {
+        return 1;
+    }
+    else if (!(strcmp(event,"fo"))) {
         runcat(0);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s fly out%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
         runadv();
         batterup();
         frameput();
-        return 1;}
-else if (!(strcmp(event,"er"))) 
-	{
+        return 1;
+    }
+    else if (!(strcmp(event,"er"))) {
 	errflag=1;
 	runcat(1);
         if (!(runchck(baserunning))) return 0;
-// all from update
         sprintf(tempstr,"%s safe on E%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
         runstats(2);
@@ -877,84 +799,80 @@ else if (!(strcmp(event,"er")))
         who_stat(0);
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
-// until here
 	runadv();
 	batterup();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"ea"))) 
-	{
+	return 1;
+    }
+    else if (!(strcmp(event,"ea"))) {
 	errflag=1;
-//	if (!(three())) return 0;
+	// if (!(three())) return 0;
 	if (!(*baserunning))
-	   runcat(-2);
+	    runcat(-2);
         if (!(runchck(baserunning))) return 0;
-// all from update 
         sprintf(tempstr,"Error %c%s",spc,location);
         outbuf(pbpfp,tempstr);
         runstats();
         pit->errors++;
         who_stat(0);
-// until here
 	runadv();
 	frameput();
-	return 1;} 
-else if (!(strcmp(event,"nj")))
-	{
-	{int i;
-	i=atoi(location);
-	if (i<1 || i>3)
+	return 1;
+    }
+    else if (!(strcmp(event,"nj"))) {
+	{ 
+	    int i;
+	    i=atoi(location);
+	    if (i<1 || i>3)
 		if (onbase[3]) i=3;
 		else if (onbase[2]) i=2;
 		else if (onbase[1]) i=1;
 		else i=0;
-	if (!i || !(onbase[i])) return 0; 
-	sprintf(tempstr,"%s can't get jump. ",onbase[i]->nout());
-        outbuf(pbpfp,tempstr);
-	frameput();
+	    if (!i || !(onbase[i])) return 0; 
+	    sprintf(tempstr,"%s can't get jump. ",onbase[i]->nout());
+	    outbuf(pbpfp,tempstr);
+	    frameput();
 	}
 	return 1;
-	}
-else if (!(strcmp(event,"fa")))
-	{
+    }
+    else if (!(strcmp(event,"fa"))) {
 	sprintf(tempstr,"%s fatigues. ",pit->mound->nout());
         outbuf(pbpfp,tempstr);
 	frameput();
 	return 1;
-	}
-else return 0;
-
+    }
+    else 
+	return 0;
 }
 
-int frame::backup(char *infile, char *outfile)
+    int 
+frame::backup(char *infile, char *outfile)
 {
-
    int result;
    char tempstr[MAX_INPUT];
    char nextstr[MAX_INPUT];
 
    frame *test;
 
-       	strcpy(tempstr,filename);
-	strcat(tempstr,outfile);
-       	if ((undofp=fopen(tempstr,"w")) == NULL)
-		{  
-       	        fprintf(stderr,"fatal error - can't open undo file\n");
-       	        exit(0);
-       	        }
-       	strcpy(tempstr,filename);
-	strcat(tempstr,infile);
-	cmdfp=fopen(tempstr,"r");
-	fgets(tempstr,MAX_INPUT,cmdfp);
+    strcpy(tempstr,filename);
+    strcat(tempstr,outfile);
+    if ((undofp=fopen(tempstr,"w")) == NULL) {
+	fprintf(stderr,"fatal error - can't open undo file\n");
+	exit(0);
+    }
+    strcpy(tempstr,filename);
+    strcat(tempstr,infile);
+    cmdfp=fopen(tempstr,"r");
+    fgets(tempstr,MAX_INPUT,cmdfp);
+    fgets(nextstr,MAX_INPUT,cmdfp);
+    while (!(feof(cmdfp))) {
+	fputs(tempstr,undofp);
+	strcpy(tempstr,nextstr);
 	fgets(nextstr,MAX_INPUT,cmdfp);
-	while (!(feof(cmdfp)))
-		{
-		fputs(tempstr,undofp);
-		strcpy(tempstr,nextstr);
-		fgets(nextstr,MAX_INPUT,cmdfp);
-		}
-	test=new frame(tempstr);
-	result=test->decode();
-	delete(test);
-	return result;
+    }
+    test=new frame(tempstr);
+    result=test->decode();
+    delete(test);
+    return result;
 }
+

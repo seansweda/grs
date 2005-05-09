@@ -329,7 +329,7 @@ team::box_score(FILE *fp)
 
     ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=out=er=0;
 
-    fprintf(fp,"\nPITCHERS  %-22s   IP  H  R ER BB  K HR \n", ibl);
+    fprintf(fp,"\nPITCHERS  %-19s   IP  H  R ER BB  K HR \n", ibl);
     newpit=pitchers;
     while (newpit) {
 	out=out+newpit->head->out;
@@ -344,7 +344,7 @@ team::box_score(FILE *fp)
 	newpit=newpit->next;
     }
     fprintf(fp,"\n");
-    fprintf(fp,"TOTALS for %-20s %3d.%1d%3d%3d%3d%3d%3d%3d\n\n",
+    fprintf(fp,"TOTALS for %-17s %3d.%1d%3d%3d%3d%3d%3d%3d\n\n",
 		    ibl,out/3,out % 3,h,r,er,bb,k,hr);
 }
 

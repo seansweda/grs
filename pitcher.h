@@ -32,7 +32,11 @@ public :
 	char *tout();
 	void hit(int);
 	char dec;
-//	~pitcher() { fprintf(stderr,"deleted %s\n",this->nout()); }
+	~pitcher() { 
+#ifdef DEBUG
+	    fprintf(stderr,"deleted %s\n",this->nout());
+#endif
+	}
 };
 
 #endif
