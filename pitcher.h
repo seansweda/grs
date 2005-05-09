@@ -1,4 +1,4 @@
-// pitcher.h
+// $Id$
 
 #ifndef __PITCHER_H
 #define __PITCHER_H

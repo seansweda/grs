@@ -1,4 +1,4 @@
-// limits.h
+// $Id$
 
 #define PATH_MAX 1024
 #define MAX_INPUT 255

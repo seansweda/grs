@@ -1,4 +1,4 @@
-// update.cc
+// $Id$
 
 #include "frame.h"
 #include "queue.h"

@@ -1,4 +1,4 @@
-// team.cc
+// $Id$
 
 #include "team.h"
 

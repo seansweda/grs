@@ -1,4 +1,4 @@
-// queue.cc
+// $Id$
 
 #include "queue.h"
 

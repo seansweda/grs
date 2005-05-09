@@ -1,4 +1,4 @@
-// pitcher.cc
+// $Id$
 
 #include "pitcher.h"
 

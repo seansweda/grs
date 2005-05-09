@@ -1,4 +1,4 @@
-// player.cc
+// $Id$
 
 #include "player.h"
 

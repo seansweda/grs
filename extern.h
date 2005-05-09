@@ -1,4 +1,5 @@
-// extern.h
+// $Id$
+
 #include "limits.h"
 
 #ifndef __EXTERN_H

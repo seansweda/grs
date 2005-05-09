@@ -1,4 +1,4 @@
-// frame.cc
+// $Id$
 
 #include "frame.h"
 

@@ -1,4 +1,4 @@
-// team.h
+// $Id$
 
 #ifndef __TEAM_H
 #define __TEAM_H
