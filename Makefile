@@ -1,4 +1,4 @@
-// $Id$
+# $Id$
 
 CC = g++
 CFLAGS = -g -Wall -Wextra -Wconversion #-DDEBUG
