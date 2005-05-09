@@ -6,6 +6,10 @@ LDFLAGS =
 
 all: grs
 
+tarball:
+	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc grscat
+	gzip grs.tar
+
 grs: main.o frame.o update.o queue.o team.o player.o pitcher.o 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o
 
