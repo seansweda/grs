@@ -35,5 +35,5 @@ pitcher.o: pitcher.cc pitcher.h limits.h
 	$(CC) $(CFLAGS) -c pitcher.cc
 
 clean: 
-	rm -f *.o grs
+	rm -f *.o grs grs.tar.gz
 
