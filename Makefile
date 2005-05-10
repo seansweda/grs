@@ -7,6 +7,7 @@ LDFLAGS =
 all: grs
 
 tarball:
+	rm -f grs.tar grs.tar.gz
 	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc grscat
 	gzip grs.tar
 
