@@ -13,7 +13,9 @@ if [ -f $1 ]; then
 	exit 1
 fi
 
-cat .grscat > $1
+if [ -f .grscat ]; then
+	cat .grscat > $1
+fi
 
 while [ -f ${1}-${game}.pbp -a -f ${1}-${game}.sts ]; do
 	echo "Game $game" >> $1
