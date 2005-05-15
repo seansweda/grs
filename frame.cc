@@ -3,56 +3,65 @@
 #include "frame.h"
 
 // Constructor which initializes the static fields
-
 frame::frame(team *away, team *home, FILE *fp)
 {
-    errflag=0;
+    errflag = 0;
     error[0] = '\0';
 
-    bat=away;
-    pit=home;
+    buffer=(char*) calloc(MAX_INPUT * 2, sizeof(char));
+    *buffer='\0';
 
-    atbat=0;
-    inning=1;
-    outs=0;
-    runs=0;
-    pbpfp=fp;
-    event[0]='&';
+    linescore = (int **) malloc (2 * sizeof(int));
+    linescore[0] = (int *) calloc (linesize, sizeof(int));
+    linescore[1] = (int *) calloc (linesize, sizeof(int));
+	
+    bat = away;
+    pit = home;
+
+    undo = 0; 		// if in the process of undo, set = 1
+    cont = 1;		// continue reading commands?
+    outs = 0; 	
+    atbat = 0; 
+    inning = 1;
+    runs = 0;
+    linesize = 9;	// size of linescore array;
+
+    pbpfp = fp;
+
+    event = NULL;
+    location = NULL;
+    baserunning = NULL;
+    comment = NULL;
+
+    runners = new queue;
 
     for ( int i=0; i<4; i++ ) 
 	onbase[i]=NULL;
     onbase[0]=ibl[atbat]->up();
 
     frameput();
-    cont=1;
 }
 
 // Constructor call in all other cases
 
 frame::frame(char *str)
 {
-    comment = (char*) calloc(MAX_INPUT, sizeof(char));
     error[0] = '\0';
-    char *temp;
-    temp = str;
-    int i = 0;
+    comment = (char*) calloc(MAX_INPUT, sizeof(char));
+    event = (char*) calloc(MAX_INPUT, sizeof(char));
+    location = (char*) calloc(MAX_INPUT, sizeof(char));
+    baserunning = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    while (*temp == ' ') temp++;
-    while (*temp != ' ' && *temp != '\n' && i < CMDLEN )
-	event[i++] = *temp++;
-    event[i] = '\0';
+    // extra inning, grow the linescore
+    if (inning > linesize) {
+	linescore[0] = (int *) realloc(linescore[0], inning * sizeof(int));
+	linescore[1] = (int *) realloc(linescore[1], inning * sizeof(int));
+	linescore[0][linesize] = 0;
+	linescore[1][linesize] = 0;
+	linesize = inning;
+    }
 
-    i = 0;
-    while (*temp == ' ') temp++;
-    while (*temp != ' ' && *temp != '\n' && *temp && i < LOCLEN )
-	location[i++] = *temp++;
-    location[i] = '\0';
-
-    i = 0;
-    while (*temp == ' ') temp++;
-    while (*temp != ' ' && *temp != '\n' && *temp && i < BRUNLEN )
-	baserunning[i++] = *temp++;
-    baserunning[i] = '\0';
+    sscanf( str, "%s %s %s", event, location, baserunning );
 
     cont=1;
     bat=ibl[atbat];
@@ -181,7 +190,7 @@ frame::runstats(int fc)
 }
 
     void 
-frame::frameput(void)
+frame::frameput()
 {
     fprintf( output, "Pit: %-15s ", pit->mound->nout() );
     fprintf( output, "%s: %2d  %s: %2d   ",
@@ -441,8 +450,6 @@ frame::cleanup()
 	delete(ibl[1]);
 	ibl[1] = 0;
 
-	free(linescore[0]);
-	free(linescore[1]);
 	free(linescore);
 	free(buffer);
 }
@@ -560,4 +567,63 @@ frame::decode()
     else if (!(strcmp(event,"fa")))
 	    return 1;
     else return 0;
+}
+
+    void 
+frame::outbuf( FILE *fp, char *str, char *punc )
+{
+    int count;
+    char tempstr[MAX_INPUT * 2];
+    char *ptr = tempstr;
+
+    if ( *punc == '\n' ) {
+	strncat( buffer, punc, 2 );
+	fputs( buffer, fp );
+	fputs( str, fp );
+	*buffer = (char) 0;
+    }
+    else if ( strlen(str) + strlen(buffer) > LINEWIDTH ) {
+	strncpy(tempstr, buffer, MAX_INPUT);
+	strncat(tempstr, punc, 2);
+	strncat(tempstr, str, MAX_INPUT);
+
+	while ( strlen(tempstr) > LINEWIDTH ) {
+	    count = 0;
+	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
+
+	    while ( count != (LINEWIDTH - 10) ) { 
+		count++; 
+		ptr++; 
+	    }
+	    while ( !(isspace(*ptr)) )
+		buffer[count++] = *(ptr++);
+
+	    buffer[count] = '\0';
+	    ptr++;
+
+	    buffer = strcat( buffer, "\n" );
+	    fputs( buffer, fp );
+	    strncpy( tempstr, ptr, MAX_INPUT * 2 );
+	}
+	strncpy( buffer, tempstr, MAX_INPUT );
+    }
+    else {
+	strncat( buffer, punc, 2 );
+	strncat( buffer, str, MAX_INPUT );
+    }
+}
+
+frame::~frame()
+{
+    if ( comment ) {
+	free(comment);
+    }
+    if ( event ) {
+#ifdef DEBUG
+	fprintf(stderr,"~frame: %s %s %s\n", event, location, baserunning);
+#endif
+	free(event);
+	free(location);
+	free(baserunning);
+    }
 }

@@ -7,25 +7,19 @@
 
 // global variables & functions in main
 
-extern FILE *stsfp,*pbpfp,*undofp,*cmdfp,*output,*input;
+extern FILE	*pbpfp,		// play-by-play output file
+		*stsfp,		// stats output file
+		*cmdfp,		// commands output file
+		*undofp,	// undo output file
+		*output,	// where to direct output
+		*input;		// where to read data
 
-extern char filename[PATH_MAX];
-
-extern char *buffer;
-
-extern team *ibl[2];
-extern queue *runners;
-extern player *onbase[4];
-
-extern int errflag;
-extern int undo, cont, outs, atbat, inning, runs, linesize;
-extern int **linescore;
+extern char filename[PATH_MAX];	// prefix for all output files
+extern team *ibl[2];		// pointers to the two teams
 
 extern void play();
 extern void setup();
 extern void setup(int);
 extern int openfile(char*);
-
-extern void outbuf(FILE*,char*,char *punc ="\0");
 
 #endif

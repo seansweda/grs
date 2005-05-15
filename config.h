@@ -9,7 +9,3 @@
 
 #define LINEWIDTH 75	// where to wrap
 
-#define CMDLEN 3	// how long is command field
-#define LOCLEN 20	// how long is location field
-#define BRUNLEN 20	// low long is running field
-

@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0beta5"
+#define VER "3.0.0beta6"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,37 +19,33 @@ FILE	*pbpfp,		// play-by-play output file
 	*cmdfp,		// commands output file
 	*undofp;	// undo output file
 
-FILE *output=stdout;	// where to direct output (default = stdout)
-FILE *input=stdin;	// where to read in data
-
-frame *f0;		// f0 is the current frame to be decoded
+FILE *output = stdout;	// where to direct output (default = stdout)
+FILE *input = stdin;	// where to read in data
 
 char filename[PATH_MAX];	// prefix for all output files
+team *ibl[2];			// pointers to the two teams
 
-char *buffer;		// output buffer
+// instantiate static objects
+int frame::undo,
+    frame::cont,
+    frame::outs,
+    frame::atbat,
+    frame::inning,
+    frame::runs,
+    frame::linesize,
+    frame::errflag;    
 
-team *ibl[2];		// pointers to the two teams
-queue *runners;		// queue to handle inherited runners
-player *onbase[4];	// array of pointers to batter & runners
+int** frame::linescore;
+queue* frame::runners;		// queue to handle inherited runners
+player* frame::onbase[4];	// array of pointers to batter & runners
 
-
-int errflag  = 0;       // error flag; true if an error was committed 
-                        // in the half inning
-
-int undo     = 0, 	// if in the process of undo, set = 1
-    cont     = 1,	// continue reading commands?
-    outs     = 0, 	
-    atbat    = 0, 
-    inning   = 1,
-    runs     = 0,
-    linesize = 9;	// size of linescore array;
-
-int **linescore;	// linescore array;
+char* frame::buffer;		// output buffer
 
     void 
 play()
 {
-    cont = 1;		// obviously we want to execute at least once!
+    frame *f0;			// f0 is the current frame to be decoded
+    frame::cont = 1;		// obviously we want to execute at least once!
 
     char tempstr[MAX_INPUT];
 
@@ -58,7 +54,7 @@ play()
     cmdfile[PATH_MAX - 4] = '\0';
     strcat(cmdfile,".cmd");
 
-    while (cont) {
+    while (frame::cont) {
 #ifdef DEBUG
 #if DEBUG == 2
 	ibl[0]->box_score(stderr); 
@@ -69,18 +65,9 @@ play()
 	fgets(tempstr,MAX_INPUT,input);
 	cmdfp=fopen(cmdfile,"a");
 
-	// extra inning, grow the linescore
-	if (inning > linesize) {
-	    linescore[0] = (int *) realloc(linescore[0], inning * sizeof(int));
-	    linescore[1] = (int *) realloc(linescore[1], inning * sizeof(int));
-	    linescore[0][linesize] = 0;
-	    linescore[1][linesize] = 0;
-	    linesize = inning;
-	}
-
 #ifdef DEBUG
 	if (output != stdout) fprintf(stderr,"%s",tempstr);
-	runners->dump();
+	frame::runners->dump();
 #endif
 	f0=new frame(tempstr);
 
@@ -98,7 +85,7 @@ play()
 	}
 
 #ifdef DEBUG
-    runners->dump();
+    frame::runners->dump();
 #endif
     }
 }
@@ -109,10 +96,10 @@ quit()
     int x, y;
     int val;
 
-    y = 16 + (3 * inning);
+    y = 16 + (3 * frame::inning);
 
     fprintf(stsfp,"    ");
-    for (x = 1; x <= inning; x++)
+    for (x = 1; x <= frame::inning; x++)
 	fprintf(stsfp,"%3d",x);
     fprintf(stsfp,"     R  H  E\n");
 
@@ -121,15 +108,15 @@ quit()
     fprintf(stsfp,"\n");
 
     fprintf(stsfp,"%s ",ibl[0]);
-    for (x = 0; x < inning; x++)
-	fprintf(stsfp,"%3d",linescore[0][x]);
+    for (x = 0; x < frame::inning; x++)
+	fprintf(stsfp,"%3d",frame::linescore[0][x]);
     fprintf(stsfp,"   %3d%3d%3d",ibl[0]->score,ibl[0]->team_hits(),
 				 ibl[0]->errors);
     fprintf(stsfp,"\n");
 
     fprintf(stsfp,"%s ",ibl[1]);
-    for (x = 0; x < inning; x++)
-	fprintf(stsfp,"%3d",linescore[1][x]);
+    for (x = 0; x < frame::inning; x++)
+	fprintf(stsfp,"%3d",frame::linescore[1][x]);
     fprintf(stsfp,"   %3d%3d%3d",ibl[1]->score,ibl[1]->team_hits(),
 				 ibl[1]->errors);
     fprintf(stsfp,"\n");
@@ -166,19 +153,13 @@ quit()
     void 
 setup()
 {
-    buffer=(char*) calloc(MAX_INPUT * 2, sizeof(char));
-    *buffer='\0';
+    frame *f0;		// f0 is the current frame to be decoded
 
-    linescore = (int **) malloc (2 * sizeof(int));
-    linescore[0] = (int *) calloc (linesize, sizeof(int));
-    linescore[1] = (int *) calloc (linesize, sizeof(int));
-	
     char tempstr[MAX_INPUT];
 	
     ibl[0]->make_lineups_pit();
     ibl[1]->make_lineups_pit();
 	
-    runners = new queue;
 
     fprintf(output, "Enter one line description of game conditions.\n");
     fgets(tempstr, MAX_INPUT, input);
@@ -193,8 +174,10 @@ setup()
 
     f0 = new frame(ibl[0], ibl[1], pbpfp);
 
-    sprintf(tempstr, "\n%s %d: ", ibl[atbat]->nout(), inning);
-    outbuf(pbpfp, tempstr);
+    sprintf(tempstr, "\n%s %d: ", ibl[frame::atbat]->nout(), frame::inning);
+    f0->outbuf(pbpfp, tempstr);
+
+    delete(f0);
 }
  
     void 
@@ -240,50 +223,6 @@ setup(int tm)
 
     ibl[tm] = new team(tempstr);
     ibl[tm]->make_lineups();
-}
-
-    void 
-outbuf( FILE *fp, char *str, char *punc )
-{
-    int count;
-    char tempstr[MAX_INPUT * 2];
-    char *ptr = tempstr;
-
-    if ( *punc == '\n' ) {
-	strncat( buffer, punc, 2 );
-	fputs( buffer, fp );
-	fputs( str, fp );
-	*buffer = (char) 0;
-    }
-    else if ( strlen(str) + strlen(buffer) > LINEWIDTH ) {
-	strncpy(tempstr, buffer, MAX_INPUT);
-	strncat(tempstr, punc, 2);
-	strncat(tempstr, str, MAX_INPUT);
-
-	while ( strlen(tempstr) > LINEWIDTH ) {
-	    count = 0;
-	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
-
-	    while ( count != (LINEWIDTH - 10) ) { 
-		count++; 
-		ptr++; 
-	    }
-	    while ( !(isspace(*ptr)) )
-		buffer[count++] = *(ptr++);
-
-	    buffer[count] = '\0';
-	    ptr++;
-
-	    buffer = strcat( buffer, "\n" );
-	    fputs( buffer, fp );
-	    strncpy( tempstr, ptr, MAX_INPUT * 2 );
-	}
-	strncpy( buffer, tempstr, MAX_INPUT );
-    }
-    else {
-	strncat( buffer, punc, 2 );
-	strncat( buffer, str, MAX_INPUT );
-    }
 }
 
     int
