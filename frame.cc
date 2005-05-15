@@ -8,16 +8,6 @@ frame::frame(team *away, team *home, FILE *fp)
     errflag = 0;
     error[0] = '\0';
 
-    buffer=(char*) calloc(MAX_INPUT * 2, sizeof(char));
-    *buffer='\0';
-
-    linescore = (int **) malloc (2 * sizeof(int));
-    linescore[0] = (int *) calloc (linesize, sizeof(int));
-    linescore[1] = (int *) calloc (linesize, sizeof(int));
-	
-    bat = away;
-    pit = home;
-
     undo = 0; 		// if in the process of undo, set = 1
     cont = 1;		// continue reading commands?
     outs = 0; 	
@@ -25,6 +15,16 @@ frame::frame(team *away, team *home, FILE *fp)
     inning = 1;
     runs = 0;
     linesize = 9;	// size of linescore array;
+
+    buffer=(char*) calloc(MAX_INPUT * 2, sizeof(char));
+    *buffer='\0';
+
+    linescore = (int **) malloc (2 * sizeof(int));
+    linescore[0] = (int *) calloc (linesize, sizeof(int));
+    linescore[1] = (int *) calloc (linesize, sizeof(int));
+
+    bat = away;
+    pit = home;
 
     pbpfp = fp;
 
@@ -611,6 +611,41 @@ frame::outbuf( FILE *fp, char *str, char *punc )
 	strncat( buffer, punc, 2 );
 	strncat( buffer, str, MAX_INPUT );
     }
+}
+
+    void
+frame::print_linescore(FILE *fp)
+{
+    int x, y;
+
+    y = 16 + (3 * inning);
+
+    fprintf(fp,"    ");
+    for (x = 1; x <= inning; x++)
+	fprintf(fp,"%3d",x);
+    fprintf(fp,"     R  H  E\n");
+
+    for (x = 1; x <= y; x++)
+	fprintf(fp,"-");
+    fprintf(fp,"\n");
+
+    fprintf(fp,"%s ",ibl[0]);
+    for (x = 0; x < inning; x++)
+	fprintf(fp,"%3d",linescore[0][x]);
+    fprintf(fp,"   %3d%3d%3d",ibl[0]->score,ibl[0]->team_hits(),
+				 ibl[0]->errors);
+    fprintf(fp,"\n");
+
+    fprintf(fp,"%s ",ibl[1]);
+    for (x = 0; x < inning; x++)
+	fprintf(fp,"%3d",linescore[1][x]);
+    fprintf(fp,"   %3d%3d%3d",ibl[1]->score,ibl[1]->team_hits(),
+				 ibl[1]->errors);
+    fprintf(fp,"\n");
+
+    for (x = 1; x <= y; x++)
+	fprintf(fp,"-");
+    fprintf(fp,"\n");
 }
 
 frame::~frame()

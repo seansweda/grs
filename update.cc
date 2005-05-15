@@ -176,10 +176,17 @@ frame::update()
 	    input = stdin;
 	    undo=0;
 	    cont=1;
+#ifdef DEBUG
+	    fprintf(stderr,"%d %d %d %d %d %d %d %d\n", 
+		undo, cont, outs, atbat, inning, runs, linesize, errflag);
+#endif
 	    return 2;
 	}
     }
     else if (!(strcmp(event,"en"))) {
+#ifdef DEBUG
+	print_linescore(stderr);
+#endif
 	if (errflag && runs) pit->unearned(inning);
 
 	sprintf(tempstr,"%s %d %s %d\n",ibl[0]->nout(),ibl[0]->score,
@@ -209,6 +216,9 @@ frame::update()
 	return 1; 
     }
     else if (!(strcmp(event,"eg"))) {
+#ifdef DEBUG
+	print_linescore(stderr);
+#endif
 	cont=0;
 	if (errflag && runs) pit->unearned(inning);
 

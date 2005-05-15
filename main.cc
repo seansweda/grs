@@ -33,7 +33,7 @@ int frame::undo,
     frame::inning,
     frame::runs,
     frame::linesize,
-    frame::errflag;    
+    frame::errflag;
 
 int** frame::linescore;
 queue* frame::runners;		// queue to handle inherited runners
@@ -93,38 +93,9 @@ play()
     void 
 quit()
 {
-    int x, y;
-    int val;
+    frame::print_linescore(stsfp);
 
-    y = 16 + (3 * frame::inning);
-
-    fprintf(stsfp,"    ");
-    for (x = 1; x <= frame::inning; x++)
-	fprintf(stsfp,"%3d",x);
-    fprintf(stsfp,"     R  H  E\n");
-
-    for (x = 1; x <= y; x++)
-	fprintf(stsfp,"-");
-    fprintf(stsfp,"\n");
-
-    fprintf(stsfp,"%s ",ibl[0]);
-    for (x = 0; x < frame::inning; x++)
-	fprintf(stsfp,"%3d",frame::linescore[0][x]);
-    fprintf(stsfp,"   %3d%3d%3d",ibl[0]->score,ibl[0]->team_hits(),
-				 ibl[0]->errors);
-    fprintf(stsfp,"\n");
-
-    fprintf(stsfp,"%s ",ibl[1]);
-    for (x = 0; x < frame::inning; x++)
-	fprintf(stsfp,"%3d",frame::linescore[1][x]);
-    fprintf(stsfp,"   %3d%3d%3d",ibl[1]->score,ibl[1]->team_hits(),
-				 ibl[1]->errors);
-    fprintf(stsfp,"\n");
-
-    for (x = 1; x <= y; x++)
-	fprintf(stsfp,"-");
-    fprintf(stsfp,"\n");
-    for (val=0; val<2; val++) {
+    for (int val=0; val<2; val++) {
 	ibl[val]->box_score(stsfp);
 	fprintf(stsfp,"LOB: %d\n",ibl[val]->lob);
 	fprintf(stsfp,"E: ");
@@ -159,7 +130,6 @@ setup()
 	
     ibl[0]->make_lineups_pit();
     ibl[1]->make_lineups_pit();
-	
 
     fprintf(output, "Enter one line description of game conditions.\n");
     fgets(tempstr, MAX_INPUT, input);

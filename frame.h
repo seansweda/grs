@@ -21,6 +21,7 @@ private :
 	char *location;
 	char *baserunning;
 	char *comment;
+	static int **linescore;
 	static char *buffer;		// output buffer
 
 	team *bat, *pit;		// Dynamic batting/pitching team vars
@@ -42,7 +43,6 @@ private :
 public :
 
 	static int undo, cont, outs, atbat, inning, runs, linesize, errflag;
-	static int **linescore;
 	static queue *runners;		// queue to handle inherited runners
 	static player *onbase[4];	// array of pointers to batter & runners
 
@@ -54,6 +54,7 @@ public :
 	void frameput();		// Outpus info useful to user
 	void who_stat( int );
 
+	static void print_linescore( FILE* );
 	void outbuf( FILE*, char*, char *punc ="\0" );
 
 	~frame();
