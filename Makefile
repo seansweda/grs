@@ -11,28 +11,28 @@ tarball:
 	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc grscat
 	gzip grs.tar
 
-grs: main.o frame.o update.o queue.o team.o player.o pitcher.o 
+grs: Makefile main.o frame.o update.o queue.o team.o player.o pitcher.o 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o
 
-main.o: main.cc frame.h team.h player.h pitcher.h limits.h
+main.o: Makefile main.cc frame.h team.h player.h pitcher.h limits.h
 	$(CC) $(CFLAGS) -c main.cc
 
-frame.o: frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h limits.h
+frame.o: Makefile frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h limits.h
 	$(CC) $(CFLAGS) -c frame.cc
 
-update.o: frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h limits.h
+update.o: Makefile frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h limits.h
 	$(CC) $(CFLAGS) -c update.cc
 
-team.o: team.cc team.h player.h pitcher.h limits.h
+team.o: Makefile team.cc team.h player.h pitcher.h limits.h
 	$(CC) $(CFLAGS) -c team.cc
 
-queue.o: queue.cc queue.h pitcher.h
+queue.o: Makefile queue.cc queue.h pitcher.h
 	$(CC) $(CFLAGS) -c queue.cc
 
-player.o: player.cc player.h limits.h
+player.o: Makefile player.cc player.h limits.h
 	$(CC) $(CFLAGS) -c player.cc
 
-pitcher.o: pitcher.cc pitcher.h limits.h
+pitcher.o: Makefile pitcher.cc pitcher.h limits.h
 	$(CC) $(CFLAGS) -c pitcher.cc
 
 clean: 
