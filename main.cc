@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0beta4"
+#define VER "3.0.0beta5"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -180,8 +180,9 @@ setup()
 	
     runners = new queue;
 
-    fprintf(output, "\nEnter one line description of game conditions.\n");
+    fprintf(output, "Enter one line description of game conditions.\n");
     fgets(tempstr, MAX_INPUT, input);
+    fprintf(output, "\n");
     fprintf(cmdfp, "%s", tempstr);
     fprintf(pbpfp, "grs version %s\n", VER);
     fprintf(pbpfp, "%s at %s \n", ibl[0]->nout(), ibl[1]->nout());

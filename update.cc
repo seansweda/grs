@@ -51,9 +51,9 @@ frame::update()
 	baserunning[0]='\0';
 	ibl[atbat]->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
-	    fprintf(output,"Enter batting order of player to be replaced:");
+	    fprintf(output,"\nEnter batting order of player: ");
 	    fgets(location,MAX_INPUT,input);
-	    fprintf(output,"\n");
+	    // fprintf(output,"\n");
 	}
 	for (i=1; i<4; i++) {
 	    if (onbase[i]==ibl[atbat]->findord(location[0]-'0')) {
@@ -95,9 +95,9 @@ frame::update()
 	baserunning[0]='\0';
 	pit->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
-	    fprintf(output,"Enter batting order of player:");
+	    fprintf(output,"\nEnter batting order of player: ");
 	    fgets(location,MAX_INPUT,input);
-	    fprintf(output,"\n");
+	    // fprintf(output,"\n");
 	}	
 	if (location[0] > '0') {
 	    if (!(strcmp(event,"dr")))  
