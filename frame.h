@@ -21,6 +21,8 @@ private :
 	char *location;
 	char *baserunning;
 	char *comment;
+	char *error;			// Error string
+
 	static int **linescore;
 	static char *buffer;		// output buffer
 
@@ -32,8 +34,6 @@ private :
 	int runchck( char* );	// Parses baserunner advances
 	void runcat( int );	// Does default baserunner advances
 	int three();		// Checks for three operands
-
-	char error[MAX_INPUT];		// Error string
 
 	void batterup();	// brings the next batter up 
 
