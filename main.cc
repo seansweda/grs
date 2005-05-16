@@ -62,18 +62,19 @@ play()
 #endif
 #endif
 	fclose(cmdfp);
-	fgets(tempstr,MAX_INPUT,input);
-	cmdfp=fopen(cmdfile,"a");
+	fgets(tempstr, MAX_INPUT, input);
+	cmdfp = fopen(cmdfile,"a");
 
 #ifdef DEBUG
-	if (output != stdout) fprintf(stderr,"%s",tempstr);
+	if (output != stdout) 
+	    fprintf(stderr,"%s",tempstr);
 	frame::runners->dump();
 #endif
-	f0=new frame(tempstr);
+	f0 = new frame(tempstr);
 
 	if (!(feof(input)) && (strlen(tempstr) > 1) && (tempstr[0] != 'u')
-		&& (f0->decode()))
-	   fprintf(cmdfp,"%s",tempstr);
+		&& ( f0->decode() ))
+	    fprintf(cmdfp, "%s", tempstr);
 
 	switch ( f0->update() ) {
 	    case 0:
@@ -176,7 +177,7 @@ setup(int tm)
 		    if ( input == stdin ) 
 			flag=1; 
 		    else 
-			exit(0);
+			exit(1);
 		}
 		i++;
 	    }
@@ -186,7 +187,7 @@ setup(int tm)
 	    if (input == stdin) 
 		flag=1; 
 	    else 
-	    	exit(0);
+	    	exit(1);
 	}
     }
     fprintf(cmdfp, "%s", tempstr);

@@ -868,7 +868,7 @@ frame::backup(char *infile, char *outfile)
     strcat(tempstr,outfile);
     if ((undofp=fopen(tempstr,"w")) == NULL) {
 	fprintf(stderr,"fatal error - can't open undo file\n");
-	exit(0);
+	exit(1);
     }
     strcpy(tempstr,filename);
     strcat(tempstr,infile);
