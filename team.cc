@@ -18,15 +18,25 @@ int i, flag;
 	    for (i=0; i< 3; i++) {
 		if (str[i] > 'Z' || str[i] < 'a') {
 		    fprintf(stderr,"\nUse all caps only");
-		    if (input == stdin) flag=1; else exit(0);}
+		    if (input == stdin) 
+			flag=1; 
+		    else 
+			exit(1);
+		}
 		else if (str[i] <= 'z') str[i]=(char)(32+(int)str[i]);
 		else if (str[i] < 'A') {
 		    fprintf(stderr,"\nUse all caps only");
-		    if (input == stdin) flag=1; else exit(0);}
+		    if (input == stdin) 
+			flag=1; 
+		    else 
+			exit(1);
+		}
 	    }
 	}
 	else if (input != stdin) {
-		fprintf(stderr,"Team name must be 3 letters!"); exit(0);}
+		fprintf(stderr,"Team name must be 3 letters!"); 
+		exit(1);
+	}
     }
     strcpy(ibl, str);
     lineup = (struct pl_list *) malloc(sizeof (struct pl_list));
@@ -142,7 +152,7 @@ team::insert( int spot, char **comment, char *def, char *inputstr )
 		if ( input == stdin ) 
 		    flag = 1; 
 		else 
-		    exit(0);
+		    exit(1);
 	    }
 	}
 	if ( strcmp(def, "ph") )	
@@ -240,7 +250,7 @@ team::make_lineups()
 		if ( input == stdin ) 
 		    flag = 1; 
 		else 
-		    exit(0);
+		    exit(1);
 	    }
 	}
 	fprintf( cmdfp, "%s", tempstr );
@@ -290,7 +300,7 @@ team::make_lineups_pit()
 	    if ( input == stdin ) 
 		flag = 1; 
 	    else 
-		exit(0);
+		exit(1);
 	}
     }
     fprintf( cmdfp, "%s", tempstr );
@@ -441,7 +451,7 @@ team::new_pit()
 	    if ( input == stdin ) 
 		flag = 1; 
 	    else 
-		exit(0);
+		exit(1);
 	}
     }
     fprintf( cmdfp, "%s", tempstr );
