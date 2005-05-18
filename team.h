@@ -44,7 +44,7 @@ private :
 	struct stat_list extra_stats[9];
 
 public :
-	team();
+	team(int);
 	team(char*);
 	int make_lineups();
 	int make_lineups_pit();
