@@ -19,7 +19,9 @@ extern team *ibl[2];		// pointers to the two teams
 
 extern void play();
 extern void setup();
-extern void setup(int);
-extern int openfile(char*);
+extern void setup( int );
+extern int openfile( char* );
+
+extern char* stripcr( char*, int );
 
 #endif
