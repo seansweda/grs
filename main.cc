@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0beta7"
+#define VER "3.0.0beta8"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -152,47 +152,9 @@ setup()
 }
  
     void 
-setup(int tm)
+setup( int tm )
 {
-    char tempstr[MAX_INPUT];
-	
-    int i;
-    int flag = 1;
-
-    char nm[2][6];
-    strcpy(nm[0], "away\0");
-    strcpy(nm[1], "home\0");
- 
-    tempstr[0]='\0';
-
-    while ( flag ) {
-	fprintf(output, "Enter a 3 letter name for %s team:\n", nm[tm]);
-	fgets(tempstr, MAX_INPUT, input);
-	if (strlen(tempstr) == 4) {
-	    flag = 0;
-	    i = 0;
-	    while ( !(flag) && (i < 3) ) {
-		if ( !(tempstr[i] >= 'A' && tempstr[i] <= 'Z') ) {
-		    fprintf(stderr, "Use all caps only\n");
-		    if ( input == stdin ) 
-			flag=1; 
-		    else 
-			exit(1);
-		}
-		i++;
-	    }
-	}
-	else {
-	    fprintf(stderr, "Team name must be 3 letters!\n");
-	    if (input == stdin) 
-		flag=1; 
-	    else 
-	    	exit(1);
-	}
-    }
-    fprintf(cmdfp, "%s", tempstr);
-
-    ibl[tm] = new team(tempstr);
+    ibl[tm] = new team(tm);
     ibl[tm]->make_lineups();
 }
 
@@ -329,3 +291,26 @@ main(int argc, char *argv[])
     fclose(stsfp);
     fclose(cmdfp);
 }
+
+    char*
+stripcr( char* word, int len )
+{
+    int c = 0;
+    char *ptr = word;
+
+    while ( *ptr != '\n' && *ptr != '\0' && c < len ) {
+	ptr++;
+	c++;
+#ifdef DEBUG
+	fprintf( stderr, "%d %d ", *ptr, c );
+#endif
+    }
+
+    *ptr = '\0';
+
+#ifdef DEBUG
+    printf("%s\n", word);
+#endif
+    return( word );
+}
+
