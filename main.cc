@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0fc1"
+#define VER "3.0.0fc2"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +48,7 @@ play()
     frame::cont = 1;		// obviously we want to execute at least once!
 
     char tempstr[MAX_INPUT];
+    memset( tempstr, '\0', MAX_INPUT );
 
     char cmdfile[PATH_MAX];
     strncpy(cmdfile, filename, PATH_MAX - 5);
@@ -128,6 +129,7 @@ setup()
     frame *f0;		// f0 is the current frame to be decoded
 
     char tempstr[MAX_INPUT];
+    memset( tempstr, '\0', MAX_INPUT );
 	
     ibl[0]->make_lineups_pit();
     ibl[1]->make_lineups_pit();
@@ -295,7 +297,7 @@ main(int argc, char *argv[])
     char*
 stripcr( char* word, int len )
 {
-    int c = 0;
+    int c = 1;
     char *ptr = word;
 
     while ( *ptr != '\n' && *ptr != '\0' && c < len ) {

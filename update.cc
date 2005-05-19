@@ -7,8 +7,10 @@
 frame::update()
 {
     int i,j;
-    char tempstr[MAX_INPUT];
     char spc;
+
+    char tempstr[MAX_INPUT];
+    memset( tempstr, '\0', MAX_INPUT );
 
     if (location[0] == '\0')
         spc = '\0';
@@ -32,8 +34,8 @@ frame::update()
     }
 
     if (!(strcmp(event,"ph"))) {
-	location[0]='\0';
-	baserunning[0]='\0';
+	memset( location, '\0', MAX_INPUT );
+	memset( baserunning, '\0', MAX_INPUT );
 	ibl[atbat]->insert( bat->what_ord(onbase[0]), &comment, "ph" );
 	onbase[0]=bat->up();
 	runadv();
@@ -47,8 +49,8 @@ frame::update()
 	return 1;  
     }
     else if (!(strcmp(event,"pr"))) {
-	location[0]='\0';
-	baserunning[0]='\0';
+	memset( location, '\0', MAX_INPUT );
+	memset( baserunning, '\0', MAX_INPUT );
 	ibl[atbat]->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
 	    fprintf(output,"\nEnter batting order of player: ");
@@ -91,8 +93,8 @@ frame::update()
 	return 1; 
     }
     else if (!(strcmp(event,"dr")) || !(strcmp(event,"dc"))) {
-	location[0]='\0';
-	baserunning[0]='\0';
+	memset( location, '\0', MAX_INPUT );
+	memset( baserunning, '\0', MAX_INPUT );
 	pit->print_lineup();
 	while (location[0] < '0' || location[0] > '9') {
 	    fprintf(output,"\nEnter batting order of player: ");

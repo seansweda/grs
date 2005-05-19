@@ -7,22 +7,22 @@
 
 player::player(char* str)
 {
-    strcpy(name,str);
-    team[0]='\0';
-    rtn[0]='\0';
-    pos[0]='\0'; 
-    ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=0;
+    strcpy( name, str );
+    memset( team, '\0', TEAMLEN );
+    memset( rtn, '\0', TEAMLEN );
+    memset( pos, '\0', POSLEN );
+    ab = h = r = rbi = b2 = b3 = hr = bb = k = sb = cs = pal = par = 0;
 }
 
 // Better constructor function
 
 player::player(char* inname, char* inteam, char* inrtn, char* inpos)
 {
-    strcpy(name,inname);
-    strcpy(team,inteam);
-    strcpy(rtn,inrtn);
-    strcpy(pos,inpos);
-    ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=0;
+    strcpy( name, inname );
+    strcpy( team, inteam );
+    strcpy( rtn, inrtn );
+    strcpy( pos, inpos );
+    ab = h = r = rbi = b2 = b3 = hr = bb = k = sb = cs = pal = par = 0;
 
     switch (*inpos) {
 	case '1' : posn = 3; break;

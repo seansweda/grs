@@ -563,10 +563,10 @@ frame::decode()
 
     if (runchck(location)) {		// Baserunning in location field?
 	strcpy( baserunning, location );
-	strcpy( location, "\0" );
+	memset( location, '\0', MAX_INPUT );
     }
     else {
-	strcpy( error, "\0" );		// clean up after runchck
+	memset( error, '\0', LINEWIDTH );	// clean up after runchck
     }
 	    
     if (!(strcmp(event,"ph")))

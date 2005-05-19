@@ -7,24 +7,24 @@
 
 pitcher::pitcher(char* str)
 {
-	strcpy(name,str);
-	team[0]='\0';
-	rtn[0]='\0';
-	throws='\0';
-	dec='-';
-	out=h=r=er=hr=bb=k=br=0;
+	strcpy( name, str );
+	memset( team, '\0', TEAMLEN );
+	memset( rtn, '\0', TEAMLEN );
+	throws = '\0';
+	dec = '-';
+	out = h = r = er = hr = bb = k = br = 0;
 }
 
 // Better constructor function
 
 pitcher::pitcher(char* inname, char* inteam, char* inrtn, char inpos)
 {
-	strcpy(name,inname);
-	strcpy(team,inteam);
-	strcpy(rtn,inrtn);
-	throws=inpos;
-	dec='-';
-	out=h=r=er=hr=bb=k=br=0;
+	strcpy( name, inname );
+	strcpy( team, inteam );
+	strcpy( rtn, inrtn );
+	throws = inpos;
+	dec = '-';
+	out = h = r = er = hr = bb = k = br = 0;
 }
 
     void 

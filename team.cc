@@ -15,6 +15,7 @@ team::team( int who )
 	flag = 0; 
 	fprintf(output, "Enter the three letter code for %s team:\n",
 		who == 0 ? "away" : "home" );
+	memset( str, '\0', MAX_INPUT );
 	fgets( str, MAX_INPUT, input );
 
 	if ( strlen(str) > 3 ) {
@@ -89,9 +90,10 @@ team::team( char *str )
 team::pos_change( int spot, char **comment )
 {
     char tempstr[MAX_INPUT];
+    memset( tempstr, '\0', MAX_INPUT );
 
     char pos[3];
-    strcpy( pos, "\0" );
+    memset( pos, '\0', MAX_INPUT );
 
     pl_list *oldpl = lineup;
 
@@ -100,7 +102,7 @@ team::pos_change( int spot, char **comment )
 
     fprintf( output, "\nEnter new position for %d: ", spot );
     fgets( tempstr, MAX_INPUT, input );
-    strcpy( pos, stripcr( tempstr, 3 ) );
+    strcpy( pos, stripcr( tempstr, POSLEN ) );
 
     fprintf( cmdfp, "%d\n", spot );
     fprintf( cmdfp, "%s\n", pos );
@@ -123,9 +125,6 @@ team::insert( int spot, char **comment, char *def, char *inputstr )
     char mlb[MAX_INPUT];
     char name[MAX_INPUT];
     char pos[MAX_INPUT];
-    strcpy( mlb, "\0" );
-    strcpy( name, "\0" );
-    strcpy( pos, "\0" );
 
     newpl = (struct pl_list *) malloc( sizeof(struct pl_list) );
     newpl->ord = spot;
@@ -136,6 +135,10 @@ team::insert( int spot, char **comment, char *def, char *inputstr )
     	while (flag) {
 	    flag=0;
 	    fprintf(output, "Player, MLB team & Position for %d: ", spot);
+	    memset( tempstr, '\0', MAX_INPUT );
+	    memset( mlb, '\0', MAX_INPUT );
+	    memset( name, '\0', MAX_INPUT );
+	    memset( pos, '\0', MAX_INPUT );
 	    fgets( tempstr, MAX_INPUT, input );
 	    fprintf( output, "\n" );
 
@@ -215,9 +218,6 @@ team::make_lineups()
     char mlb[MAX_INPUT];
     char name[MAX_INPUT];
     char pos[MAX_INPUT];
-    strcpy( mlb, "\0" );
-    strcpy( name, "\0" );
-    strcpy( pos, "\0" );
     
     current = newpl = lineup;
     fprintf(output,"Enter lineup for %s \n", ibl);
@@ -234,6 +234,10 @@ team::make_lineups()
     	while ( flag ) {
 	    flag = 0;
 	    fprintf(output, "Player, MLB team & Position for %d: ", spot);
+	    memset( tempstr, '\0', MAX_INPUT );
+	    memset( mlb, '\0', MAX_INPUT );
+	    memset( name, '\0', MAX_INPUT );
+	    memset( pos, '\0', MAX_INPUT );
 	    fgets( tempstr, MAX_INPUT, input );
 	    // fprintf( output, "\n" );
 
@@ -276,14 +280,15 @@ team::make_lineups_pit()
     char mlb[MAX_INPUT];
     char name[MAX_INPUT];
     char throws[MAX_INPUT];
-    strcpy( mlb, "\0" );
-    strcpy( name, "\0" );
-    strcpy( throws, "\0" );
 
     flag = 1;
     while ( flag ) {
 	flag=0;
 	fprintf(output, "Starting pitcher for %s, MLB team & Throws: ", ibl);
+	memset( tempstr, '\0', MAX_INPUT );
+	memset( mlb, '\0', MAX_INPUT );
+	memset( name, '\0', MAX_INPUT );
+	memset( throws, '\0', MAX_INPUT );
 	fgets( tempstr, MAX_INPUT, input );
 	// fprintf( output, "\n" );
 
@@ -422,10 +427,6 @@ team::new_pit()
     char name[MAX_INPUT];
     char throws[MAX_INPUT];
     char bats[MAX_INPUT];
-    strcpy( mlb, "\0" );
-    strcpy( name, "\0" );
-    strcpy( throws, "\0" );
-    strcpy( bats, "\0" );
 
     newpit=(struct pit_list *)malloc(sizeof (struct pit_list));
     newpit->next=NULL;
@@ -434,6 +435,11 @@ team::new_pit()
     while ( flag ) {
 	flag = 0;
 	fprintf(output, "Relief Pitcher, MLB team & Throws: " );
+	memset( tempstr, '\0', MAX_INPUT );
+	memset( mlb, '\0', MAX_INPUT );
+	memset( name, '\0', MAX_INPUT );
+	memset( throws, '\0', MAX_INPUT );
+	memset( bats, '\0', MAX_INPUT );
 	fgets( tempstr, MAX_INPUT, input );
 	fprintf( output, "\n" );
 
@@ -666,6 +672,7 @@ team::decisions()
     fprintf( output, "\nEnter W/L/S for appropriate %s pitcher.  <CR> if none.\n", ibl );
     while (curr) {
 	fprintf( output, "%s: ", curr->head->nout() );
+	memset( wls, '\0', MAX_INPUT );
 	fgets( wls, MAX_INPUT, input );
 	switch (*wls) {
 		case 'w' :
@@ -698,11 +705,13 @@ team::unearned( int inning )
     while ( curr ) {
 	if ( curr->head->out + numout >= (inning-1)*3 ) {
 	    fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
+	    memset( urstr, '\0', MAX_INPUT );
 	    fgets( urstr, MAX_INPUT, input );
 	    ur = atoi(urstr);
 	    while ( ur < 0 || ur > curr->head->er ) {
 		fprintf( stderr, "Invalid unearned runs total.\n" );
 		fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
+		memset( urstr, '\0', MAX_INPUT );
 		fgets( urstr, MAX_INPUT, input );
 		ur = atoi(urstr);
 	    }
