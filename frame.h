@@ -52,7 +52,7 @@ public :
 	int update();			// update the stats
 	void help( char* );		// Prints helpful? messages
 	void frameput();		// Outpus info useful to user
-	void who_stat( int );
+	void who_stat( int, int );	// add stat to player @fielding pos
 
 	static void print_linescore( FILE* );
 	void outbuf( FILE*, char*, char *punc ="\0" );

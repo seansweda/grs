@@ -539,7 +539,7 @@ team::newstat(char *pl_name, int stat)
     extra_stats[stat].ord++;
     prev = curr = extra_stats[stat].next;
 
-    if (*pl_name) {
+    if ( strlen(pl_name) ) {
 #ifdef DEBUG
 	fprintf( stderr, "p:%d c:%d\n", prev, curr );
 #endif
@@ -588,31 +588,35 @@ team::printstat( FILE *fp,int stat )
 {
 
     struct stat_list *curr;
-#ifdef DEBUG
-    fprintf( stderr, "es:%d\n",extra_stats[stat].next );
-#endif
-
     curr = extra_stats[stat].next;
+
+#ifdef DEBUG
+    fprintf( stderr, "es:%d %d c:%d\n", stat, extra_stats[stat].ord, curr );
+#endif
 
     if (extra_stats[stat].ord) {
 	fprintf(fp,"%d - ",extra_stats[stat].ord);
-	while(curr->next) {
+	if ( curr ) {
+	    while( curr->next) {
 #ifdef DEBUG
-	    fprintf( stderr, "c:%d cn:%d\n",curr,curr->next );
+		fprintf( stderr, "c:%d cn:%d\n",curr,curr->next );
 #endif
-	    if (curr->ord > 1) {
-		fprintf(fp,"%s %d, ", curr->name, curr->ord);
-		curr = curr->next;
+		if (curr->ord > 1) {
+		    fprintf(fp,"%s %d, ", curr->name, curr->ord);
+		    curr = curr->next;
+		}
+		else {
+		    fprintf(fp,"%s, ",curr->name);
+		    curr = curr->next;
+		}
 	    }
-	    else {
-                fprintf(fp,"%s, ",curr->name);
-                curr = curr->next;
-	    }
+	    if (curr->ord > 1)
+		fprintf(fp,"%s %d.\n",curr->name,curr->ord);
+	    else
+		fprintf(fp,"%s.\n",curr->name);
 	}
-	if (curr->ord > 1)
-	    fprintf(fp,"%s %d.\n",curr->name,curr->ord);
 	else
-            fprintf(fp,"%s.\n",curr->name);
+	    fprintf(fp,"none.\n");
     }
 
     else

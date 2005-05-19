@@ -109,7 +109,9 @@ frame::runadv()
 			newbase[i] = NULL;
 		    break;
 		default :
-		    sprintf( error, "Baserunning error: %s\n", baserunning );
+		    // if we get here, runchck didn't do its job!
+		    sprintf( error, "Fatal baserunning error: %s\n", baserunning );
+		    exit(1);
 	    }
 	}
 	else {
@@ -397,6 +399,9 @@ frame::runchck(char *runstr)
 		break;
 	    default: 
 		retval = 0;
+		strncat( errstr, str, 2 );
+		errptr += 2;
+		*errptr = '\0';
 		break;
 	}
 	str+=2;
@@ -514,14 +519,25 @@ frame::three()
 }
 
     void 
-frame::who_stat(int stat)
+frame::who_stat( int stat, int who )
+// adds stat to player at fielding position "who"
 {
-   int who = location[0] - '0';
-// printf("who - %d",who);
+#ifdef DEBUG
+   fprintf( stderr, "who_stat: %d\n", who );
+#endif
    switch (who) {
-        case 0 : pit->newstat("\0",stat); break;
-        case 1 : pit->newstat(pit->mound->nout(),stat); break;
-        default: pit->newstat(pit->posout(who),stat);}
+        case 0 :
+	    pit->newstat( "\0", stat );
+	    break;
+        case 1 :
+	    pit->newstat( pit->mound->nout(), stat ); 
+	    break;
+        default: 
+#ifdef DEBUG
+	   fprintf( stderr, "who_stat: newstat \"%s\", %d\n", pit->posout(who), stat );
+#endif
+	    pit->newstat( pit->posout(who), stat );
+   }
 }
 
     void 
@@ -654,6 +670,10 @@ frame::decode()
     else if (!(strcmp(event,"nj")))
 	return 1;
     else if (!(strcmp(event,"fa")))
+	return 1;
+    else if (!(strcmp(event,"in")))
+	return 1;
+    else if (!(strcmp(event,"ic")))
 	return 1;
     else { 
 	sprintf( error, "Invalid command: %s\n", event );

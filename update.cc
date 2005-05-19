@@ -104,7 +104,9 @@ frame::update()
 		pit->insert( (location[0]-'0'), &comment );
 	    else
 		pit->pos_change( (location[0]-'0'), &comment );
-	    }
+	}
+	else
+	    fprintf( cmdfp, "0\n" );
 	runadv();
 #ifdef DEBUG
         fprintf(stderr, "%s now batting %c for %s.",
@@ -308,7 +310,8 @@ frame::update()
 	return 1;
     }
     else if (!(strcmp(event,"ci"))) {
-        runcat(1);
+	errflag=1;
+        runcat(-1);
 	if (!(runchck(baserunning))) return 0;
         sprintf(tempstr,"%s CI",onbase[0]->nout());
         outbuf(pbpfp,tempstr);
@@ -347,11 +350,13 @@ frame::update()
 	return 1;
     }
     else if (!(strcmp(event,"pb"))) {
+	errflag=1;
         runcat(-2);
         if (!(runchck(baserunning))) return 0;
         sprintf(tempstr,"PB");
         outbuf(pbpfp,tempstr);
         runstats();
+        pit->errors++;
         runadv();
         frameput();
         return 1;
@@ -798,15 +803,26 @@ frame::update()
         frameput();
         return 1;
     }
-    else if (!(strcmp(event,"er"))) {
-	errflag=1;
+    else if ( !(strcmp(event,"er")) ) {
+	errflag = 1;
 	runcat(1);
-        if (!(runchck(baserunning))) return 0;
-        sprintf(tempstr,"%s safe on E%c%s",onbase[0]->nout(),spc,location);
-        outbuf(pbpfp,tempstr);
+        if ( !(runchck(baserunning)) ) 
+	    return 0;
+	if ( strlen(location) > 0 ) {
+	    if ( location[0] < '1' || location[0] > '9' ) {
+		sprintf( error, "\"%s\" invalid.  First character must be fielder's position (1-9).", location );
+		return 0;
+	    }
+	}
+	else {
+	    sprintf( error, "Must supply fielder's position (1-9)." );
+	    return 0;
+	}
+        sprintf(tempstr, "%s safe on E%c%s", onbase[0]->nout(), spc, location);
+        outbuf(pbpfp, tempstr);
         runstats(2);
         pit->errors++;
-        who_stat(0);
+        who_stat(0, (int) location[0] - '0');
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
 	runadv();
@@ -815,16 +831,27 @@ frame::update()
 	return 1;
     }
     else if (!(strcmp(event,"ea"))) {
-	errflag=1;
+	errflag = 1;
 	// if (!(three())) return 0;
-	if (!(*baserunning))
+	if ( !(*baserunning) )
 	    runcat(-2);
-        if (!(runchck(baserunning))) return 0;
-        sprintf(tempstr,"Error %c%s",spc,location);
-        outbuf(pbpfp,tempstr);
+        if ( !(runchck(baserunning)) ) 
+	    return 0;
+	if ( strlen(location) > 0 ) {
+	    if ( location[0] < '1' || location[0] > '9' ) {
+		sprintf( error, "\"%s\" invalid.  First character must be fielder's position (1-9).", location );
+		return 0;
+	    }
+	}
+	else {
+	    sprintf( error, "Must supply fielder's position (1-9)." );
+	    return 0;
+	}
+        sprintf(tempstr, "Error %c%s", spc, location);
+        outbuf(pbpfp, tempstr);
         runstats();
         pit->errors++;
-        who_stat(0);
+        who_stat(0, (int) location[0] - '0');
 	runadv();
 	frameput();
 	return 1;
@@ -845,9 +872,24 @@ frame::update()
 	}
 	return 1;
     }
-    else if (!(strcmp(event,"fa"))) {
-	sprintf(tempstr,"%s fatigues. ",pit->mound->nout());
-        outbuf(pbpfp,tempstr);
+    else if ( !(strcmp(event,"fa")) ) {
+	sprintf( tempstr, "%s fatigues. ", pit->mound->nout() );
+        outbuf( pbpfp, tempstr );
+	frameput();
+	return 1;
+    }
+    else if ( !(strcmp(event,"ic")) ) {
+	sprintf( tempstr, "Infield in @ 1b/3b. " );
+        outbuf( pbpfp, tempstr );
+	frameput();
+	return 1;
+    }
+    else if ( !(strcmp(event,"in")) ) {
+	if ( strlen(location) > 0 )
+	    sprintf( tempstr, "Infield in @ %s. ", location );
+	else
+	    sprintf( tempstr, "Infield in. " );
+        outbuf( pbpfp, tempstr );
 	frameput();
 	return 1;
     }
