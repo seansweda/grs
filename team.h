@@ -41,7 +41,15 @@ private :
 	struct pit_list *pitchers;		// ptr to linked list
 	struct pl_list *findord_pl(int);
 
-	struct stat_list extra_stats[9];
+	struct stat_list extra_stats[9];	// 0: E
+						// 1: PB
+						// 2: GIDP
+						// 3: SH
+						// 4: SF
+						// 5: HBP
+						// 6: WP
+						// 7: IBB
+						// 8: BALK
 
 public :
 	team(int);
