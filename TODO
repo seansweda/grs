@@ -1,36 +1,18 @@
 // $Id$
 
-Things to fix/change/add in GRS
+Known Bugs
+- none!
 
-Bug Fixes
-1) fc w/o an out causes a seg fault, ex: with runners on 2nd and 3rd,
-   the following sequence will bomb: fc b1233h; hr;
-2) when escaping a dr/dc with 0, the 0 does not get put in the cmd file
-3) pb does not generate unearned run prompt
-4) illegal event codes return 'incorrect baserunning' if there is
-   location or baserunning data
-5) runners should only advance if forced by catchers interference
-*) unearned runs kludge
+Events
+- triple play
+- baserunner interference
+- rule 7.05 play (what is this referring to?)
 
-Events to Add:
-1) rule 7.05 play, event code ?
-2) baserunner interference code - 'ri'
-3) cutoff play, runner out, perhaps as a rundown code?
-*) swing and miss on H&R
-*) specific IFR/OFR codes
+Feature Requests
+- check for valid lineup after dr/dc/en
+- dice rolling
+- allow use of 4 instead of "h" for baserunning
+- baserunners allowed for current pitcher
+- handle STARTS/INJURIES
+- interactive lineup entry
 
-Interface:
-1) double-check runner advancement, make sure runners exist
-2) help screen, possibly a grep of the docs file?
-3) make some plays like 'dp' more user friendly
-*) interactive lineup entry
-*) better interface?
-
-Features:
-1) translate non-capitalized team names
-2) code for injuries, standardized output (will help league office!)
-*) check master database for valid name/team combinations
-*) output decisions under linescore
-*) allow use of 4 instead of "h" in baserunning
-
-*low priority item

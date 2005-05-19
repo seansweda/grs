@@ -1,19 +1,25 @@
 // $Id$
 
-GRS is a program for creating a game report for a Pursue the Pennant
-game.  It was written by Greg Speegle (speegle@mercury.baylor.edu)
-and Sean Sweda (sweda@css.itd.umich.edu).  The code is available
-via anonymous ftp from stimpy.css.itd.umich.edu
+GRS is a program for creating a game report for the Internet Baseball
+League.  It was written by Sean Sweda (sweda@ibl.org), with assistance
+from Greg Speegle and Richard Dunlap.  The code is available via 
+anonymous ftp at ftp://ftp.ibl.org/grs/
 
-mail bug reports to the authors
+please submit bug reports to the author
+
 
 COMPILING THE PROGRAM
 
-See the README file, also available from stimpy.css.itd.umich.edu
+1) unpack the source ( tar -xzf grs.tgz )
+
+2) edit Makefile to your taste
+
+3) "make"
+
 
 RUNNING THE PROGRAM
 
-Usage: grs [-ahfv] [afile] [hfile] [infile] outfile
+Usage: grs [ (-a afile) (-h hfile) | (-f cmdfile) ] outfile
 
 -a	Used to read in the away team's lineup from an external file.
 	ex: grs -a yesterdays_game.cmd todays_game
@@ -29,7 +35,7 @@ Usage: grs [-ahfv] [afile] [hfile] [infile] outfile
 	(v2.3.0 and later)
 
 If you use the -f flag to read in a file, make sure that the last
-event is NOT 'eg' or 'en'.
+event is NOT 'eg'.
 
 The last operand is always the output file prefix.  GRS will create
 the following files:
@@ -37,7 +43,7 @@ the following files:
 <outfile>.sts	- the stats
 <outfile>.pbp	- the play-by-play
 <outfile>.cmd	- the commands you typed in
-<outfile>.un# 	- a file grs uses temporarily to process the undo command
+<outfile>.un# 	- a file GRS uses temporarily to process the undo command
 		  there may be several of these files after you are done
 
 The accompanying shell script, grscat (instructions at the end) will
@@ -45,16 +51,18 @@ concatenate these files into one large file, if you so desire.
 
 WHAT IT DOESN'T DO
 
-(hopefully this will remain blank)
+GRS is not smart enough to figure out earned runs, you'll have to do that
+yourself when prompted.  There are some esoteric events which GRS does not
+handle gracefully, if you come across one please inform the author.
 
 ENTERING THE LINEUPS
 
 GRS uses space dilimited text.  Thus, when prompted for player name,
 real team, and position, you should separate these by spaces.
-Example:  Whitaker DET 2b
+Example:  Trammell DET ss
 
 When GRS is started, you will be prompted for a three letter team
-abbreviation for each team.  Please capitalize this abbreviation.
+abbreviation for each team.  This code will be converted to upper case.
 
 This program was created with the designated hitter in mind.  If the
 pitcher bats in your league, you must enter him in the original lineup
@@ -85,10 +93,10 @@ baserunning	- in groups of 2, indicating where the player started,
 
 The location is optional for all events.  Some events require baserunning
 information.  When entering errors, only list the player who made the
-error in the location field. (e.g. er 3 b1 instead of er 6-3 b1 for a
+error in the location field. (e.g. er 3/rg6 b1 instead of er 6-3 b1 for a
 dropped throw by the firstbaseman)
 
-This is a list of the events that the grs program accepts:
+This is a list of the events that the GRS program accepts:
 
 ph - pinch hit
 
@@ -106,7 +114,7 @@ np - new pitcher
 
 	Use the same form as lineup entry.  Also, if you are playing
 	with the pitcher batting, you can specify the position in the
-	batting order where the pitcher will hit, and grs will
+	batting order where the pitcher will hit, and GRS will
 	automatically insert him into the batting order.
 	ex: Harvey FLA R 9 	(this would put Harvey in the 9 hole)
 	
@@ -127,7 +135,7 @@ un - undo
 	events at once.  Make sure that there is never an undo
 	command in a command file that you are reading in via the
 	-f flag, as the undo command is never recorded in the .cmd
-	file normally, and this will only serve to confuse grs.
+	file normally, and this will only serve to confuse GRS.
 
 en - end of inning
 eg - end of game 
@@ -135,6 +143,8 @@ eg - end of game
 cm - comment
 nj - enters in a "<runner> unable to get jump" comment, specify base of runner
 fa - enters in a "<pitcher> fatigues" comment
+in - enters in an "infield in" comment, can supply positions
+ic - enters in an "infield in @ 1b/3b" comment
 
 so - strikeout
 kd - strikeout, dropped third strike
@@ -157,7 +167,7 @@ oa - out advancing on a throw
 2b - double
 3b - triple
 hr - home run
-dp,gd - ground into double play
+dp, gd - ground into double play
 fd - fly into double play
 ld - line into double play
 lo - line out
@@ -181,36 +191,12 @@ fo - fly out
 go - ground out
 
 
-GRSCAT
-
-grscat is a shell script I wrote to concatenate the files that grs
-creates.  I name my files according to week number and game number
-
-e.g. grs 8-1		- for week 8, game 1
-
-grscat takes 2 aguments, the week number, and the last game played
-
-e.g  grscat 8 3 	- will cat all week 8 games up to 8-3 into 
-			  a file called 8
-
-also, if you put mail header info into a file called .grscat in the
-same directory as the files you are grscat-ing, it will put it at
-the top of the file
-
-e.g. my .grscat is
-
-To:
-cc:
-Subject:
-------- 
-
-
 ************
 UNDO WARNING
 ************
 
 Undo is the most precarious part of our program, i.e. the most likely
-way to crash grs.  The current status is:
+way to crash GRS.  The current status is:
 
 Undo seems to be 100% functional.
 
@@ -224,3 +210,33 @@ above is the "observed" pattern of activity of undo.  It *may* crash,
 possibly destroying your game report.  If you don't want to try undo,
 just end the game, then use copy-paste to re-input your commands
 (copy from the .cmd file).  Or even easier still, use the -f flag.
+
+
+
+GRSCAT
+
+grscat is a shell script I wrote to concatenate the files that GRS
+creates.  I name my files according to week number and game number
+
+e.g. grs 8-1		- for week 8, game 1
+
+grscat takes a single argument, the week number
+
+e.g  grscat 8 	 	- will cat all week 8 games into a file named "8"
+
+also, if you put mail header info into a file called .grscat in the
+same directory as the files you are grscat-ing, it will put it at
+the top of the file
+
+e.g. my .grscat is
+
+To:
+cc:
+Subject:
+------- 
+
+WEEK
+AWAY
+HOME
+
+

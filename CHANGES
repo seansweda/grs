@@ -1,26 +1,23 @@
 // $Id$
 
-7/25/94
-grs version 2.7.2
-
 This is the latest and greatest grs construction program.
-
-The files are have been tar'd and compressed.
-Use the following commands to extract grs:
-
-uncompress grs.tar.Z
-tar -xvf grs.tar
-
-grs has been successfully compiled with:
-CC (DEC, SGI Indigo)
-gnu's g++ (Sun)
-(I will add to this list if you send me a message)
-
-Make sure to edit the makefile accordingly.
-Then type "make"
 
 VERSION HISTORY
 -----------------------------------------------------------------------
+3.0.0	* Changed to 2-line prompt.  Added score & half inning indicator.
+	* Added a lot of input verification code.  Eliminated a bunch of
+	potential buffer overruns.  User input is more bullet-proof now.
+	* Fixed a nasty bug caused by a fc with no out recorded.
+	* Fixed a nasty double-free which could cause undo to die.
+	* Fixed a nasty bug which would cause segfault if an error made but
+	no player could be found in the lineup at that position
+	* Error messages are much more helpful now.
+	* Fixed bug when escaping dr/dc with 0, was not recorded in .cmd
+	* pb & ci now result in unearned run prompt
+	* runners only advanced when forced on ci
+	* Team codes will be automatically converted to upper case.
+	* Added "in" & "ic" events for infield in comments
+
 2.7.2	Fixed several known bugs.  Made pbp output nicer.
 
 2.7.1	Added double steals.  Fixed bug which caused incorrect
