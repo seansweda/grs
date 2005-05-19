@@ -1,7 +1,7 @@
 // $Id$
 
 Known Bugs
-- none!
+- player position string size is hard coded, should be dynamic
 
 Events
 - 0 out errors (perhaps bb as baserunning?)
