@@ -17,6 +17,7 @@ VERSION HISTORY
 	* runners only advanced when forced on ci
 	* Team codes will be automatically converted to upper case.
 	* Added "in" & "ic" events for infield in comments
+	* baserunner staying at same base now legal, e.g. "22"
 
 2.7.2	Fixed several known bugs.  Made pbp output nicer.
 
