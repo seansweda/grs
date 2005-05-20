@@ -849,7 +849,7 @@ frame::update()
 	    sprintf( error, "Must supply fielder's position (1-9)." );
 	    return 0;
 	}
-        sprintf(tempstr, "Error %c%s", spc, location);
+        sprintf(tempstr, "Error%c%s", spc, location);
         outbuf(pbpfp, tempstr);
         runstats();
         pit->errors++;
