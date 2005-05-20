@@ -4,6 +4,7 @@
 #define __PLAYER_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "player.h"
 #include "limits.h"
@@ -13,7 +14,7 @@ private :
 	char name[NAMELEN];
 	char team[TEAMLEN];
 	char rtn[TEAMLEN];
-	char pos[POSLEN * 9];
+	char *pos;
 public :
 	player(char*);
 	player(char*, char*, char*, char*);
@@ -38,6 +39,7 @@ public :
 	char *pout();
 	void pa(char);
 	void new_pos(char*);
+	int getpos(char*);
 	~player() {
 #ifdef DEBUG
 	    fprintf(stderr,"deleted %s\n",this->nout());
