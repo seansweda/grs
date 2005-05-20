@@ -4,12 +4,10 @@ Known Bugs
 - none!
 
 Events
-- 0 out errors (perhaps bb as baserunning?)
 - triple play
 - baserunner interference
 
 Feature Requests
-- make it legal to specify baserunner staying at same base
 - check for valid lineup after dr/dc/en
 - dice rolling
 - allow use of 4 instead of "h" for baserunning
