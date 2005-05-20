@@ -258,7 +258,7 @@ frame::runchck(char *runstr)
 // Checks baserunning, removes double occurances.
 {
     char *str, *temptr, *errptr;
-    int flag = 1, retval = 1;
+    int copy = 1, retval = 1;
     int done[4];
 
     for ( int j=0; j<=3; j++ )
@@ -280,7 +280,7 @@ frame::runchck(char *runstr)
     while ( *str ) {
 	switch ( *str ) {
 	    case 'b': 
-		flag = 1;
+		copy = 1;
 		if ( !done[0] ) {
 		    switch ( *(str+1) ) {
 			case 'o':
@@ -290,11 +290,11 @@ frame::runchck(char *runstr)
 			case '3': 
 			    break;
 			default: 
-			    flag = 0; 
+			    copy = 0; 
 			    retval = 0;
 			    break;
 		    }
-		    if (flag) {
+		    if ( copy ) {
 			done[0] = 1;
 			strncat( temp, str, 2 );
 			temptr += 2;
@@ -308,30 +308,34 @@ frame::runchck(char *runstr)
 		}
 		break;
 	    case '1':
-		flag = 1;
+		copy = 1;
 		if ( !done[1] ) {
 		    switch ( *(str+1) ) {
+			case '1':
+			    copy = 0;
+			    done[1] = 1;
+			    break;
 			case 'o':
 			case 'h':
 			case '2':
 			case '3': 
 			    break;
 			default: 
-			    flag = 0; 
+			    copy = 0; 
 			    retval = 0;
 			    break;
 		    }
 		    if ( !(onbase[1]) ) {
-			flag = 0;
+			copy = 0;
 			retval = 0;
 		    }
-		    if (flag) {
+		    if ( copy ) {
 			done[1] = 1;
 			strncat( temp, str, 2 );
 			temptr += 2;
 			*temptr = '\0';
 		    }
-		    else {
+		    else if ( !done[1] ) {
 			strncat( errstr, str, 2 );
 			errptr += 2;
 			*errptr = '\0';
@@ -339,29 +343,33 @@ frame::runchck(char *runstr)
 		}
 		break;
 	    case '2':	
-		flag = 1;
+		copy = 1;
 		if ( !done[2] ) {
 		    switch ( *(str+1) ) {
+			case '2':
+			    copy = 0;
+			    done[2] = 1;
+			    break;
 			case 'o':
 			case 'h':
 			case '3': 
 			    break;
 			default: 
-			    flag = 0; 
+			    copy = 0; 
 			    retval = 0;
 			    break; 
 		    }
 		    if ( !(onbase[2]) ) { 
-			flag = 0;
+			copy = 0;
 			retval = 0;
 		    }
-		    if (flag) {
+		    if ( copy ) {
 			done[2] = 1;
 			strncat( temp, str, 2 );
 			temptr += 2;
 			*temptr = '\0';
 		    }
-		    else {
+		    else if ( !done[2] ) {
 			strncat( errstr, str, 2 );
 			errptr += 2;
 			*errptr = '\0';
@@ -369,28 +377,32 @@ frame::runchck(char *runstr)
 		}
 		break;
 	    case '3':
-		flag = 1;
+		copy = 1;
 	        if ( !done[3] ) {
 		    switch ( *(str+1) ) {
+			case '3':
+			    copy = 0;
+			    done[3] = 1;
+			    break;
 			case 'o':
 			case 'h': 
 			    break;
 			default: 
-			    flag = 0; 
+			    copy = 0; 
 			    retval = 0;
 			    break; 
 		    }
 		    if ( !(onbase[3]) ) { 
-			flag = 0; 
+			copy = 0; 
 			retval = 0;
 		    }
-		    if (flag) {
+		    if ( copy ) {
 			done[3] = 1;
 			strncat( temp, str, 2 );
 			temptr += 2;
 			*temptr = '\0';
 		    }
-		    else {
+		    else if ( !done[3] ) {
 			strncat( errstr, str, 2 );
 			errptr += 2;
 			*errptr = '\0';
