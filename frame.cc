@@ -61,6 +61,9 @@ frame::frame(char *str)
     }
 
     sscanf( str, "%s %s %s", event, location, baserunning );
+    strcpy( event, stripcr( event, MAX_INPUT ) );
+    strcpy( location, stripcr( location, MAX_INPUT ) );
+    strcpy( baserunning, stripcr( baserunning, MAX_INPUT ) );
 
     cont=1;
     bat=ibl[atbat];

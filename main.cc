@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0fc3"
+#define VER "3.0.0fc4"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,18 +68,16 @@ play()
 
 #ifdef DEBUG
 	if (output != stdout) 
-	    fprintf(stderr,"%s",tempstr);
+	    fprintf( stderr, "%s", tempstr );
 	frame::runners->dump();
 #endif
-	f0 = new frame(tempstr);
+	f0 = new frame( tempstr );
 
-	if (!(feof(input)) && (strlen(tempstr) > 1) && (tempstr[0] != 'u')
-		&& ( f0->decode() ))
-	    fprintf(cmdfp, "%s", tempstr);
+	f0->decode();
 
 	switch ( f0->update() ) {
 	    case 0:
-		    tempstr[strlen(tempstr)-1] = '\0';
+		    tempstr[strlen(tempstr) - 1] = '\0';
 		    f0->help(tempstr);
 	    case 1:
 		    delete(f0);

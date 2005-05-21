@@ -19,6 +19,9 @@ VERSION HISTORY
 	* Added "in" & "ic" events for infield in comments
 	* baserunner staying at same base now legal, e.g. "22"
 	* fixed bug in assigning cs with other runners advancing
+	* "en" with less than 3 outs not allowed (use "eg")
+	* commands which fail baserunning checks are not recorded in .cmd,
+	also full baserunning now recorded in .cmd
 
 2.7.2	Fixed several known bugs.  Made pbp output nicer.
 

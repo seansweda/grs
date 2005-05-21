@@ -56,6 +56,7 @@ public :
 
 	static void print_linescore( FILE* );
 	void outbuf( FILE*, char*, char *punc ="\0" );
+	void putcmd();
 
 	~frame();
 };
