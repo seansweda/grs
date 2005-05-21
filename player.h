@@ -40,12 +40,7 @@ public :
 	void pa(char);
 	void new_pos(char*);
 	int getpos(char*);
-	~player() {
-#ifdef DEBUG
-	    fprintf(stderr,"deleted %s\n",this->nout());
-#endif
-	}
-
+	~player(); 
 };
 
 #endif

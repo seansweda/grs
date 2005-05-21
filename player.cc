@@ -126,3 +126,12 @@ player::getpos( char *posstr )
 	    return( 0 );
     }
 }
+
+player::~player()
+{
+    free(pos);
+#ifdef DEBUG
+    fprintf(stderr,"deleted %s\n",this->nout());
+#endif
+}
+
