@@ -6,7 +6,7 @@
     int 
 frame::update()
 {
-    int i,j;
+    int i, j;
     char spc;
 
     char tempstr[MAX_INPUT];
@@ -382,15 +382,8 @@ frame::update()
         sprintf(tempstr,"SB");
         outbuf(pbpfp,tempstr);
         runstats();
-        onbase[baserunning[0]-'0']->sb++;
-
-	// Double steal check
-	if (strlen(baserunning) > 2)
-	    if (((i=baserunning[2]-'0') > 0) && (i < 4)) 
-		onbase[i]->sb++;
-	// Triple steal check
-	if (strlen(baserunning) > 4)
-	    if (((j=baserunning[4]-'0') > 0) && (j < 4)) 
+	for ( i = 0; i < (int) strlen(baserunning); i += 2 ) 
+	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 )
 		onbase[j]->sb++;
 	runadv();
 	frameput();
@@ -418,7 +411,9 @@ frame::update()
         outbuf(pbpfp,tempstr);
         if (!(runners->queue_empty())) runners->dequeue();
         runstats();
-        onbase[baserunning[0]-'0']->cs++;
+	for ( i = 0; i < (int) strlen(baserunning); i += 2 ) 
+	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 && baserunning[i+1] == 'o' )
+		onbase[j]->cs++;
 	runadv();
 	frameput();
 	return 1;
@@ -430,9 +425,11 @@ frame::update()
         if (!(runchck(baserunning))) return 0;
         sprintf(tempstr,"%s K, CS%c%s",onbase[0]->nout(),spc,location);
         outbuf(pbpfp,tempstr);
-        runstats();
         if (!(runners->queue_empty())) runners->dequeue();
-        onbase[baserunning[0]-'0']->cs++;
+        runstats();
+	for ( i = 0; i < (int) strlen(baserunning); i += 2 ) 
+	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 && baserunning[i+1] == 'o' )
+		onbase[j]->cs++;
         pit->mound->k++;
         onbase[0]->k++;
         onbase[0]->ab++;
@@ -454,14 +451,9 @@ frame::update()
         onbase[0]->k++;
         onbase[0]->ab++;
         onbase[0]->pa(pit->mound->throws);
-        onbase[baserunning[0]-'0']->sb++;
-	{ 
-	    int i;
-	    // Double steal check
-	    if (((i=baserunning[2]-'0') > 0) && (i < 4)) onbase[i]->sb++;
-	    // Triple steal check
-	    if (((i=baserunning[4]-'0') > 0) && (i < 4)) onbase[i]->sb++;
-	}
+	for ( i = 0; i < (int) strlen(baserunning); i += 2 ) 
+	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 )
+		onbase[j]->sb++;
 	runadv();
 	batterup();
 	frameput();
