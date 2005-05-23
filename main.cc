@@ -259,7 +259,7 @@ main(int argc, char *argv[])
 	input = stdin;
 	output = stdout;
 	if ( hfile ) {
-	    input = fopen( afile, "r" );
+	    input = fopen( hfile, "r" );
 	    output = fopen( NULLDEV, "w" );
 	    if (input == NULL) {
 		fprintf( stderr, "cannot open %s\n", hfile );
