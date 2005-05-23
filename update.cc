@@ -164,7 +164,7 @@ frame::update()
 	    strcat( tempstr, out_ext );
 	    undofp = fopen( tempstr, "r" );
 	    openfile( filename );
-	    output = fopen( "/dev/null" , "w" );
+	    output = fopen( NULLDEV , "w" );
 	    input = undofp;
 #ifdef DEBUG
 	    fprintf( stderr, "setting up: " );

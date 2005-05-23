@@ -1,6 +1,6 @@
 // $Id$
 
-#include "limits.h"
+#include "config.h"
 
 #ifndef __EXTERN_H
 #define __EXTERN_H

@@ -1,12 +1,12 @@
 // $Id$
 
-#define VER "3.0.0fc4"
+#define VER "3.0.0fc5"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "limits.h"
+#include "config.h"
 #include "pitcher.h"
 #include "player.h"
 #include "team.h"
@@ -192,13 +192,13 @@ main(int argc, char *argv[])
 
     while ((c = getopt(argc, argv, "a:h:f:v")) != EOF)
     switch (c) {
-	case 'a':	afile = (char *) malloc(sizeof(PATH_MAX));
+	case 'a':	afile = (char *) calloc(PATH_MAX, sizeof(char));
 	    		strncpy( afile, optarg, PATH_MAX );
 			break;
-	case 'h':	hfile = (char *) malloc(sizeof(PATH_MAX));	
+	case 'h':	hfile = (char *) calloc(PATH_MAX, sizeof(char));	
 	    		strncpy( hfile, optarg, PATH_MAX );
 			break;
-	case 'f':	cfile = (char *) malloc(sizeof(PATH_MAX));	
+	case 'f':	cfile = (char *) calloc(PATH_MAX, sizeof(char));	
 	    		strncpy( cfile, optarg, PATH_MAX );
 			break;
 	case 'v':	fprintf(stderr,"%s\n",VER);
@@ -232,8 +232,8 @@ main(int argc, char *argv[])
     }
 
     if ( cfile ) {
-	input = fopen(cfile,"r");
-	output = fopen("/dev/null","w");
+	input = fopen( cfile, "r" );
+	output = fopen( NULLDEV , "w" );
 	if (input == NULL) {
 	    fprintf( stderr, "cannot open %s\n", cfile );
 	    exit(1);
@@ -246,20 +246,12 @@ main(int argc, char *argv[])
     }
     else {
 	if ( afile ) {
+	    input = fopen( afile, "r" );
+	    output = fopen( NULLDEV, "w" );
 	    if (input == NULL) {
 		fprintf( stderr, "cannot open %s\n", afile );
 		exit(1);
 	    }
-	}
-	if ( hfile ) {
-	    if (input == NULL) {
-		fprintf( stderr, "cannot open %s\n", hfile );
-		exit(1);
-	    }
-	}
-	if ( afile ) {
-	    input = fopen(afile,"r");
-	    output = fopen("/dev/null","w");
 	}
 	setup(0);
 	if (input != stdin) fclose(input);
@@ -267,8 +259,12 @@ main(int argc, char *argv[])
 	input = stdin;
 	output = stdout;
 	if ( hfile ) {
-	    input = fopen(afile,"r");
-	    output = fopen("/dev/null","w");
+	    input = fopen( afile, "r" );
+	    output = fopen( NULLDEV, "w" );
+	    if (input == NULL) {
+		fprintf( stderr, "cannot open %s\n", hfile );
+		exit(1);
+	    }
 	}
 	setup(1);
 	if (input != stdin) fclose(input);

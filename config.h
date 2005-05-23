@@ -1,5 +1,11 @@
 // $Id$
 
+#ifdef WIN32
+#   define NULLDEV	"NUL:"
+#else
+#   define NULLDEV	"/dev/null"
+#endif
+
 #define PATH_MAX 1024
 #define MAX_INPUT 255
 
