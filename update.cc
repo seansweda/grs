@@ -43,12 +43,6 @@ frame::update()
 	frameput();
         strcat( comment, " " );
         outbuf( pbpfp, comment );
-#ifdef DEBUG
-        fprintf( stderr, "%s now batting %d for %s.\n",
-		onbase[0]->nout(),
-		bat->what_ord(onbase[0]),
-		bat->nout() );
-#endif
 	return(1);  
     }
     else if ( !(strcmp( event, "pr" )) ) {
@@ -67,10 +61,6 @@ frame::update()
 		frameput();
         	strcat( comment, " " );
         	outbuf( pbpfp, comment );
-#ifdef DEBUG
-	      	fprintf( stderr, "%s now running on %d for %s.",
-			onbase[i]->nout(), i, bat->nout() );
-#endif
 		return(1);
 	    }
 	}	
@@ -110,12 +100,6 @@ frame::update()
 		pit->pos_change( ( tempstr[0] - '0' ), &comment );
 	}
 	runadv();
-#ifdef DEBUG
-        fprintf( stderr, "%s now batting %c for %s.",
-		bat->findord( tempstr[0]-'0' )->nout(),
-		tempstr[0],
-		bat->nout() );
-#endif
 	frameput();
         strcat( comment, " " );
         outbuf( pbpfp, comment );
