@@ -92,8 +92,8 @@ team::pos_change( int spot, char **comment )
     char tempstr[MAX_INPUT];
     memset( tempstr, '\0', MAX_INPUT );
 
-    char pos[3];
-    memset( pos, '\0', MAX_INPUT );
+    char pos[POSLEN];
+    memset( pos, '\0', POSLEN );
 
     pl_list *oldpl = lineup;
 
@@ -103,12 +103,18 @@ team::pos_change( int spot, char **comment )
     fprintf( output, "\nEnter new position for %d: ", spot );
     fgets( tempstr, MAX_INPUT, input );
     strcpy( pos, stripcr( tempstr, POSLEN ) );
+#ifdef DEBUG
+    fprintf( stderr, "pos_change %d: %s\n", spot, pos );
+#endif
 
     fprintf( cmdfp, "%d\n", spot );
     fprintf( cmdfp, "%s\n", pos );
     fprintf( output, "\n" );
 
     oldpl->head->new_pos(pos);
+#ifdef DEBUG
+    fprintf( stderr, "pos_change %d: %s DONE\n", spot, pos );
+#endif
     sprintf( tempstr, "%s moves to %s.", oldpl->head->nout(), pos );
     strcat( *comment, tempstr );
 }
@@ -147,13 +153,12 @@ team::insert( int spot, char **comment, char *def, char *inputstr )
 	    strcpy( mlb, stripcr( mlb, TEAMLEN ) );
 	    strcpy( pos, stripcr( pos, POSLEN ) );
 #ifdef DEBUG
-	    fprintf( stderr, "insert: %s, %s, %s\n", name, mlb, pos );
+	    fprintf( stderr, "insert %d: %s, %s, %s\n", spot, name, mlb, pos );
 #endif
-
 	    if ( strlen(name) == 0 || strlen(mlb) == 0 || strlen(pos) == 0 ) {
 		fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
-		fprintf( stderr, "insert: %d, %d, %d\n", 
+		fprintf( stderr, "insert %d: %d, %d, %d\n", spot,
 	    		strlen(name), strlen(mlb), strlen(pos) );
 #endif
 		if ( input == stdin ) 
@@ -203,6 +208,9 @@ team::insert( int spot, char **comment, char *def, char *inputstr )
     if ( up() == oldpl->head ) 
 	current=newpl;
 
+#ifdef DEBUG
+    fprintf( stderr, "insert %d: %s, %s, %s DONE\n", spot, name, mlb, pos );
+#endif
     strcat( *comment, tempstr );
 }
 
