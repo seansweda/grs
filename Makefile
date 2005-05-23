@@ -1,5 +1,8 @@
 # $Id$
 
+# -DDEBUG turns on debugging output
+# -DWIN32 for building on Windows
+
 CC = g++
 CFLAGS = -g -Wall -Wextra -Wconversion #-DDEBUG
 LDFLAGS =

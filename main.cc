@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0fc5"
+#define VER "3.0.0"
 
 #include <stdio.h>
 #include <stdlib.h>
