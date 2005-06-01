@@ -53,6 +53,8 @@ public :
 	void help( char* );		// Prints helpful? messages
 	void frameput();		// Outpus info useful to user
 	void who_stat( int, int );	// add stat to player @fielding pos
+	int outsonplay( char* );	// how many outs in this play
+	int batterout( char* );		// did the batter make an out?
 
 	static void print_linescore( FILE* );
 	void outbuf( FILE*, char*, char *punc ="\0" );

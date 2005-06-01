@@ -134,73 +134,88 @@ frame::runadv()
 // runstats(2) is for any play where it is not obvious what happened
 // to the batter, i.e. it outputs in .pbp the result for the batter
 
-
     void 
-frame::runstats(int fc)
+frame::runstats( int fc )
 {
-    int i,j;
+    int i, j;
     char *(b[4]);
     char tempstr[MAX_INPUT];
     char *str;
 
     pitcher *run_charged_to;
-    int somebody_out=0;
 
-    b[1]="to first";
-    b[2]="to second";
-    b[3]="to third";
+    b[1] = "to first";
+    b[2] = "to second";
+    b[3] = "to third";
 
-    str=baserunning;
-    while (*str) {  
-	if (*str=='b') {
-	    i=0;
-	    if ((*(str+1) != 'o') && (fc != 1))
-		    runners->add(pit->mound); }
-	    
-	else i=(int) (*str - '0');
-	if (onbase[i]) {		// If runner is onbase
-	    str++;  
-	    j=(int)*str-'0';
-	    switch (*str) {
-		case 'o' :			// If runner made an out
-		       pit->mound->out++;
-		       somebody_out++;
-		       if ((i == 0) && (fc > 0)) {
-			    sprintf(tempstr,"%s out",onbase[i]->nout());
-			    outbuf(pbpfp,tempstr,", ");}
-		       else if (i > 0) {
-			    sprintf(tempstr,"%s out",onbase[i]->nout());
-			    outbuf(pbpfp,tempstr,", ");}
-		       break;
-		case 'h' :			// If runner scored a run
-		       run_charged_to = runners->dequeue();
-		       run_charged_to->r++;
-		       run_charged_to->er++;
-		       onbase[i]->r++;
-		       bat->score++;
-		       runs++;
-		       sprintf(tempstr,"%s scores",onbase[i]->nout());
-		       outbuf(pbpfp,tempstr,", ");
-		       break;
-		case '1':			// If runner (batter) went to 1st
-		case '2' :			// If runner went to second
-		case '3' :			// If runner went to third
-		       if ((i == 0) && (fc > 0)) {
-			    sprintf(tempstr,"%s %s",onbase[i]->nout(),b[j]);
-			    outbuf(pbpfp,tempstr,", ");}
-		       else if (i > 0) {
-			    sprintf(tempstr,"%s %s",onbase[i]->nout(),b[j]);
-			    outbuf(pbpfp,tempstr,", ");}
-		       break;
-		default : ;
-		}
-	    }
-	str++;
+    str = baserunning;
+    while ( *str ) {  
+	if ( *str == 'b' ) {
+	    i = 0;
+	    if ( (*(str+1) != 'o') && (fc != 1) )
+		    runners->add(pit->mound); 
 	}
-    outbuf(pbpfp,"",". ");
+	else 
+	    i = (int) (*str - '0');
+
+	if ( onbase[i] ) {		// If runner is onbase
+	    str++;  
+	    j = (int) *str - '0';
+	    switch ( *str ) {
+		case 'o' :		// If runner made an out
+		    pit->mound->out++;
+		    if ( (i == 0) && (fc > 0) ) {
+			sprintf( tempstr, "%s out", onbase[i]->nout() );
+			outbuf( pbpfp, tempstr, ", " );
+		    }
+		    else if ( i > 0 ) {
+			sprintf( tempstr, "%s out", onbase[i]->nout() );
+			outbuf( pbpfp, tempstr, ", " );
+		    }
+		    break;
+		case 'h' :		// If runner scored a run
+		    run_charged_to = runners->dequeue();
+		    run_charged_to->r++;
+		    run_charged_to->er++;
+		    onbase[i]->r++;
+		    bat->score++;
+		    runs++;
+		    sprintf( tempstr, "%s scores", onbase[i]->nout() );
+		    outbuf( pbpfp, tempstr, ", " );
+		    break;
+		case '1' :		// If runner (batter) went to 1st
+		case '2' :		// If runner went to second
+		case '3' :		// If runner went to third
+		    if ( (i == 0) && (fc > 0) ) {
+			sprintf( tempstr, "%s %s", onbase[i]->nout(), b[j] );
+			outbuf( pbpfp, tempstr, ", " );
+		    }
+		    else if ( i > 0 ) {
+			sprintf( tempstr, "%s %s", onbase[i]->nout(), b[j] );
+			outbuf( pbpfp, tempstr, ", " );
+		    }
+		   break;
+		default : ;
+	    }
+	}
+	str++;
+    }
+	
+    outbuf( pbpfp, "", ". " );
+
+    // at this point we need fc binary
+    if ( fc != 1 ) {
+	fc = 0;
+    }
+
+    // if there were baserunning outs, dequeue runners
+    for ( i = 0; i < (outsonplay(baserunning) - batterout(baserunning) - fc); i++ )
+	runners->dequeue();
 
     // if this is a fc play where nobody is out, we need to queue a pitcher
-    if ((fc==1) && !(somebody_out)) runners->add(pit->mound);
+    if ( (fc == 1) && (outsonplay(baserunning) == 0) ) {
+	runners->add(pit->mound);
+    }
 
     return;
 }
@@ -276,7 +291,7 @@ frame::runchck(char *runstr)
     *errptr = '\0';
 
 #ifdef DEBUG
-    fprintf( stderr, "runchck: %s\n", runstr );
+    fprintf( stderr, "pre runchck: %s\n", runstr );
 #endif
     str = runstr;
 
@@ -424,13 +439,18 @@ frame::runchck(char *runstr)
 	    
     if (retval)
 	strcpy( runstr, temp );		// cleaned up baserunning string
+
+	if ( outsonplay(runstr) + outs > 3 ) {
+	    sprintf( error, "Too many outs on play.\n" );
+	    retval = 0;
+	}
     else
 	sprintf( error, "Baserunning error: %s\n", errstr );
 
 #ifdef DEBUG
-    fprintf( stderr, "runchck: %s\n", runstr );
+    fprintf( stderr, "post runchck: %s\n", runstr );
 #endif
-    return retval;
+    return(retval);
 }
 
     void 
@@ -517,9 +537,7 @@ frame::runcat(int adv)
     } // switch
 
     *temptr='\0';
-    //printf("%s\n",temp);
     strcat(baserunning,temp);
-    //printf("%s\n",baserunning);
 }
 
     int 
@@ -773,6 +791,37 @@ frame::print_linescore(FILE *fp)
     for (x = 1; x <= y; x++)
 	fprintf(fp,"-");
     fprintf(fp,"\n");
+}
+
+    int
+frame::outsonplay( char *brun )
+{
+    int num = 0;
+    char *ptr; 
+    
+    ptr = brun;
+    while ( *ptr != '\0' ) {
+	if ( *ptr++ == 'o' ) {
+	    num++;
+	}
+    }
+
+#ifdef DEBUG
+    fprintf( stderr, "oop: %d batter: %d\n", num, batterout( brun ) );
+#endif
+
+    return(num);
+}
+
+    int
+frame::batterout( char *brun )
+{
+    if ( strstr( brun, "bo" ) != 0 ) { 
+	return(1);
+    }
+    else {
+	return(0);
+    }
 }
 
 frame::~frame()
