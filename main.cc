@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0"
+#define VER "3.0.0p1"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,7 +69,6 @@ play()
 #ifdef DEBUG
 	if (output != stdout) 
 	    fprintf( stderr, "%s", tempstr );
-	frame::runners->dump();
 #endif
 	f0 = new frame( tempstr );
 
@@ -86,6 +85,7 @@ play()
 
 #ifdef DEBUG
     frame::runners->dump();
+    fprintf( stderr, "\n" );
 #endif
     }
 }
@@ -297,16 +297,10 @@ stripcr( char* word, int len )
     while ( *ptr != '\n' && *ptr != '\0' && c < len ) {
 	ptr++;
 	c++;
-#ifdef DEBUG
-	fprintf( stderr, "%d %d ", *ptr, c );
-#endif
     }
 
     *ptr = '\0';
 
-#ifdef DEBUG
-    printf("%s\n", word);
-#endif
     return( word );
 }
 
