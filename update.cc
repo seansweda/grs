@@ -70,7 +70,7 @@ frame::update()
 	putcmd();
 	int bats = pit->new_pit();
 #ifdef DEBUG
-	fprintf( stderr, "batting %d", bats );
+	fprintf( stderr, "batting %d\n", bats );
 #endif
 	if ( (bats < 1) || (bats > 9) )
 	    sprintf( comment, "%s now pitching for %s. ",
@@ -436,8 +436,6 @@ frame::update()
 	putcmd();
         sprintf( tempstr, "CS%c%s", spc, location);
         outbuf( pbpfp, tempstr );
-        if ( !(runners->queue_empty()) ) 
-	    runners->dequeue();
         runstats();
 	for ( i = 0; i < (int) strlen(baserunning); i += 2 ) 
 	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 && baserunning[i+1] == 'o' )
@@ -455,8 +453,6 @@ frame::update()
 	putcmd();
         sprintf( tempstr, "%s K, CS%c%s", onbase[0]->nout(), spc, location );
         outbuf( pbpfp, tempstr );
-        if ( !(runners->queue_empty()) ) 
-	    runners->dequeue();
         runstats();
 	for ( i = 0; i < (int) strlen(baserunning); i += 2 ) 
 	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 && baserunning[i+1] == 'o' )
@@ -500,8 +496,6 @@ frame::update()
 	putcmd();
         sprintf( tempstr, "Pickoff%c%s", spc, location );
         outbuf( pbpfp, tempstr );
-        if ( !(runners->queue_empty()) ) 
-	    runners->dequeue();
         runstats();
 	runadv();
 	frameput();
@@ -515,8 +509,6 @@ frame::update()
 	putcmd();
         sprintf( tempstr, "Trying to advance%c%s", spc, location );
         outbuf( pbpfp, tempstr );
-        if ( !(runners->queue_empty()) ) 
-	    runners->dequeue();
         runstats();
 	runadv();
 	frameput();
@@ -607,8 +599,6 @@ frame::update()
 	putcmd();
         sprintf( tempstr, "%s GDP%c%s", onbase[0]->nout(), spc, location );
         outbuf( pbpfp, tempstr );
-        if ( !(runners->queue_empty()) ) 
-	    runners->dequeue();
         runstats();
         bat->newstat( onbase[0]->nout(), 2 );
         onbase[0]->pa(pit->mound->throws);
@@ -627,8 +617,6 @@ frame::update()
 	putcmd();
         sprintf( tempstr, "%s FDP%c%s", onbase[0]->nout(), spc, location );
         outbuf( pbpfp, tempstr );
-        if ( !(runners->queue_empty()) ) 
-	    runners->dequeue();
         runstats();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
@@ -646,8 +634,6 @@ frame::update()
 	putcmd();
         sprintf( tempstr, "%s LDP%c%s", onbase[0]->nout(), spc, location );
         outbuf( pbpfp, tempstr );
-        if ( !(runners->queue_empty()) ) 
-	    runners->dequeue();
         runstats();
         onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
