@@ -151,19 +151,19 @@ frame::update()
 	    output = fopen( NULLDEV , "w" );
 	    input = undofp;
 #ifdef DEBUG
-	    fprintf( stderr, "setting up: " );
+	    fprintf( stderr, "setup 0\n" );
 #endif
 	    setup(0);
 #ifdef DEBUG
-	    fprintf( stderr, "1 " );
+	    fprintf( stderr, "setup 1\n" );
 #endif
 	    setup(1);
 #ifdef DEBUG
-	    fprintf( stderr, "2 " );
+	    fprintf( stderr, "setup 2\n" );
 #endif
 	    setup();
 #ifdef DEBUG
-	    fprintf( stderr, "\nreloading\n" );
+	    fprintf( stderr, "reloading\n" );
 #endif
 	    play();
 	    output = stdout;
