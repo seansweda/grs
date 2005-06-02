@@ -31,11 +31,11 @@ private :
 	void runstats( int fc = 0 );	// Does runners stats and pbp
 	void rbi();			// Does RBIs
 	
-	int runchck( char* );	// Parses baserunner advances
-	void runcat( int );	// Does default baserunner advances
-	int three();		// Checks for three operands
+	int runchck( char* );		// Parses baserunner advances
+	void runcat( int );		// Does default baserunner advances
+	int three();			// Checks for three operands
 
-	void batterup();	// brings the next batter up 
+	void batterup();		// brings the next batter up 
 
 	void cleanup();			// frees up memory for an undo
 	int backup( char*, char* );	// backs up one line in .cmd file
@@ -51,7 +51,7 @@ public :
 	int decode();			// decode the parsed command line
 	int update();			// update the stats
 	void help( char* );		// Prints helpful? messages
-	void frameput();		// Outpus info useful to user
+	void frameput();		// Outputs info useful to user
 	void who_stat( int, int );	// add stat to player @fielding pos
 	int outsonplay( char* );	// how many outs in this play
 	int batterout( char* );		// did the batter make an out?

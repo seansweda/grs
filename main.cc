@@ -1,6 +1,6 @@
 // $Id$
 
-#define VER "3.0.0p1"
+#define VER "3.0.0p2"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,15 +72,22 @@ play()
 #endif
 	f0 = new frame( tempstr );
 
-	f0->decode();
-
-	switch ( f0->update() ) {
-	    case 0:
-		    tempstr[strlen(tempstr) - 1] = '\0';
-		    f0->help(tempstr);
+	switch ( f0->decode() ) {
 	    case 1:
-		    delete(f0);
-		    break;
+		switch ( f0->update() ) {
+		    case 0:
+			tempstr[strlen(tempstr) - 1] = '\0';
+			f0->help(tempstr);
+		    case 1:
+			delete(f0);
+			break;
+		}
+		break;
+	    default:
+		tempstr[strlen(tempstr) - 1] = '\0';
+		f0->help(tempstr);
+		delete(f0);
+		break;
 	}
 
 #ifdef DEBUG
