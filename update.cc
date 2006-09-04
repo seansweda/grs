@@ -380,7 +380,6 @@ frame::update()
         sprintf( tempstr, "PB" );
         outbuf( pbpfp, tempstr );
         runstats();
-        pit->errors++;
         runadv();
         frameput();
         return(1);
