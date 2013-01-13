@@ -1,18 +1,20 @@
-// player.h
+// $Id$
 
 #ifndef __PLAYER_H
 #define __PLAYER_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "player.h"
+#include "config.h"
 
 class player {
 private :
-	char name[20];
-	char team[4];
-	char rtn[4];
-	char pos[15];
+	char name[NAMELEN];
+	char team[TEAMLEN];
+	char rtn[TEAMLEN];
+	char *pos;
 public :
 	player(char*);
 	player(char*, char*, char*, char*);
@@ -37,7 +39,8 @@ public :
 	char *pout();
 	void pa(char);
 	void new_pos(char*);
-//	~player() {fprintf(stderr,"deleted %s\n",this->nout());}
+	int getpos(char*);
+	~player(); 
 };
 
 #endif

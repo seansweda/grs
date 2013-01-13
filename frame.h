@@ -1,4 +1,4 @@
-// frame.h
+// $Id$
 
 #ifndef FRAME_H
 #define FRAME_H
@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "player.h"
 #include "pitcher.h"
 #include "team.h"
@@ -16,39 +17,50 @@
 class frame {
 private :
 
-	char event[3];
-	char location[20];
-	char baserunning[20];
-	char comment[80];
+	char *event;
+	char *location;
+	char *baserunning;
+	char *comment;
+	char *error;			// Error string
 
-	team *bat,*pit;		// Dynamic batting/pitching team vars
-	int runadv();		// Advances runners . . .
-	void runstats(int fc = 0);	// Does runners stats and pbp
-	void rbi();		// Does RBIs
+	static int **linescore;
+	static char *buffer;		// output buffer
+
+	team *bat, *pit;		// Dynamic batting/pitching team vars
+	int runadv();			// Advances runners . . .
+	void runstats( int fc = 0 );	// Does runners stats and pbp
+	void rbi();			// Does RBIs
 	
-	int runchck(char *);	// Parses baserunner advances
-	void runcat(int);	// Does default baserunner advances
-	int three();		// Checks for three operands
+	int runchck( char* );		// Parses baserunner advances
+	void runcat( int );		// Does default baserunner advances
+	int three();			// Checks for three operands
 
-	char error[80];		// Error string
-
-	void batterup();	// brings the next batter up 
+	void batterup();		// brings the next batter up 
 
 	void cleanup();			// frees up memory for an undo
-	int backup(char*,char*);	// backs up one line in .cmd file
+	int backup( char*, char* );	// backs up one line in .cmd file
 					// returns 1 if it is a legal command
 public :
 
-	frame(char*);
-	frame(team*,team*,FILE*);	// First constructor called
+	static int undo, cont, outs, atbat, inning, runs, linesize, errflag;
+	static queue *runners;		// queue to handle inherited runners
+	static player *onbase[4];	// array of pointers to batter & runners
+
+	frame( char* );
+	frame( team*, team*, FILE* );	// First constructor called
 	int decode();			// decode the parsed command line
 	int update();			// update the stats
-	void help(char*);		// Prints helpful? messages
-	void frameput(void);		// Outpus info useful to user
-	void who_stat(int);
+	void help( char* );		// Prints helpful? messages
+	void frameput();		// Outputs info useful to user
+	void who_stat( int, int );	// add stat to player @fielding pos
+	int outsonplay( char* );	// how many outs in this play
+	int batterout( char* );		// did the batter make an out?
 
-//	~frame() {if (output != stdout) fprintf(stderr,"%s %s %s\n",
-//			event,location,baserunning);}
+	static void print_linescore( FILE* );
+	void outbuf( FILE*, char*, char *punc ="\0" );
+	void putcmd();
+
+	~frame();
 };
 
 #endif

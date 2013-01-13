@@ -1,0 +1,242 @@
+// $Id$
+
+GRS is a program for creating a game report for the Internet Baseball
+League.  GRS was written by Sean Sweda (sweda@ibl.org), with assistance
+from Greg Speegle, Richard Dunlap, and Christian Beliveau.  The code is 
+available via anonymous ftp at ftp://ftp.ibl.org/ibl/grs/
+
+** please submit bug reports to sweda@ibl.org **
+
+
+COMPILING THE PROGRAM
+
+1) unpack the source ( tar -xzf grs.tgz )
+
+2) edit Makefile to your taste
+
+3) "make"
+
+
+RUNNING THE PROGRAM
+
+Usage: grs [ (-a afile) (-h hfile) | (-f cmdfile) ] outfile
+
+-a	Used to read in the away team's lineup from an external file.
+	ex: grs -a yesterdays_game.cmd todays_game
+
+-h	Used to read in the home team's lineup from an external file.
+	ex: grs -h my_lineup_vsRH game6
+
+-f	Used to read in commands from an external file.  NOTE:  This
+	includes the lineups, thus -f is incompatible with -a and/or -h.
+	ex: grs -f unfinished_game 1-1
+
+-v	Using this flag will cause grs to output the version number.
+	(v2.3.0 and later)
+
+If you use the -f flag to read in a file, make sure that the last
+event is NOT 'eg'.
+
+The last operand is always the output file prefix.  GRS will create
+the following files:
+
+<outfile>.sts	- the stats
+<outfile>.pbp	- the play-by-play
+<outfile>.cmd	- the commands you typed in
+<outfile>.un# 	- a file GRS uses temporarily to process the undo command
+		  there may be several of these files after you are done
+
+The accompanying shell script, grscat (instructions at the end) will
+concatenate these files into one large file, if you so desire.
+
+WHAT IT DOESN'T DO
+
+GRS is not smart enough to figure out earned runs, you'll have to do that
+yourself when prompted.  There are some esoteric events which GRS does not
+handle gracefully, if you come across one please inform the author.
+
+ENTERING THE LINEUPS
+
+GRS uses space dilimited text.  Thus, when prompted for player name,
+real team, and position, you should separate these by spaces.
+Example:  Trammell DET ss
+
+When GRS is started, you will be prompted for a three letter team
+abbreviation for each team.  This code will be converted to upper case.
+
+This program was created with the designated hitter in mind.  If the
+pitcher bats in your league, you must enter him in the original lineup
+twice, once as a batter and once as a pitcher.
+
+As noted above, lineups may be read in from an external file.  If you
+want to do this, make sure the lienups are in the same format as they
+appear in the .cmd file.
+
+
+COMMAND SYNTAX
+
+GRS accepts commands in the following syntax: (space delimited)
+
+event location baserunning
+
+event 		- a 2 letter event code, all of which are listed below
+location	- many uses, eg. location of a hit (gcf), or fielding
+		  on the play (6-3);  also can be used to indicate a
+		  special kind of play like a H&R or IFR, eg. 6-3(IFR)
+		  or IFR(6) or lcf(H&R), etc.
+baserunning	- in groups of 2, indicating where the player started,
+		  and where he ended up, eg. 12 means runner on 1st
+		  went to second.  Use the letter 'b' for the batter,
+		  'o' for out, and 'h' for home.  There are default
+		  advances programmed in, so you can skip the
+		  baserunning field if nobody advanced an extra base.
+
+The location is optional for all events.  Some events require baserunning
+information.  When entering errors, only list the player who made the
+error in the location field. (e.g. er 3/rg6 b1 instead of er 6-3 b1 for a
+dropped throw by the firstbaseman)
+
+This is a list of the events that the GRS program accepts:
+
+ph - pinch hit
+
+	Use the same form as lineup entry.  List the position the
+	pinch-hitter will play next inning, or just "ph" if he
+	is only pinch-hitting.
+
+pr - pinch run
+
+        Use the same form as lineup entry.  List the position the
+        pinch-runner will play next inning, or just "pr" if he
+        is only pinch-running.
+
+np - new pitcher
+
+	Use the same form as lineup entry.  Also, if you are playing
+	with the pitcher batting, you can specify the position in the
+	batting order where the pitcher will hit, and GRS will
+	automatically insert him into the batting order.
+	ex: Harvey FLA R 9 	(this would put Harvey in the 9 hole)
+	
+dr - defensive replacement
+dc - defensive position change
+
+	Use the same form as lineup entry.  The only difference
+	between these two commands is that "dc" moves a player from
+	one position to another and "dr" replaces a player.
+
+la - list the away team's lineup
+lh - list the home team's lineup
+
+un - undo
+
+	Undo will allow you to undo any event, including a lineup
+	change or the end of an inning.  You can even undo several
+	events at once.  Make sure that there is never an undo
+	command in a command file that you are reading in via the
+	-f flag, as the undo command is never recorded in the .cmd
+	file normally, and this will only serve to confuse GRS.
+
+en - end of inning
+eg - end of game 
+
+cm - comment
+nj - enters in a "<runner> unable to get jump" comment, specify base of runner
+fa - enters in a "<pitcher> fatigues" comment
+in - enters in an "infield in" comment, can supply positions
+ic - enters in an "infield in @ 1b/3b" comment
+
+so - strikeout
+kd - strikeout, dropped third strike
+kc - strikeout, caught stealing
+ks - strikeout, stolen base
+bb - walk
+iw - intentional walk
+ci - catcher's interference
+hb, hp - hit by pitch
+wp - wild pitch
+pb - passed ball
+bk - balk
+sb - stolen base
+cs - caught stealing
+pk - picked off
+th - advance on a throw
+oa - out advancing on a throw
+
+1b - single
+2b - double
+3b - triple
+hr - home run
+dp, gd - ground into double play
+fd - fly into double play
+ld - line into double play
+lo - line out
+fc - fielder's choice, batter reaches first
+hg - hard ground out
+rg - routine ground out
+sg - slow ground out
+hf - high fly
+po - pop out
+fp, pf - foul pop out
+sf - sacrifice fly
+sh - sacrifice hit
+lf - long fly 
+wt, df - warning track fly (from deep fly chart)
+er - batter reaches on error
+ea - runner advances on error
+
+generic codes:
+
+fo - fly out
+go - ground out
+
+
+************
+UNDO WARNING
+************
+
+Undo is the most precarious part of our program, i.e. the most likely
+way to crash GRS.  The current status is:
+
+Undo seems to be 100% functional.
+
+NEVER, EVER, use the -f flag with an undo command imbedded in the
+input file!  the undo event is never recorded in a .cmd file, and GRS
+is not expecting it!  there will be grave (although quite comical) 
+consequences if you ignore this.
+
+The moral of the story is, use undo at your own risk.  What is listed
+above is the "observed" pattern of activity of undo.  It *may* crash,
+possibly destroying your game report.  If you don't want to try undo,
+just end the game, then use copy-paste to re-input your commands
+(copy from the .cmd file).  Or even easier still, use the -f flag.
+
+
+
+GRSCAT
+
+grscat is a shell script I wrote to concatenate the files that GRS
+creates.  I name my files according to week number and game number
+
+e.g. grs 8-1		- for week 8, game 1
+
+grscat takes a single argument, the week number
+
+e.g  grscat 8 	 	- will cat all week 8 games into a file named "8"
+
+also, if you put mail header info into a file called .grscat in the
+same directory as the files you are grscat-ing, it will put it at
+the top of the file
+
+e.g. my .grscat is
+
+To:
+cc:
+Subject:
+------- 
+
+WEEK
+AWAY
+HOME
+
+

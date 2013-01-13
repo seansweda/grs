@@ -1,33 +1,43 @@
-# Some notes on this makefile:
-#
-# DEBUG is for us (the creators/debuggers), leave it blank
-# PORT has been used in the path for hard coding the runtime libraries
-# 	into the executable.  In order to do this, add "-Bstatic" after
-#	PORT (without the quotes).  What this does is allow you to
-#	compile on one machine, but be able to move the executable
-#	between many different machines of the same type.
-# CC is your c++ compiler.  Change CC to whatever compiler you want to
-#	use.  See the README file for compilers that have been used
-#	successfully.
+# $Id$
 
+# -DDEBUG turns on debugging output
+# -DWIN32 for building on Windows
 
-DEBUG =
-PORT = 
 CC = g++
+CFLAGS = -g -Wall -Wextra -Wconversion #-DDEBUG
+LDFLAGS =
 
-grs: main.o frame.o update.o queue.o team.o player.o pitcher.o 
-	$(CC) $(PORT) $(DEBUG) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o
-main.o: main.cc frame.h team.h player.h pitcher.h
-	$(CC) $(DEBUG) -c main.cc
-frame.o: frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h
-	$(CC) $(DEBUG) -c frame.cc
-update.o: frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h
-	$(CC) $(DEBUG) -c update.cc
-team.o: team.cc team.h player.h pitcher.h
-	$(CC) $(DEBUG) -c team.cc
-queue.o: queue.cc queue.h pitcher.h
-	$(CC) $(DEBUG) -c queue.cc
-player.o: player.cc player.h 
-	$(CC) $(DEBUG) -c player.cc
-pitcher.o: pitcher.cc pitcher.h
-	$(CC) $(DEBUG) -c pitcher.cc
+all: grs
+
+tarball:
+	rm -f grs.tar grs.tar.gz
+	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc grscat
+	gzip grs.tar
+
+grs: Makefile main.o frame.o update.o queue.o team.o player.o pitcher.o 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o
+
+main.o: Makefile main.cc frame.h team.h player.h pitcher.h config.h
+	$(CC) $(CFLAGS) -c main.cc
+
+frame.o: Makefile frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h config.h
+	$(CC) $(CFLAGS) -c frame.cc
+
+update.o: Makefile frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h config.h
+	$(CC) $(CFLAGS) -c update.cc
+
+team.o: Makefile team.cc team.h player.h pitcher.h config.h
+	$(CC) $(CFLAGS) -c team.cc
+
+queue.o: Makefile queue.cc queue.h pitcher.h
+	$(CC) $(CFLAGS) -c queue.cc
+
+player.o: Makefile player.cc player.h config.h
+	$(CC) $(CFLAGS) -c player.cc
+
+pitcher.o: Makefile pitcher.cc pitcher.h config.h
+	$(CC) $(CFLAGS) -c pitcher.cc
+
+clean: 
+	rm -f *.o grs grs.tar.gz
+

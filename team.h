@@ -1,4 +1,4 @@
-// team.h
+// $Id$
 
 #ifndef __TEAM_H
 #define __TEAM_H
@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h> 
 #include <ctype.h> 
+#include "config.h"
 #include "player.h"
 #include "pitcher.h"
 
@@ -28,22 +29,30 @@ struct pit_list {
 // Linked list of names
 struct stat_list {
 	int ord;
-	char name[80];
+	char name[NAMELEN];
 	stat_list *next;
 	};
 
 class team {
 private :
-	char ibl[4];
+	char ibl[TEAMLEN];
 	struct pl_list *lineup;			// ptr to linked list
 	struct pl_list *current;		// ptr to current batter
 	struct pit_list *pitchers;		// ptr to linked list
 	struct pl_list *findord_pl(int);
 
-	struct stat_list extra_stats[9];
+	struct stat_list extra_stats[9];	// 0: E
+						// 1: PB
+						// 2: GIDP
+						// 3: SH
+						// 4: SF
+						// 5: HBP
+						// 6: WP
+						// 7: IBB
+						// 8: BALK
 
 public :
-	team();
+	team(int);
 	team(char*);
 	int make_lineups();
 	int make_lineups_pit();
@@ -51,8 +60,8 @@ public :
 	char *posout(int);	
 	player *next_up();
 	player *up();
-	char* insert(int, char* ="", char* ="");
-	char* pos_change(int);
+	void insert(int, char**, char* ="", char* ="");
+	void pos_change(int, char**);
 	int new_pit();
 	char *nout();
 	int score;
