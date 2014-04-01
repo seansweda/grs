@@ -1,5 +1,3 @@
-// $Id$
-
 #include "config.h"
 
 #ifndef __EXTERN_H

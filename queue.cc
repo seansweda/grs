@@ -1,5 +1,3 @@
-// $Id$
-
 #include "queue.h"
 
 queue::queue()

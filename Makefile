@@ -1,5 +1,3 @@
-# $Id$
-
 # -DDEBUG turns on debugging output
 # -DWIN32 for building on Windows
 

@@ -1,5 +1,3 @@
-// $Id$
-
 #ifdef WIN32
 #   define NULLDEV	"NUL:"
 #else

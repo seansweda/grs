@@ -1,5 +1,3 @@
-// $Id$
-
 #include "frame.h"
 #include "queue.h"
 

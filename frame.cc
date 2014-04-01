@@ -1,5 +1,3 @@
-// $Id$
-
 #include "frame.h"
 
 // Constructor which initializes the static fields

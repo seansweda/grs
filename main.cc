@@ -1,5 +1,3 @@
-// $Id$
-
 #define VER "3.0.1"
 
 #include <stdio.h>

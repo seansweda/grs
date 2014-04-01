@@ -1,5 +1,3 @@
-// $Id$
-
 #include "team.h"
 #include "extern.h"
 
