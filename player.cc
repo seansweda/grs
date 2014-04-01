@@ -42,13 +42,6 @@ player::hit( int i )
 }
 
     void 
-player::move(char* str)
-{
-    for ( int i=0; i<2; i++ ) 
-	pos[i] = *str + i;
-}
-
-    void 
 player::sout(FILE *fp)
 {
     fprintf(fp,"%-8s %-5s%-5s%-17s%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d",

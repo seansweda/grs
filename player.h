@@ -31,7 +31,6 @@ public :
 	int pal;
 	int par;
 	void hit(int);
-	void move(char*);
 	void sout(FILE*);
 	char *nout();
 	char *pout();
