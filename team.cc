@@ -20,7 +20,7 @@ team::team( int who )
 	    for ( i=0; i< 3; i++ ) {
 		if ( isalpha(str[i]) ) {
 		    if ( islower (str[i]) )
-			str[i] = toupper(str[i]);   // convert to uppercase
+			str[i] = (char)toupper(str[i]); // convert to uppercase
 		}
 		else {
 		    flag = 1;
@@ -119,7 +119,7 @@ team::pos_change( int spot, char **comment )
 
 // Adds a new player at position "spot" in the batting order
     void
-team::insert( int spot, char **comment, char *def, char *inputstr )
+team::insert( int spot, char **comment, const char *def, const char *inputstr )
 {
     struct pl_list *newpl, *oldpl;
     int flag;
@@ -654,7 +654,7 @@ team::posout( int position )
     if (curr->head->posn == position)
 	return (curr->head->nout());
     else
-	return ("\0");
+	return (char(0));
 }
 
     int 

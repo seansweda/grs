@@ -918,7 +918,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "nj" )) ) {
 	i = atoi(location);
-	if ( i < 1 || i > 3 )
+	if ( i < 1 || i > 3 ) {
 	    if ( onbase[3] ) 
 		i = 3;
 	    else if ( onbase[2] ) 
@@ -927,6 +927,7 @@ frame::update()
 		i = 1;
 	    else 
 		i = 0;
+	}
 	if ( !i || !(onbase[i]) ) {
 	    sprintf( error, "No runner at \"%s\"\n", location );
 	    return(0);

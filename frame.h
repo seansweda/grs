@@ -55,7 +55,7 @@ public :
 	int batterout( char* );		// did the batter make an out?
 
 	static void print_linescore( FILE* );
-	void outbuf( FILE*, char*, char *punc ="\0" );
+	void outbuf( FILE*, const char*, const char* = "\0" );
 	void putcmd();
 
 	~frame();

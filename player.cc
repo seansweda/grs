@@ -12,7 +12,7 @@ player::player( char* str )
 }
 
 // Better constructor function
-player::player( char* inname, char* inteam, char* inrtn, char* inpos )
+player::player( char* inname, char* inteam, char* inrtn, const char* inpos )
 {
     strcpy( name, inname );
     strcpy( team, inteam );

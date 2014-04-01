@@ -136,7 +136,7 @@ frame::runadv()
 frame::runstats( int fc )
 {
     int i, j;
-    char *(b[4]);
+    const char *(b[4]);
     char tempstr[MAX_INPUT];
     char *str;
 
@@ -562,7 +562,7 @@ frame::who_stat( int stat, int who )
 #endif
    switch (who) {
         case 0 :
-	    pit->newstat( "\0", stat );
+	    pit->newstat( char(0), stat );
 	    break;
         case 1 :
 	    pit->newstat( pit->mound->nout(), stat ); 
@@ -780,7 +780,7 @@ frame::decode()
 }
 
     void 
-frame::outbuf( FILE *fp, char *str, char *punc )
+frame::outbuf( FILE *fp, const char *str, const char *punc )
 {
     int count;
     char tempstr[MAX_INPUT * 2];
@@ -839,14 +839,14 @@ frame::print_linescore(FILE *fp)
 	fprintf(fp,"-");
     fprintf(fp,"\n");
 
-    fprintf(fp,"%s ",ibl[0]);
+    fprintf(fp,"%s ",ibl[0]->nout());
     for (x = 0; x < inning; x++)
 	fprintf(fp,"%3d",linescore[0][x]);
     fprintf(fp,"   %3d%3d%3d",ibl[0]->score,ibl[0]->team_hits(),
 				 ibl[0]->errors);
     fprintf(fp,"\n");
 
-    fprintf(fp,"%s ",ibl[1]);
+    fprintf(fp,"%s ",ibl[1]->nout());
     for (x = 0; x < inning; x++)
 	fprintf(fp,"%3d",linescore[1][x]);
     fprintf(fp,"   %3d%3d%3d",ibl[1]->score,ibl[1]->team_hits(),

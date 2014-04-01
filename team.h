@@ -58,7 +58,7 @@ public :
 	char *posout(int);	
 	player *next_up();
 	player *up();
-	void insert(int, char**, char* ="", char* ="");
+	void insert(int, char**, const char* = "\0", const char* = "\0");
 	void pos_change(int, char**);
 	int new_pit();
 	char *nout();

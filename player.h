@@ -15,7 +15,7 @@ private :
 	char *pos;
 public :
 	player(char*);
-	player(char*, char*, char*, char*);
+	player(char*, char*, char*, const char*);
 	int posn;
 	int ab;
 	int h;
