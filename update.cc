@@ -321,7 +321,7 @@ frame::update()
         onbase[0]->pa(pit->mound->throws);
         rbi();
 	runadv();
-	batterup();
+	batterup(0);	// iw doesn't count as BF
 	frameput();
 	return(1);
     }

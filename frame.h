@@ -35,7 +35,7 @@ private :
 	void runcat( int );		// Does default baserunner advances
 	int three();			// Checks for three operands
 
-	void batterup();		// brings the next batter up 
+	void batterup( int nobf = 1 );	// brings the next batter up
 
 	void cleanup();			// frees up memory for an undo
 	int backup( char*, char* );	// backs up one line in .cmd file

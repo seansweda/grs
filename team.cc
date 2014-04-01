@@ -339,9 +339,9 @@ team::box_score( FILE *fp )
     struct pl_list *newpl;
     struct pit_list *newpit;
 
-    int ab, h, r, rbi, b2, b3, hr, bb, k, sb, cs, pal, par, out, er;
+    int ab, h, r, rbi, b2, b3, hr, bb, k, sb, cs, pal, par, out, er, bf;
 
-    ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=out=er=0;
+    ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=out=er=bf=0;
 
     fprintf(fp,"\n\nBATTERS  %-29s AB  R  H RI 2B 3B HR SB CS BB  K PL PR\n", ibl);
     newpl=lineup;
@@ -368,9 +368,9 @@ team::box_score( FILE *fp )
     fprintf(fp,"TOTALS for %-26s %3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d\n",
 			ibl,ab,r,h,rbi,b2,b3,hr,sb,cs,bb,k,pal,par);
 
-    ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=out=er=0;
+    ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=out=er=bf=0;
 
-    fprintf(fp,"\nPITCHERS  %-19s   IP  H  R ER BB  K HR \n", ibl);
+    fprintf(fp,"\nPITCHERS  %-19s   IP  H  R ER BB  K HR  BF\n", ibl);
     newpit=pitchers;
     while (newpit) {
 	out=out+newpit->head->out;
@@ -380,13 +380,14 @@ team::box_score( FILE *fp )
 	bb=bb+newpit->head->bb;
 	k=k+newpit->head->k;
 	hr=hr+newpit->head->hr;
+	bf=bf+newpit->head->bf;
 	newpit->head->sout(fp);
 	fprintf(fp,"\n");
 	newpit=newpit->next;
     }
     fprintf(fp,"\n");
-    fprintf(fp,"TOTALS for %-17s %3d.%1d%3d%3d%3d%3d%3d%3d\n\n",
-		    ibl,out/3,out % 3,h,r,er,bb,k,hr);
+    fprintf(fp,"TOTALS for %-17s %3d.%1d%3d%3d%3d%3d%3d%3d %3d\n\n",
+		    ibl,out/3,out % 3,h,r,er,bb,k,hr,bf);
 }
 
 // Returns the next batter in the order

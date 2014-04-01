@@ -250,8 +250,12 @@ frame::rbi()
 }
 
     void 
-frame::batterup()
+frame::batterup( int bf )
 {
+    // call with bf=0 for events that should not count as BF
+    if ( bf ) {
+	pit->mound->bf++;
+    }
     bat->next_up();
     onbase[0]=bat->up();
 }

@@ -25,7 +25,7 @@ public :
 	int bb;
 	int k;
 	int hr;
-	int br;
+	int bf;
 	char throws; 
 	void sout(FILE*);
 	char *nout();
