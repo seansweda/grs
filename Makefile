@@ -1,8 +1,9 @@
 # -DDEBUG turns on debugging output
 # -DWIN32 for building on Windows
 
+GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always)
 CC = g++
-CFLAGS = -g -Wall -Wextra -Wconversion #-DDEBUG
+CFLAGS = -g -Wall -Wextra -Wconversion -DGIT=\"$(GIT_VERSION)\" #-DDEBUG
 LDFLAGS =
 
 all: grs

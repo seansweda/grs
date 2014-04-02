@@ -142,7 +142,11 @@ setup()
     fgets(tempstr, MAX_INPUT, input);
     fprintf(output, "\n");
     fprintf(cmdfp, "%s", tempstr);
-    fprintf(pbpfp, "grs version %s\n", VER);
+    fprintf(pbpfp, "grs version %s", VER);
+#ifdef GIT
+    fprintf(pbpfp, " (%s)", GIT);
+#endif
+    fprintf(pbpfp, "\n");
     fprintf(pbpfp, "%s at %s \n", ibl[0]->nout(), ibl[1]->nout());
     fprintf(pbpfp, "%s\n", tempstr);
     fprintf(pbpfp, "Starting pitchers - %s for %s, and %s for %s\n",
@@ -230,7 +234,11 @@ main(int argc, char *argv[])
 	case 'f':	cfile = (char *) calloc(PATH_MAX, sizeof(char));	
 	    		strncpy( cfile, optarg, PATH_MAX );
 			break;
-	case 'v':	fprintf(stderr,"%s\n",VER);
+	case 'v':	fprintf(stderr,"%s",VER);
+#ifdef GIT
+			fprintf(stderr, " (%s)", GIT);
+#endif
+			fprintf(stderr, "\n");
 			exit(0);
 	case '?':	usage++;
     }
