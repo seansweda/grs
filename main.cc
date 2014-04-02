@@ -1,6 +1,7 @@
 #define VER "3.1_beta"
 
 #include <stdio.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -186,6 +187,29 @@ openfile( char *prefix )
 }
 
     int
+checkfile( char *prefix )
+{
+    char filename[PATH_MAX];
+    struct stat sb;
+    int result = 0;
+
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( stat(strcat( filename, ".pbp"), &sb ) == 0 )
+	result++;
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( stat(strcat( filename, ".sts"), &sb ) == 0 )
+	result++;
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( stat(strcat( filename, ".cmd"), &sb ) == 0 )
+	result++;
+
+    return (result);
+}
+
+    int
 main(int argc, char *argv[])
 {
 
@@ -224,6 +248,13 @@ main(int argc, char *argv[])
     else {
 	strncpy( filename, argv[optind], PATH_MAX - 5 );
 	filename[PATH_MAX - 4] = '\0';
+
+	// don't overwrite existing files
+	if ( checkfile(filename) ) {
+	    fprintf( stderr, "%s.* file(s) already exist\n", filename );
+	    exit(1);
+	}
+
 	if ( openfile(filename) ) {
 	    fprintf( stderr, "cannot open %s.*\n", filename );
 	    exit(1);
