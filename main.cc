@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef GETOPT
+#   include "getopt/getopt.h"
+#else
+#   include <unistd.h>
+#endif
 #include "config.h"
 #include "pitcher.h"
 #include "player.h"
