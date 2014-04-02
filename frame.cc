@@ -222,11 +222,13 @@ frame::runstats( int fc )
 frame::frameput()
 {
     fprintf( output, "Pit: %-15s ", pit->mound->nout() );
+    fprintf( output, "IP: %2d.%d  BF: %2d   ",
+	    pit->mound->out / 3, pit->mound->out % 3, pit->mound->bf );
     fprintf( output, "%s: %2d  %s: %2d   ",
     		ibl[0]->nout(), ibl[0]->score,
     		ibl[1]->nout(), ibl[1]->score );
-    fprintf( output, "In: %s %d  Outs: %d\n", 
-    		atbat == 0 ? "Top" : "Bot", inning, outs );
+    fprintf( output, "In: %s %d  Outs: %d\n",
+		atbat == 0 ? "Top" : "Bot", inning, outs);
     fprintf( output, "Bat: %-15s ", onbase[0]->nout() );
     for ( int i=1; i<4; i++ ) 
 	fprintf( output, "%1d: %-15s ", i, 
