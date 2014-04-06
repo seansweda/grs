@@ -69,6 +69,7 @@ public :
 	pitcher *mound;
 	player *findord(int);
 	void print_lineup(void);
+	void check_defense(void);
 	player *back_up();
 	void newstat(char*, int);
 	void printstat(FILE*, int);

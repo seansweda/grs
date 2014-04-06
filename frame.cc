@@ -234,6 +234,7 @@ frame::frameput()
 	fprintf( output, "%1d: %-15s ", i, 
 		onbase[i] ? onbase[i]->nout() : "    ");
     fprintf( output, "\n" );
+    ibl[ atbat == 0 ? 1 : 0 ]->check_defense();
 }
 
     void 

@@ -529,6 +529,66 @@ team::print_lineup()
     }
 }
 
+    void
+team::check_defense()
+{
+    struct pl_list *newpl;
+    int i, field[8];
+    char missing[25];
+
+    missing[0] = '\0';
+
+    for ( i = 0; i < 8; i++ ) {
+	field[i] = 0;
+    }
+
+    newpl=lineup;
+    while (newpl) {
+	while (newpl->next && newpl->ord==newpl->next->ord) newpl=newpl->next;
+	field[ newpl->head->getpos( newpl->head->pout() ) - 2 ] = 1;
+	newpl=newpl->next;
+    }
+
+    for ( i = 0; i < 8; i++ ) {
+#ifdef DEBUG
+	fprintf( stderr, "check_defense: %d/%d : %s\n", i, field[i], missing );
+#endif
+	if ( field[i] == 0 ) {
+	    switch ( i + 2 ) {
+		case 2	:
+		    strcat( missing, " c" );
+		    break;
+		case 3	:
+		    strcat( missing, " 1b" );
+		    break;
+		case 4	:
+		    strcat( missing, " 2b" );
+		    break;
+		case 5	:
+		    strcat( missing, " 3b" );
+		    break;
+		case 6	:
+		    strcat( missing, " ss" );
+		    break;
+		case 7	:
+		    strcat( missing, " lf" );
+		    break;
+		case 8	:
+		    strcat( missing, " cf" );
+		    break;
+		case 9	:
+		    strcat( missing, " rf" );
+		    break;
+	    }
+	}
+    }
+
+    if ( strlen(missing) != 0 ) {
+	fprintf(output,"defense missing:%s\n", missing);
+    }
+
+}
+
     int 
 team::team_hits ()
 {
