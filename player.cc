@@ -79,7 +79,7 @@ player::pa( char c )
 player::new_pos( char *newpos )
 {
     // extend pos string
-    pos = (char*) realloc( pos, strlen(pos) + strlen(newpos) );	
+    pos = (char*) realloc( pos, strlen(pos) + strlen(newpos) + 2 );
     strcat( pos, "-" );
     strcat( pos, newpos );
     posn = getpos( newpos );
