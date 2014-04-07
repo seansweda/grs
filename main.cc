@@ -228,7 +228,8 @@ main(int argc, char *argv[])
     char *cfile = NULL;
     int usage = 0;
 
-    while ((c = getopt(argc, argv, "a:h:f:v")) != EOF)
+    int overwrite = 0;
+    while ((c = getopt(argc, argv, "a:h:f:vo")) != EOF)
     switch (c) {
 	case 'a':	afile = (char *) calloc(PATH_MAX, sizeof(char));
 	    		strncpy( afile, optarg, PATH_MAX );
@@ -238,6 +239,8 @@ main(int argc, char *argv[])
 			break;
 	case 'f':	cfile = (char *) calloc(PATH_MAX, sizeof(char));	
 	    		strncpy( cfile, optarg, PATH_MAX );
+			break;
+	case 'o':	overwrite = 1;
 			break;
 	case 'v':	fprintf(stderr,"%s",VER);
 #ifdef GIT
@@ -263,7 +266,7 @@ main(int argc, char *argv[])
 	filename[PATH_MAX - 4] = '\0';
 
 	// don't overwrite existing files
-	if ( checkfile(filename) ) {
+	if ( !overwrite && checkfile(filename) ) {
 	    fprintf( stderr, "%s.* file(s) already exist\n", filename );
 	    exit(1);
 	}
