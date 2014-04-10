@@ -969,30 +969,49 @@ frame::update()
     int 
 frame::backup( char *infile, char *outfile )
 {
-   int result;
-   char tempstr[MAX_INPUT];
-   char nextstr[MAX_INPUT];
+    int result;
+    size_t cmdlen;
+    char filestr[MAX_INPUT];
+    char currstr[MAX_INPUT];
+    char nextstr[MAX_INPUT];
 
-   frame *test;
+    frame *test;
 
-    strcpy( tempstr,filename );
-    strcat( tempstr, outfile );
-    if ( ( undofp = fopen(tempstr,"w") ) == NULL ) {
+    strcpy( filestr,filename );
+    strcat( filestr, outfile );
+    if ( ( undofp = fopen(filestr,"w") ) == NULL ) {
 	fprintf( stderr, "fatal error - can't open undo file\n" );
 	exit(1);
     }
-    strcpy( tempstr, filename );
-    strcat( tempstr, infile );
-    cmdfp = fopen(tempstr,"r");
-    fgets( tempstr, MAX_INPUT, cmdfp );
+#ifdef DEBUG_UNDO
+    fprintf( stderr, "backup(%s):\n", filestr );
+#endif
+    strcpy( filestr, filename );
+    strcat( filestr, infile );
+    cmdfp = fopen(filestr,"r");
+
+    fgets( currstr, MAX_INPUT, cmdfp );
     fgets( nextstr, MAX_INPUT, cmdfp );
     while ( !(feof(cmdfp)) ) {
-	fputs( tempstr, undofp );
-	strcpy( tempstr, nextstr );
+	cmdlen = strlen(currstr);
+#ifdef DEBUG_UNDO
+	fprintf( stderr, "1: (%d) %s2: %s",
+		(int)cmdlen, currstr, nextstr);
+#endif
+	fputs( currstr, undofp );
+	strcpy( currstr, nextstr );
 	fgets( nextstr, MAX_INPUT, cmdfp );
     }
-    test = new frame(tempstr);
+
+    // on dc/dr skip decode, fail early
+    if ( cmdlen == 2 ) {
+	return(0);
+    }
+    test = new frame(currstr);
     result = test->decode();
+#ifdef DEBUG_UNDO
+    fprintf( stderr, "decode(%s) = %d\n", stripcr(currstr, MAX_INPUT), result );
+#endif
     delete(test);
     return(result);
 }

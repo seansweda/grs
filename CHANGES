@@ -6,6 +6,7 @@ VERSION HISTORY
 	* display current pitcher's IP & BF totals
 	* prevent overwriting of existing output files
 	* check for valid defensive lineup
+	* fix undo after dc bug
 
 3.0.1	* fix baserunner queue bug
 	* sanity check for outs on play
