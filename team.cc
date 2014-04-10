@@ -157,7 +157,7 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
 		fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
 		fprintf( stderr, "insert %d: %d, %d, %d\n", spot,
-	    		strlen(name), strlen(mlb), strlen(pos) );
+			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
 		if ( input == stdin ) 
 		    flag = 1; 
@@ -259,7 +259,7 @@ team::make_lineups()
 		fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
 		fprintf( stderr, "make_lineups: %d, %d, %d\n", 
-	    		strlen(name), strlen(mlb), strlen(pos) );
+			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
 		if ( input == stdin ) 
 		    flag = 1; 
@@ -310,7 +310,7 @@ team::make_lineups_pit()
 	    fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
 	    fprintf( stderr, "make_lineups_pit: %d, %d, %d\n", 
-	    		strlen(name), strlen(mlb), strlen(throws) );
+		    (int)strlen(name), (int)strlen(mlb), (int)strlen(throws) );
 #endif
 	    if ( input == stdin ) 
 		flag = 1; 
@@ -323,7 +323,7 @@ team::make_lineups_pit()
     pitchers->next = 0;
     mound=pitchers->head;
 #ifdef DEBUG
-    fprintf(stderr,"%d:%s->%d\n",pitchers,pitchers->head->nout(),pitchers->next);
+    fprintf(stderr,"%p:%s->%p\n",pitchers,pitchers->head->nout(),pitchers->next);
 #endif
     fprintf(output,"\n");
     return 1;
@@ -463,7 +463,7 @@ team::new_pit()
 	    fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
 	    fprintf( stderr, "new_pit: %d, %d, %d\n", 
-	    		strlen(name), strlen(mlb), strlen(throws) );
+		    (int)strlen(name), (int)strlen(mlb), (int)strlen(throws) );
 #endif
 	    if ( input == stdin ) 
 		flag = 1; 
@@ -476,11 +476,11 @@ team::new_pit()
     newpit->next = 0;
     oldpit = pitchers;
 #ifdef DEBUG
-    fprintf(stderr,"\n%d:%s->%d ",oldpit,oldpit->head->nout(),oldpit->next);
+    fprintf(stderr,"\n%p:%s->%p ",oldpit,oldpit->head->nout(),oldpit->next);
 #endif
     while (oldpit->next) {
 #ifdef DEBUG
-    fprintf(stderr,"\n%d:%s->%d ",oldpit,oldpit->head->nout(),oldpit->next);
+    fprintf(stderr,"\n%p:%s->%p ",oldpit,oldpit->head->nout(),oldpit->next);
 #endif
 	oldpit=oldpit->next;
     }
@@ -614,12 +614,12 @@ team::newstat(char *pl_name, int stat)
 
     if ( strlen(pl_name) ) {
 #ifdef DEBUG
-	fprintf( stderr, "p:%d c:%d\n", prev, curr );
+	fprintf( stderr, "p:%p c:%p\n", prev, curr );
 #endif
 	if (prev) {
 	    while ((curr) && (strcmp(prev->name, pl_name))){
 #ifdef DEBUG
-		fprintf( stderr, "p:%d c:%d\n", prev, curr );
+		fprintf( stderr, "p:%p c:%p\n", prev, curr );
 #endif
 		prev = curr;
 		curr = curr->next;
@@ -628,7 +628,7 @@ team::newstat(char *pl_name, int stat)
 		prev->ord++;}
 	    else {
 #ifdef DEBUG
-		fprintf( stderr, "p:%d c:%d\n", prev, curr );
+		fprintf( stderr, "p:%p c:%p\n", prev, curr );
 #endif
 		curr = (stat_list*) malloc(sizeof(stat_list));
 		curr->ord = 1;
@@ -637,12 +637,12 @@ team::newstat(char *pl_name, int stat)
 		prev->next = curr;
 	    }
 #ifdef DEBUG
-	    fprintf( stderr, "p:%d c:%d\n", prev, curr );
+	    fprintf( stderr, "p:%p c:%p\n", prev, curr );
 #endif
 	}
 	else {
 #ifdef DEBUG
-	    fprintf( stderr, "p:%d c:%d\n", prev, curr );
+	    fprintf( stderr, "p:%p c:%p\n", prev, curr );
 #endif
 	    prev = (stat_list*) malloc(sizeof(stat_list));
 	    prev->ord = 1;
@@ -650,7 +650,7 @@ team::newstat(char *pl_name, int stat)
 	    prev->next = NULL;
 	    extra_stats[stat].next = prev;
 #ifdef DEBUG
-	    fprintf( stderr, "p:%d c:%d\n", prev, curr );
+	    fprintf( stderr, "p:%p c:%p\n", prev, curr );
 #endif
 	}
     }
@@ -664,7 +664,7 @@ team::printstat( FILE *fp,int stat )
     curr = extra_stats[stat].next;
 
 #ifdef DEBUG
-    fprintf( stderr, "es:%d %d c:%d\n", stat, extra_stats[stat].ord, curr );
+    fprintf( stderr, "es:%d %d c:%p\n", stat, extra_stats[stat].ord, curr );
 #endif
 
     if (extra_stats[stat].ord) {
@@ -672,7 +672,7 @@ team::printstat( FILE *fp,int stat )
 	if ( curr ) {
 	    while( curr->next) {
 #ifdef DEBUG
-		fprintf( stderr, "c:%d cn:%d\n",curr,curr->next );
+		fprintf( stderr, "c:%p cn:%p\n",curr,curr->next );
 #endif
 		if (curr->ord > 1) {
 		    fprintf(fp,"%s %d, ", curr->name, curr->ord);
@@ -714,7 +714,7 @@ team::posout( int position )
     if (curr->head->posn == position)
 	return (curr->head->nout());
     else
-	return (char(0));
+	return ( (char*)NULL );
 }
 
     int 

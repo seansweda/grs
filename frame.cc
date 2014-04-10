@@ -16,8 +16,8 @@ frame::frame(team *away, team *home, FILE *fp)
     *buffer='\0';
 
     linescore = (int **) malloc (2 * sizeof(int));
-    linescore[0] = (int *) calloc (linesize, sizeof(int));
-    linescore[1] = (int *) calloc (linesize, sizeof(int));
+    linescore[0] = (int *) calloc ( (size_t)linesize, sizeof(int) );
+    linescore[1] = (int *) calloc ( (size_t)linesize, sizeof(int) );
 
     bat = away;
     pit = home;
@@ -50,9 +50,9 @@ frame::frame(char *str)
     error = (char*) calloc(LINEWIDTH, sizeof(char));
 
     // extra inning, grow the linescore
-    if (inning > linesize) {
-	linescore[0] = (int *) realloc(linescore[0], inning * sizeof(int));
-	linescore[1] = (int *) realloc(linescore[1], inning * sizeof(int));
+    if ( inning > linesize ) {
+	linescore[0] = (int *) realloc(linescore[0], (size_t)(inning * sizeof(int)));
+	linescore[1] = (int *) realloc(linescore[1], (size_t)(inning * sizeof(int)));
 	linescore[0][linesize] = 0;
 	linescore[1][linesize] = 0;
 	linesize = inning;
@@ -565,7 +565,7 @@ frame::who_stat( int stat, int who )
 #endif
    switch (who) {
         case 0 :
-	    pit->newstat( char(0), stat );
+	    pit->newstat( (char*)NULL, stat );
 	    break;
         case 1 :
 	    pit->newstat( pit->mound->nout(), stat ); 
