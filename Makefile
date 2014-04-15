@@ -14,7 +14,7 @@ all: grs
 
 tarball:
 	rm -f grs.tar grs.tar.gz
-	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc grscat
+	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc getopt grscat
 	gzip grs.tar
 
 grs: Makefile main.o frame.o update.o queue.o team.o player.o pitcher.o $(GETOPT)
