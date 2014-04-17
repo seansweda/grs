@@ -680,6 +680,9 @@ frame::decode()
     else if ( !(strcmp(event,"th")) ) {
 	return(1);
     }
+    else if ( !(strcmp(event,"di")) ) {
+	return(1);
+    }
     else if ( !(strcmp(event,"cs")) ) {
 	return(1);
     }
@@ -695,6 +698,9 @@ frame::decode()
     else if ( !(strcmp(event,"oa")) ) {
 	return(1);
     }
+    else if ( !(strcmp(event,"ri")) ) {
+	return(1);
+    }
     else if ( !(strcmp(event,"1b")) ) {
 	return(1);
     }
@@ -705,6 +711,9 @@ frame::decode()
 	return(1);
     }
     else if ( !(strcmp(event,"hr")) ) {
+	return(1);
+    }
+    else if ( !(strcmp(event,"tp")) ) {
 	return(1);
     }
     else if ( !(strcmp(event,"gd")) || !(strcmp(event,"dp")) ) {

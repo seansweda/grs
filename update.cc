@@ -404,7 +404,19 @@ frame::update()
         sprintf( tempstr, "On throw" );
         outbuf( pbpfp, tempstr );
         runstats();
-        rbi();
+	runadv();
+	frameput();
+	return(1);
+    }
+    else if ( !(strcmp( event, "di" )) ) {
+	if ( !(*baserunning) )
+	    runcat(-2);
+	if ( !(runchck(baserunning)) )
+	    return(0);
+	putcmd();
+        sprintf( tempstr, "On defensive indifference" );
+        outbuf( pbpfp, tempstr );
+        runstats();
 	runadv();
 	frameput();
 	return(1);
@@ -511,6 +523,19 @@ frame::update()
 	frameput();
 	return(1);
     }
+    else if ( !(strcmp( event, "ri" )) ) {
+	if ( !(*baserunning) )
+	    runcat(-3);
+	if ( !(runchck(baserunning)) )
+	    return(0);
+	putcmd();
+        sprintf( tempstr, "On baserunner interference%c%s", spc, location );
+        outbuf( pbpfp, tempstr );
+        runstats();
+	runadv();
+	frameput();
+	return(1);
+    }
     else if ( !(strcmp( event, "1b" )) ) {
 	runcat(1);
         if ( !(runchck(baserunning)) ) 
@@ -581,6 +606,23 @@ frame::update()
         onbase[0]->hr++;
         onbase[0]->pa(pit->mound->throws);
         rbi();
+        onbase[0]->ab++;
+	runadv();
+	batterup();
+	frameput();
+	return(1);
+    }
+    else if ( !(strcmp( event, "tp" )) ) {
+	if ( !(*baserunning) )
+	    strcat( baserunning, "2o1o" );
+	runcat(0);
+        if ( !(runchck(baserunning)) )
+	    return(0);
+	putcmd();
+        sprintf( tempstr, "%s triple play%c%s", onbase[0]->nout(), spc, location );
+        outbuf( pbpfp, tempstr );
+        runstats();
+        onbase[0]->pa(pit->mound->throws);
         onbase[0]->ab++;
 	runadv();
 	batterup();

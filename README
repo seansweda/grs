@@ -164,11 +164,14 @@ cs - caught stealing
 pk - picked off
 th - advance on a throw
 oa - out advancing on a throw
+ri - baserunner out due to interference
+di - defensive indifference
 
 1b - single
 2b - double
 3b - triple
 hr - home run
+tp - triple play
 dp, gd - ground into double play
 fd - fly into double play
 ld - line into double play
