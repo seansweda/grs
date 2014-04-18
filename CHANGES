@@ -70,7 +70,7 @@ VERSION HISTORY
 	the dreaded "segmentation fault".
 	Also, added the -v flag to output the version of grs.
 
-2.2.0   Changed play-by-play output to remove redundancies, after
+2.2.0	Changed play-by-play output to remove redundancies, after
 	incessant whining by Richard Dunlap (Macon Peaches).  :-)
 
 2.1.2	Fixed bug in "np" which would not output correct MLB team
@@ -94,9 +94,9 @@ VERSION HISTORY
 
 1.1.1	Starting pitchers now listed in .pbp file.
 
-1.1.0	Inherited runners now charged to correct pitcher.  
+1.1.0	Inherited runners now charged to correct pitcher.
 
-1.0.0 	Undo semi-functional.  Also, the "eg" command works.  
+1.0.0	Undo semi-functional.  Also, the "eg" command works.
 	LOB now tabulated.
 
 0.90 the extra stats (E, PB, GIDP, etc.) no longer have to be entered

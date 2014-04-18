@@ -6,7 +6,7 @@
 
 struct item
 {
-    pitcher *entry;	
+    pitcher *entry;
     item *next;
 };
 
@@ -18,13 +18,13 @@ class queue
 	     *last;
 
     public:
-	queue(); 
+	queue();
 	void add(pitcher *new_entry);
-        pitcher* dequeue();
-        int queue_empty();
-        void clear();
-        void dump();		// print info about the queue
-        ~queue();
+	pitcher* dequeue();
+	int queue_empty();
+	void clear();
+	void dump();		// print info about the queue
+	~queue();
 };
 
 #endif

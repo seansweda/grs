@@ -37,7 +37,7 @@ public :
 	void pa(char);
 	void new_pos(char*);
 	int getpos(char*);
-	~player(); 
+	~player();
 };
 
 #endif

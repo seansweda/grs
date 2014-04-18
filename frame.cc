@@ -3,10 +3,10 @@
 // Constructor which initializes the static fields
 frame::frame(team *away, team *home, FILE *fp)
 {
-    undo = 0; 		// if in the process of undo, set = 1
+    undo = 0;		// if in the process of undo, set = 1
     cont = 1;		// continue reading commands?
-    outs = 0; 	
-    atbat = 0; 
+    outs = 0;
+    atbat = 0;
     inning = 1;
     runs = 0;
     linesize = 9;	// size of linescore array;
@@ -32,7 +32,7 @@ frame::frame(team *away, team *home, FILE *fp)
 
     runners = new queue;
 
-    for ( int i=0; i<4; i++ ) 
+    for ( int i=0; i<4; i++ )
 	onbase[i]=NULL;
     onbase[0]=ibl[atbat]->up();
 
@@ -68,7 +68,7 @@ frame::frame(char *str)
     pit=ibl[(atbat+1)%2];
 }
 
-    int 
+    int
 frame::runadv()
 // update the onbase array based on baserunning
 {
@@ -77,21 +77,21 @@ frame::runadv()
     player *runner;
     player *newbase[4];
 
-    for ( i=0; i<4; i++ ) 
+    for ( i=0; i<4; i++ )
 	newbase[i] = onbase[i];
 
     str=baserunning;
 
-    while ( *str ) {  
+    while ( *str ) {
 	if ( *str == 'b' ) {
-	    runner = bat->up(); 
+	    runner = bat->up();
 	    i=0;
 	}
-	else 
+	else
 	    runner = onbase[ i = (int)( *str - '0' ) ];
 
 	if ( runner ) {				// If runner is onbase
-	    j = (int)( *(++str) - '0' );  
+	    j = (int)( *(++str) - '0' );
 	    switch ( *str ) {
 		case 'o' :			// If runner made an out
 		    outs = outs + 1;
@@ -116,13 +116,13 @@ frame::runadv()
 	    }
 	}
 	else {
-	    return(0); 
+	    return(0);
 	}
 
 	str++;
     }
-	
-    for ( i=0; i<4; i++ ) 
+
+    for ( i=0; i<4; i++ )
 	onbase[i] = newbase[i];
     return(1);
 }
@@ -132,7 +132,7 @@ frame::runadv()
 // runstats(2) is for any play where it is not obvious what happened
 // to the batter, i.e. it outputs in .pbp the result for the batter
 
-    void 
+    void
 frame::runstats( int fc )
 {
     int i, j;
@@ -147,17 +147,17 @@ frame::runstats( int fc )
     b[3] = "to third";
 
     str = baserunning;
-    while ( *str ) {  
+    while ( *str ) {
 	if ( *str == 'b' ) {
 	    i = 0;
 	    if ( (*(str+1) != 'o') && (fc != 1) )
-		    runners->add(pit->mound); 
+		    runners->add(pit->mound);
 	}
-	else 
+	else
 	    i = (int) (*str - '0');
 
 	if ( onbase[i] ) {		// If runner is onbase
-	    str++;  
+	    str++;
 	    j = (int) *str - '0';
 	    switch ( *str ) {
 		case 'o' :		// If runner made an out
@@ -198,7 +198,7 @@ frame::runstats( int fc )
 	}
 	str++;
     }
-	
+
     outbuf( pbpfp, "", ". " );
 
     // at this point we need fc binary
@@ -218,39 +218,39 @@ frame::runstats( int fc )
     return;
 }
 
-    void 
+    void
 frame::frameput()
 {
     fprintf( output, "Pit: %-15s ", pit->mound->nout() );
     fprintf( output, "IP: %2d.%d  BF: %2d   ",
 	    pit->mound->out / 3, pit->mound->out % 3, pit->mound->bf );
-    fprintf( output, "%s: %2d  %s: %2d   ",
-    		ibl[0]->nout(), ibl[0]->score,
-    		ibl[1]->nout(), ibl[1]->score );
+    fprintf( output, "%s: %2d  %s: %2d	 ",
+		ibl[0]->nout(), ibl[0]->score,
+		ibl[1]->nout(), ibl[1]->score );
     fprintf( output, "In: %s %d  Outs: %d\n",
 		atbat == 0 ? "Top" : "Bot", inning, outs);
     fprintf( output, "Bat: %-15s ", onbase[0]->nout() );
-    for ( int i=1; i<4; i++ ) 
-	fprintf( output, "%1d: %-15s ", i, 
+    for ( int i=1; i<4; i++ )
+	fprintf( output, "%1d: %-15s ", i,
 		onbase[i] ? onbase[i]->nout() : "    ");
     fprintf( output, "\n" );
     ibl[ atbat == 0 ? 1 : 0 ]->check_defense();
 }
 
-    void 
+    void
 frame::rbi()
 {
     char *str;
 
     str=baserunning;
     while (*str) {
-        if (*str=='h')
-                onbase[0]->rbi++;
-        str++;
+	if (*str=='h')
+		onbase[0]->rbi++;
+	str++;
     }
 }
 
-    void 
+    void
 frame::batterup( int bf )
 {
     // call with bf=0 for events that should not count as BF
@@ -261,7 +261,7 @@ frame::batterup( int bf )
     onbase[0]=bat->up();
 }
 
-    void 
+    void
 frame::help(char *str)
 {
     if ( *error == '\0' ) {
@@ -273,10 +273,10 @@ frame::help(char *str)
 
     //if (input != stdin) exit(0);
 
-    frameput();	
+    frameput();
 }
 
-    int 
+    int
 frame::runchck(char *runstr)
 // Checks baserunning, removes double occurances.
 {
@@ -302,7 +302,7 @@ frame::runchck(char *runstr)
 
     while ( *str ) {
 	switch ( *str ) {
-	    case 'b': 
+	    case 'b':
 		copy = 1;
 		if ( !done[0] ) {
 		    switch ( *(str+1) ) {
@@ -310,10 +310,10 @@ frame::runchck(char *runstr)
 			case 'h':
 			case '1':
 			case '2':
-			case '3': 
+			case '3':
 			    break;
-			default: 
-			    copy = 0; 
+			default:
+			    copy = 0;
 			    retval = 0;
 			    break;
 		    }
@@ -341,10 +341,10 @@ frame::runchck(char *runstr)
 			case 'o':
 			case 'h':
 			case '2':
-			case '3': 
+			case '3':
 			    break;
-			default: 
-			    copy = 0; 
+			default:
+			    copy = 0;
 			    retval = 0;
 			    break;
 		    }
@@ -365,7 +365,7 @@ frame::runchck(char *runstr)
 		    }
 		}
 		break;
-	    case '2':	
+	    case '2':
 		copy = 1;
 		if ( !done[2] ) {
 		    switch ( *(str+1) ) {
@@ -375,14 +375,14 @@ frame::runchck(char *runstr)
 			    break;
 			case 'o':
 			case 'h':
-			case '3': 
+			case '3':
 			    break;
-			default: 
-			    copy = 0; 
+			default:
+			    copy = 0;
 			    retval = 0;
-			    break; 
+			    break;
 		    }
-		    if ( !(onbase[2]) ) { 
+		    if ( !(onbase[2]) ) {
 			copy = 0;
 			retval = 0;
 		    }
@@ -401,22 +401,22 @@ frame::runchck(char *runstr)
 		break;
 	    case '3':
 		copy = 1;
-	        if ( !done[3] ) {
+		if ( !done[3] ) {
 		    switch ( *(str+1) ) {
 			case '3':
 			    copy = 0;
 			    done[3] = 1;
 			    break;
 			case 'o':
-			case 'h': 
+			case 'h':
 			    break;
-			default: 
-			    copy = 0; 
+			default:
+			    copy = 0;
 			    retval = 0;
-			    break; 
+			    break;
 		    }
-		    if ( !(onbase[3]) ) { 
-			copy = 0; 
+		    if ( !(onbase[3]) ) {
+			copy = 0;
 			retval = 0;
 		    }
 		    if ( copy ) {
@@ -432,7 +432,7 @@ frame::runchck(char *runstr)
 		    }
 		}
 		break;
-	    default: 
+	    default:
 		retval = 0;
 		strncat( errstr, str, 2 );
 		errptr += 2;
@@ -441,7 +441,7 @@ frame::runchck(char *runstr)
 	}
 	str+=2;
     }
-	    
+
     if (retval)
 	strcpy( runstr, temp );		// cleaned up baserunning string
 
@@ -458,7 +458,7 @@ frame::runchck(char *runstr)
     return(retval);
 }
 
-    void 
+    void
 frame::runcat(int adv)
 /*
     runcat(-4) lead runner advances 1 base
@@ -479,10 +479,10 @@ frame::runcat(int adv)
 
 
     switch (adv) {
-    case 0 : 					// batter out
+    case 0 :					// batter out
 	    strcat(baserunning,"bo");
 	    break;
-	    
+
     case -1 :					// advance if forced
 	    if (!onbase[1])
 	       strcat(baserunning,"b1");
@@ -507,7 +507,7 @@ frame::runcat(int adv)
 	    break;
 
     case -3 :
-    //	strcat(baserunning,"1o");	
+    //	strcat(baserunning,"1o");
 	    for (i=1;i<=3;i++)
 	       if (onbase[i]) test=i;
 	    sprintf(temptr++,"%1d",test);
@@ -545,7 +545,7 @@ frame::runcat(int adv)
     strcat(baserunning,temp);
 }
 
-    int 
+    int
 frame::three()
 {
     if (baserunning[0] == '\0') {
@@ -556,7 +556,7 @@ frame::three()
 	return(1);
 }
 
-    void 
+    void
 frame::who_stat( int stat, int who )
 // adds stat to player at fielding position "who"
 {
@@ -564,13 +564,13 @@ frame::who_stat( int stat, int who )
    fprintf( stderr, "who_stat: %d\n", who );
 #endif
    switch (who) {
-        case 0 :
+	case 0 :
 	    pit->newstat( (char*)NULL, stat );
 	    break;
-        case 1 :
-	    pit->newstat( pit->mound->nout(), stat ); 
+	case 1 :
+	    pit->newstat( pit->mound->nout(), stat );
 	    break;
-        default: 
+	default:
 #ifdef DEBUG
 	   fprintf( stderr, "who_stat: newstat \"%s\", %d\n", pit->posout(who), stat );
 #endif
@@ -578,7 +578,7 @@ frame::who_stat( int stat, int who )
    }
 }
 
-    void 
+    void
 frame::cleanup()
 {
 	delete(runners);
@@ -592,14 +592,14 @@ frame::cleanup()
 	free(buffer);
 }
 
-    int 
+    int
 frame::decode()
 {
 #ifdef DEBUG
 	fprintf(stderr,"decode: %s %s %s\n", event, location, baserunning);
 #endif
     if (event[0] == '\0') {
-	return(1); 			// No event to decode, ignore.
+	return(1);			// No event to decode, ignore.
     }
 
     if (runchck(location)) {		// Baserunning in location field?
@@ -609,7 +609,7 @@ frame::decode()
     else {
 	memset( error, '\0', LINEWIDTH );	// clean up after runchck
     }
-	    
+
     // these events are legal with three outs
     if ( !(strcmp(event,"lh")) ) {
 	return(1);
@@ -617,17 +617,17 @@ frame::decode()
     else if ( !(strcmp(event,"la")) ) {
 	return(1);
     }
-    else if ( !(strcmp(event,"un")) ) { 
+    else if ( !(strcmp(event,"un")) ) {
 	return(1);
     }
     else if ( !(strcmp(event,"en")) ) {
 	return(1);
     }
     else if ( !(strcmp(event,"eg")) ) {
-	return(1); 
+	return(1);
     }
-    else if ( !(strcmp(event,"cm")) ) { 
-	return(1); 
+    else if ( !(strcmp(event,"cm")) ) {
+	return(1);
     }
 
     // the rest are not
@@ -636,21 +636,21 @@ frame::decode()
 	return(0);
     }
     else if ( !(strcmp(event,"ph")) ) {
-	return(1);  
-    }
-    else if ( !(strcmp(event,"pr")) ) { 
 	return(1);
     }
-    else if ( !(strcmp(event,"np")) ) { 
-	return(1); 
+    else if ( !(strcmp(event,"pr")) ) {
+	return(1);
     }
-    else if ( !(strcmp(event,"dr") ) || !(strcmp(event,"dc")) ) { 
-	return(1); 
+    else if ( !(strcmp(event,"np")) ) {
+	return(1);
+    }
+    else if ( !(strcmp(event,"dr") ) || !(strcmp(event,"dc")) ) {
+	return(1);
     }
     else if ( !(strcmp(event,"so")) ) {
-	return(1); 
+	return(1);
     }
-    else if ( !(strcmp(event,"kd")) ) { 
+    else if ( !(strcmp(event,"kd")) ) {
 	return(1);
     }
     else if ( !(strcmp(event,"bb")) ) {
@@ -765,7 +765,7 @@ frame::decode()
 	return(1);
     }
     else if ( !(strcmp(event,"fo")) ) {
-        return(1);
+	return(1);
     }
     else if ( !(strcmp(event,"er")) ) {
 	return(1);
@@ -785,13 +785,13 @@ frame::decode()
     else if ( !(strcmp(event,"ic")) ) {
 	return(1);
     }
-    else { 
+    else {
 	sprintf( error, "Invalid command: %s\n", event );
 	return(0);
     }
 }
 
-    void 
+    void
 frame::outbuf( FILE *fp, const char *str, const char *punc )
 {
     int count;
@@ -813,9 +813,9 @@ frame::outbuf( FILE *fp, const char *str, const char *punc )
 	    count = 0;
 	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
 
-	    while ( count != (LINEWIDTH - 10) ) { 
-		count++; 
-		ptr++; 
+	    while ( count != (LINEWIDTH - 10) ) {
+		count++;
+		ptr++;
 	    }
 	    while ( !(isspace(*ptr)) )
 		buffer[count++] = *(ptr++);
@@ -845,7 +845,7 @@ frame::print_linescore(FILE *fp)
     fprintf(fp,"    ");
     for (x = 1; x <= inning; x++)
 	fprintf(fp,"%3d",x);
-    fprintf(fp,"     R  H  E\n");
+    fprintf(fp,"     R	H  E\n");
 
     for (x = 1; x <= y; x++)
 	fprintf(fp,"-");
@@ -874,8 +874,8 @@ frame::print_linescore(FILE *fp)
 frame::outsonplay( char *brun )
 {
     int num = 0;
-    char *ptr; 
-    
+    char *ptr;
+
     ptr = brun;
     while ( *ptr != '\0' ) {
 	if ( *ptr++ == 'o' ) {
@@ -893,7 +893,7 @@ frame::outsonplay( char *brun )
     int
 frame::batterout( char *brun )
 {
-    if ( strstr( brun, "bo" ) != 0 ) { 
+    if ( strstr( brun, "bo" ) != 0 ) {
 	return(1);
     }
     else {

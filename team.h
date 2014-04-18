@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> 
-#include <ctype.h> 
+#include <string.h>
+#include <ctype.h>
 #include "config.h"
 #include "player.h"
 #include "pitcher.h"
@@ -19,7 +19,7 @@ struct pl_list {
 	};
 
 // Linked list of pitchers
-struct pit_list { 
+struct pit_list {
 	pitcher *head;
 	pit_list *next;
 	};
@@ -55,7 +55,7 @@ public :
 	int make_lineups();
 	int make_lineups_pit();
 	void box_score(FILE*);
-	char *posout(int);	
+	char *posout(int);
 	player *next_up();
 	player *up();
 	void insert(int, char**, const char* = "\0", const char* = "\0");

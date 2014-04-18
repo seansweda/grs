@@ -1,11 +1,11 @@
 #include "queue.h"
 
 queue::queue()
-{ 
+{
     first = last = 0;
 }
 
-    void 
+    void
 queue::add( pitcher *new_entry )
 {
    if ( this->last ) {
@@ -23,7 +23,7 @@ queue::add( pitcher *new_entry )
     }
 }
 
-    pitcher* 
+    pitcher*
 queue::dequeue()
 {
     if ( queue_empty() ) {
@@ -47,7 +47,7 @@ queue::dequeue()
    }
 }
 
-    void 
+    void
 queue::dump()
 {
     item *curr = this->first;
@@ -66,7 +66,7 @@ queue::dump()
 }
 
 
-    int 
+    int
 queue::queue_empty()
 {
     if ( this->first == 0 )
@@ -75,7 +75,7 @@ queue::queue_empty()
 	return(0);
 }
 
-    void 
+    void
 queue::clear()
 {
     item *curr,

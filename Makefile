@@ -44,6 +44,6 @@ pitcher.o: Makefile pitcher.cc pitcher.h config.h
 getopt.o: Makefile getopt/getopt.c getopt/getopt.h
 	$(CC) $(CFLAGS) -c getopt/getopt.c
 
-clean: 
+clean:
 	rm -f *.o grs grs.tar.gz
 

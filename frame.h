@@ -27,7 +27,7 @@ private :
 	int runadv();			// Advances runners . . .
 	void runstats( int fc = 0 );	// Does runners stats and pbp
 	void rbi();			// Does RBIs
-	
+
 	int runchck( char* );		// Parses baserunner advances
 	void runcat( int );		// Does default baserunner advances
 	int three();			// Checks for three operands

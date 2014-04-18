@@ -24,13 +24,13 @@ public :
 	int k;
 	int hr;
 	int bf;
-	char throws; 
+	char throws;
 	void sout(FILE*);
 	char *nout();
 	char *tout();
 	void hit(int);
 	char dec;
-	~pitcher() { 
+	~pitcher() {
 #ifdef DEBUG
 	    fprintf(stderr,"deleted %s\n",this->nout());
 #endif

@@ -10,7 +10,7 @@ team::team( int who )
     int flag = 1;
 
     while ( flag ) {
-	flag = 0; 
+	flag = 0;
 	fprintf(output, "Enter the three letter code for %s team:\n",
 		who == 0 ? "away" : "home" );
 	memset( str, '\0', MAX_INPUT );
@@ -28,17 +28,17 @@ team::team( int who )
 	    }
 	    if ( flag ) {
 		    fprintf(stderr, "Team name must be alphanumeric\n");
-		    if (input == stdin) 
-			flag = 1; 
-		    else 
+		    if (input == stdin)
+			flag = 1;
+		    else
 			exit(1);
 	    }
 	}
-	else { 
-	    fprintf(stderr, "Team name must be 3 letters!\n"); 
-	    if (input == stdin) 
-		flag = 1; 
-	    else 
+	else {
+	    fprintf(stderr, "Team name must be 3 letters!\n");
+	    if (input == stdin)
+		flag = 1;
+	    else
 		exit(1);
 	}
     }
@@ -133,10 +133,10 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
     newpl = (struct pl_list *) malloc( sizeof(struct pl_list) );
     newpl->ord = spot;
     newpl->next = NULL;
-    
+
     if ( !(*inputstr) ) {
 	flag = 1;
-    	while (flag) {
+	while (flag) {
 	    flag=0;
 	    fprintf(output, "Player, MLB team & Position for %d: ", spot);
 	    memset( tempstr, '\0', MAX_INPUT );
@@ -159,13 +159,13 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
 		fprintf( stderr, "insert %d: %d, %d, %d\n", spot,
 			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
-		if ( input == stdin ) 
-		    flag = 1; 
-		else 
+		if ( input == stdin )
+		    flag = 1;
+		else
 		    exit(1);
 	    }
 	}
-	if ( strcmp(def, "ph") )	
+	if ( strcmp(def, "ph") )
 	    fprintf( cmdfp, "%d\n", spot );
 	fprintf( cmdfp, "%s", tempstr );
     }
@@ -196,14 +196,14 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
     }
     else {
 	newpl->head = new player( name, ibl, mlb, def );
-	newpl->head->new_pos(pos); 
-        sprintf( tempstr, "%s %s for %s, batting %d.",
-                name, def, oldpl->head->nout(), spot);
+	newpl->head->new_pos(pos);
+	sprintf( tempstr, "%s %s for %s, batting %d.",
+		name, def, oldpl->head->nout(), spot);
     }
 
     newpl->next=oldpl->next;
     oldpl->next=newpl;
-    if ( up() == oldpl->head ) 
+    if ( up() == oldpl->head )
 	current=newpl;
 
 #ifdef DEBUG
@@ -213,7 +213,7 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
 }
 
 // Creates the lineups for a team
-    int 
+    int
 team::make_lineups()
 {
     struct pl_list *newpl;
@@ -224,11 +224,11 @@ team::make_lineups()
     char mlb[MAX_INPUT];
     char name[MAX_INPUT];
     char pos[MAX_INPUT];
-    
+
     current = newpl = lineup;
     fprintf(output,"Enter lineup for %s \n", ibl);
     for ( spot = 1; spot < 10; spot++ ) {
-	if ( spot == 1 ) 
+	if ( spot == 1 )
 	    newpl = lineup;
 	else {
 	    newpl->next = (struct pl_list *) malloc(sizeof (struct pl_list) );
@@ -237,7 +237,7 @@ team::make_lineups()
 	}
 	newpl->ord = spot;
 	flag = 1;
-    	while ( flag ) {
+	while ( flag ) {
 	    flag = 0;
 	    fprintf(output, "Player, MLB team & Position for %d: ", spot);
 	    memset( tempstr, '\0', MAX_INPUT );
@@ -258,12 +258,12 @@ team::make_lineups()
 	    if ( strlen(name) == 0 || strlen(mlb) == 0 || strlen(pos) == 0 ) {
 		fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
-		fprintf( stderr, "make_lineups: %d, %d, %d\n", 
+		fprintf( stderr, "make_lineups: %d, %d, %d\n",
 			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
-		if ( input == stdin ) 
-		    flag = 1; 
-		else 
+		if ( input == stdin )
+		    flag = 1;
+		else
 		    exit(1);
 	    }
 	}
@@ -276,7 +276,7 @@ team::make_lineups()
 }
 
 // Do the pitchers
-    int 
+    int
 team::make_lineups_pit()
 {
     int flag;
@@ -309,12 +309,12 @@ team::make_lineups_pit()
 	if ( strlen(name) == 0 || strlen(mlb) == 0 || strlen(throws) == 0 ) {
 	    fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
-	    fprintf( stderr, "make_lineups_pit: %d, %d, %d\n", 
+	    fprintf( stderr, "make_lineups_pit: %d, %d, %d\n",
 		    (int)strlen(name), (int)strlen(mlb), (int)strlen(throws) );
 #endif
-	    if ( input == stdin ) 
-		flag = 1; 
-	    else 
+	    if ( input == stdin )
+		flag = 1;
+	    else
 		exit(1);
 	}
     }
@@ -331,7 +331,7 @@ team::make_lineups_pit()
 
 
 // Outputs the box score
-    void 
+    void
 team::box_score( FILE *fp )
 {
     struct pl_list *newpl;
@@ -368,7 +368,7 @@ team::box_score( FILE *fp )
 
     ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=out=er=bf=0;
 
-    fprintf(fp,"\nPITCHERS  %-19s   IP  H  R ER BB  K HR  BF\n", ibl);
+    fprintf(fp,"\nPITCHERS  %-19s   IP	H  R ER BB  K HR  BF\n", ibl);
     newpit=pitchers;
     while (newpit) {
 	out=out+newpit->head->out;
@@ -389,21 +389,21 @@ team::box_score( FILE *fp )
 }
 
 // Returns the next batter in the order
-    player* 
+    player*
 team::next_up()
 {
-    if (current && current->next) 
+    if (current && current->next)
 	current=current->next;
-    else 
+    else
 	current=lineup;
 
-    while (current->next && current->ord==current->next->ord) 
+    while (current->next && current->ord==current->next->ord)
 	current=current->next;
 
     return current->head;
 }
 
-    player* 
+    player*
 team::back_up()
 {
     if (current->ord != 1)
@@ -415,14 +415,14 @@ team::back_up()
 }
 
 // Returns the current batter
-    player* 
+    player*
 team::up()
 {
     return current->head;
 }
 
 // Inputs a new pitcher
-    int 
+    int
 team::new_pit()
 {
     struct pit_list *newpit,*oldpit;
@@ -462,12 +462,12 @@ team::new_pit()
 	if ( strlen(name) == 0 || strlen(mlb) == 0 || strlen(throws) == 0 ) {
 	    fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
-	    fprintf( stderr, "new_pit: %d, %d, %d\n", 
+	    fprintf( stderr, "new_pit: %d, %d, %d\n",
 		    (int)strlen(name), (int)strlen(mlb), (int)strlen(throws) );
 #endif
-	    if ( input == stdin ) 
-		flag = 1; 
-	    else 
+	    if ( input == stdin )
+		flag = 1;
+	    else
 		exit(1);
 	}
     }
@@ -489,13 +489,13 @@ team::new_pit()
     return ( bats[0] - '0' );
 }
 
-    char* 
+    char*
 team::nout()
 {
     return(ibl);
 }
 
-    player* 
+    player*
 team::findord( int i )
 {
     struct pl_list *oldpl;
@@ -505,7 +505,7 @@ team::findord( int i )
     return(oldpl->head);
 }
 
-    struct pl_list* 
+    struct pl_list*
 team::findord_pl( int i )
 {
     struct pl_list *oldpl;
@@ -515,7 +515,7 @@ team::findord_pl( int i )
     return(oldpl);
 }
 
-    void 
+    void
 team::print_lineup()
 {
     struct pl_list *newpl;
@@ -589,7 +589,7 @@ team::check_defense()
 
 }
 
-    int 
+    int
 team::team_hits ()
 {
     int total = 0;
@@ -604,7 +604,7 @@ team::team_hits ()
     return (total);
 }
 
-    void 
+    void
 team::newstat(char *pl_name, int stat)
 {
     struct stat_list *curr, *prev;
@@ -632,7 +632,7 @@ team::newstat(char *pl_name, int stat)
 #endif
 		curr = (stat_list*) malloc(sizeof(stat_list));
 		curr->ord = 1;
-		strcpy(curr->name, pl_name);	
+		strcpy(curr->name, pl_name);
 		curr->next = NULL;
 		prev->next = curr;
 	    }
@@ -656,7 +656,7 @@ team::newstat(char *pl_name, int stat)
     }
 }
 
-    void 
+    void
 team::printstat( FILE *fp,int stat )
 {
 
@@ -696,7 +696,7 @@ team::printstat( FILE *fp,int stat )
 	fprintf(fp,"none.\n");
 }
 
-    char* 
+    char*
 team::posout( int position )
 {
 
@@ -717,7 +717,7 @@ team::posout( int position )
 	return ( (char*)NULL );
 }
 
-    int 
+    int
 team::what_ord( player *up )
 {
 
@@ -729,7 +729,7 @@ team::what_ord( player *up )
    return (curr->ord);
 }
 
-    void 
+    void
 team::decisions()
 {
 
@@ -759,8 +759,8 @@ team::decisions()
 	curr = curr->next;
     }
 }
- 
-    void 
+
+    void
 team::unearned( int inning )
 {
     int numout = 0;
