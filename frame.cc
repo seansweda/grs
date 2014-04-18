@@ -224,7 +224,7 @@ frame::frameput()
     fprintf( output, "Pit: %-15s ", pit->mound->nout() );
     fprintf( output, "IP: %2d.%d  BF: %2d   ",
 	    pit->mound->out / 3, pit->mound->out % 3, pit->mound->bf );
-    fprintf( output, "%s: %2d  %s: %2d	 ",
+    fprintf( output, "%s: %2d  %s: %2d   ",
 		ibl[0]->nout(), ibl[0]->score,
 		ibl[1]->nout(), ibl[1]->score );
     fprintf( output, "In: %s %d  Outs: %d\n",
@@ -845,7 +845,7 @@ frame::print_linescore(FILE *fp)
     fprintf(fp,"    ");
     for (x = 1; x <= inning; x++)
 	fprintf(fp,"%3d",x);
-    fprintf(fp,"     R	H  E\n");
+    fprintf(fp,"     R  H  E\n");
 
     for (x = 1; x <= y; x++)
 	fprintf(fp,"-");

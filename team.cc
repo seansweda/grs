@@ -368,7 +368,7 @@ team::box_score( FILE *fp )
 
     ab=h=r=rbi=b2=b3=hr=bb=k=sb=cs=pal=par=out=er=bf=0;
 
-    fprintf(fp,"\nPITCHERS  %-19s   IP	H  R ER BB  K HR  BF\n", ibl);
+    fprintf(fp,"\nPITCHERS  %-19s   IP  H  R ER BB  K HR  BF\n", ibl);
     newpit=pitchers;
     while (newpit) {
 	out=out+newpit->head->out;
