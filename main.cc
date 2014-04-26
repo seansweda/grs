@@ -1,11 +1,15 @@
-// $Id$
-
-#define VER "3.0.1"
+#define VER "3.1_beta"
 
 #include <stdio.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef GETOPT
+#   include "getopt/getopt.h"
+#else
+#   include <unistd.h>
+#endif
 #include "config.h"
 #include "pitcher.h"
 #include "player.h"
@@ -41,7 +45,7 @@ player* frame::onbase[4];	// array of pointers to batter & runners
 
 char* frame::buffer;		// output buffer
 
-    void 
+    void
 play()
 {
     frame *f0;			// f0 is the current frame to be decoded
@@ -58,7 +62,7 @@ play()
     while (frame::cont) {
 #ifdef DEBUG
 #if DEBUG == 2
-	ibl[0]->box_score(stderr); 
+	ibl[0]->box_score(stderr);
 	ibl[1]->box_score(stderr);
 #endif
 #endif
@@ -67,7 +71,7 @@ play()
 	cmdfp = fopen(cmdfile,"a");
 
 #ifdef DEBUG
-	if (output != stdout) 
+	if (output != stdout)
 	    fprintf( stderr, "%s", tempstr );
 #endif
 	f0 = new frame( tempstr );
@@ -97,7 +101,7 @@ play()
     }
 }
 
-    void 
+    void
 quit()
 {
     frame::print_linescore(stsfp);
@@ -128,14 +132,14 @@ quit()
     fprintf(pbpfp,"\n");
 }
 
-    void 
+    void
 setup()
 {
     frame *f0;		// f0 is the current frame to be decoded
 
     char tempstr[MAX_INPUT];
     memset( tempstr, '\0', MAX_INPUT );
-	
+
     ibl[0]->make_lineups_pit();
     ibl[1]->make_lineups_pit();
 
@@ -143,7 +147,11 @@ setup()
     fgets(tempstr, MAX_INPUT, input);
     fprintf(output, "\n");
     fprintf(cmdfp, "%s", tempstr);
-    fprintf(pbpfp, "grs version %s\n", VER);
+    fprintf(pbpfp, "grs version %s", VER);
+#ifdef GIT
+    fprintf(pbpfp, " (%s)", GIT);
+#endif
+    fprintf(pbpfp, "\n");
     fprintf(pbpfp, "%s at %s \n", ibl[0]->nout(), ibl[1]->nout());
     fprintf(pbpfp, "%s\n", tempstr);
     fprintf(pbpfp, "Starting pitchers - %s for %s, and %s for %s\n",
@@ -157,8 +165,8 @@ setup()
 
     delete(f0);
 }
- 
-    void 
+
+    void
 setup( int tm )
 {
     ibl[tm] = new team(tm);
@@ -188,6 +196,29 @@ openfile( char *prefix )
 }
 
     int
+checkfile( char *prefix )
+{
+    char filename[PATH_MAX];
+    struct stat sb;
+    int result = 0;
+
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( stat(strcat( filename, ".pbp"), &sb ) == 0 )
+	result++;
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( stat(strcat( filename, ".sts"), &sb ) == 0 )
+	result++;
+    strncpy( filename, prefix, PATH_MAX - 5 );
+    filename[PATH_MAX - 4] = '\0';
+    if ( stat(strcat( filename, ".cmd"), &sb ) == 0 )
+	result++;
+
+    return (result);
+}
+
+    int
 main(int argc, char *argv[])
 {
 
@@ -197,18 +228,25 @@ main(int argc, char *argv[])
     char *cfile = NULL;
     int usage = 0;
 
-    while ((c = getopt(argc, argv, "a:h:f:v")) != EOF)
+    int overwrite = 0;
+    while ((c = getopt(argc, argv, "a:h:f:vo")) != EOF)
     switch (c) {
 	case 'a':	afile = (char *) calloc(PATH_MAX, sizeof(char));
-	    		strncpy( afile, optarg, PATH_MAX );
+			strncpy( afile, optarg, PATH_MAX );
 			break;
-	case 'h':	hfile = (char *) calloc(PATH_MAX, sizeof(char));	
-	    		strncpy( hfile, optarg, PATH_MAX );
+	case 'h':	hfile = (char *) calloc(PATH_MAX, sizeof(char));
+			strncpy( hfile, optarg, PATH_MAX );
 			break;
-	case 'f':	cfile = (char *) calloc(PATH_MAX, sizeof(char));	
-	    		strncpy( cfile, optarg, PATH_MAX );
+	case 'f':	cfile = (char *) calloc(PATH_MAX, sizeof(char));
+			strncpy( cfile, optarg, PATH_MAX );
 			break;
-	case 'v':	fprintf(stderr,"%s\n",VER);
+	case 'o':	overwrite = 1;
+			break;
+	case 'v':	fprintf(stderr,"%s",VER);
+#ifdef GIT
+			fprintf(stderr, " (%s)", GIT);
+#endif
+			fprintf(stderr, "\n");
 			exit(0);
 	case '?':	usage++;
     }
@@ -226,6 +264,13 @@ main(int argc, char *argv[])
     else {
 	strncpy( filename, argv[optind], PATH_MAX - 5 );
 	filename[PATH_MAX - 4] = '\0';
+
+	// don't overwrite existing files
+	if ( !overwrite && checkfile(filename) ) {
+	    fprintf( stderr, "%s.* file(s) already exist\n", filename );
+	    exit(1);
+	}
+
 	if ( openfile(filename) ) {
 	    fprintf( stderr, "cannot open %s.*\n", filename );
 	    exit(1);

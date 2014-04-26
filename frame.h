@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef FRAME_H
 #define FRAME_H
 
@@ -7,7 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <unistd.h>
 #include "player.h"
 #include "pitcher.h"
 #include "team.h"
@@ -30,12 +27,12 @@ private :
 	int runadv();			// Advances runners . . .
 	void runstats( int fc = 0 );	// Does runners stats and pbp
 	void rbi();			// Does RBIs
-	
+
 	int runchck( char* );		// Parses baserunner advances
 	void runcat( int );		// Does default baserunner advances
 	int three();			// Checks for three operands
 
-	void batterup();		// brings the next batter up 
+	void batterup( int nobf = 1 );	// brings the next batter up
 
 	void cleanup();			// frees up memory for an undo
 	int backup( char*, char* );	// backs up one line in .cmd file
@@ -57,7 +54,7 @@ public :
 	int batterout( char* );		// did the batter make an out?
 
 	static void print_linescore( FILE* );
-	void outbuf( FILE*, char*, char *punc ="\0" );
+	void outbuf( FILE*, const char*, const char* = "\0" );
 	void putcmd();
 
 	~frame();

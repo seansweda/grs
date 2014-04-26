@@ -1,9 +1,8 @@
-// $Id$
-
 GRS is a program for creating a game report for the Internet Baseball
 League.  GRS was written by Sean Sweda (sweda@ibl.org), with assistance
-from Greg Speegle, Richard Dunlap, and Christian Beliveau.  The code is 
-available via anonymous ftp at ftp://ftp.ibl.org/ibl/grs/
+from Greg Speegle, Richard Dunlap, and Christian Beliveau.  The source
+code is available at github <https://github.com/seansweda/grs> or via
+anonymous ftp <ftp://ftp.ibl.org/ibl/grs/>
 
 ** please submit bug reports to sweda@ibl.org **
 
@@ -27,12 +26,15 @@ Usage: grs [ (-a afile) (-h hfile) | (-f cmdfile) ] outfile
 -h	Used to read in the home team's lineup from an external file.
 	ex: grs -h my_lineup_vsRH game6
 
--f	Used to read in commands from an external file.  NOTE:  This
+-f	Used to read in commands from an external file.  NOTE:	This
 	includes the lineups, thus -f is incompatible with -a and/or -h.
 	ex: grs -f unfinished_game 1-1
 
 -v	Using this flag will cause grs to output the version number.
 	(v2.3.0 and later)
+
+-o	Used to overwrite existing output files.
+	(v3.1 and later)
 
 If you use the -f flag to read in a file, make sure that the last
 event is NOT 'eg'.
@@ -43,7 +45,7 @@ the following files:
 <outfile>.sts	- the stats
 <outfile>.pbp	- the play-by-play
 <outfile>.cmd	- the commands you typed in
-<outfile>.un# 	- a file GRS uses temporarily to process the undo command
+<outfile>.un#	- a file GRS uses temporarily to process the undo command
 		  there may be several of these files after you are done
 
 The accompanying shell script, grscat (instructions at the end) will
@@ -57,7 +59,7 @@ handle gracefully, if you come across one please inform the author.
 
 ENTERING THE LINEUPS
 
-GRS uses space dilimited text.  Thus, when prompted for player name,
+GRS uses space dilimited text.	Thus, when prompted for player name,
 real team, and position, you should separate these by spaces.
 Example:  Trammell DET ss
 
@@ -79,7 +81,7 @@ GRS accepts commands in the following syntax: (space delimited)
 
 event location baserunning
 
-event 		- a 2 letter event code, all of which are listed below
+event		- a 2 letter event code, all of which are listed below
 location	- many uses, eg. location of a hit (gcf), or fielding
 		  on the play (6-3);  also can be used to indicate a
 		  special kind of play like a H&R or IFR, eg. 6-3(IFR)
@@ -106,9 +108,9 @@ ph - pinch hit
 
 pr - pinch run
 
-        Use the same form as lineup entry.  List the position the
-        pinch-runner will play next inning, or just "pr" if he
-        is only pinch-running.
+	Use the same form as lineup entry.  List the position the
+	pinch-runner will play next inning, or just "pr" if he
+	is only pinch-running.
 
 np - new pitcher
 
@@ -116,8 +118,8 @@ np - new pitcher
 	with the pitcher batting, you can specify the position in the
 	batting order where the pitcher will hit, and GRS will
 	automatically insert him into the batting order.
-	ex: Harvey FLA R 9 	(this would put Harvey in the 9 hole)
-	
+	ex: Harvey FLA R 9	(this would put Harvey in the 9 hole)
+
 dr - defensive replacement
 dc - defensive position change
 
@@ -138,7 +140,7 @@ un - undo
 	file normally, and this will only serve to confuse GRS.
 
 en - end of inning
-eg - end of game 
+eg - end of game
 
 cm - comment
 nj - enters in a "<runner> unable to get jump" comment, specify base of runner
@@ -162,11 +164,14 @@ cs - caught stealing
 pk - picked off
 th - advance on a throw
 oa - out advancing on a throw
+ri - baserunner out due to interference
+di - defensive indifference
 
 1b - single
 2b - double
 3b - triple
 hr - home run
+tp - triple play
 dp, gd - ground into double play
 fd - fly into double play
 ld - line into double play
@@ -180,7 +185,7 @@ po - pop out
 fp, pf - foul pop out
 sf - sacrifice fly
 sh - sacrifice hit
-lf - long fly 
+lf - long fly
 wt, df - warning track fly (from deep fly chart)
 er - batter reaches on error
 ea - runner advances on error
@@ -202,7 +207,7 @@ Undo seems to be 100% functional.
 
 NEVER, EVER, use the -f flag with an undo command imbedded in the
 input file!  the undo event is never recorded in a .cmd file, and GRS
-is not expecting it!  there will be grave (although quite comical) 
+is not expecting it!  there will be grave (although quite comical)
 consequences if you ignore this.
 
 The moral of the story is, use undo at your own risk.  What is listed
@@ -222,7 +227,7 @@ e.g. grs 8-1		- for week 8, game 1
 
 grscat takes a single argument, the week number
 
-e.g  grscat 8 	 	- will cat all week 8 games into a file named "8"
+e.g  grscat 8		- will cat all week 8 games into a file named "8"
 
 also, if you put mail header info into a file called .grscat in the
 same directory as the files you are grscat-ing, it will put it at
@@ -233,7 +238,7 @@ e.g. my .grscat is
 To:
 cc:
 Subject:
-------- 
+-------
 
 WEEK
 AWAY

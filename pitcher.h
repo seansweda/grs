@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef __PITCHER_H
 #define __PITCHER_H
 
@@ -25,14 +23,14 @@ public :
 	int bb;
 	int k;
 	int hr;
-	int br;
-	char throws; 
+	int bf;
+	char throws;
 	void sout(FILE*);
 	char *nout();
 	char *tout();
 	void hit(int);
 	char dec;
-	~pitcher() { 
+	~pitcher() {
 #ifdef DEBUG
 	    fprintf(stderr,"deleted %s\n",this->nout());
 #endif

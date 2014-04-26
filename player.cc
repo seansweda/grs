@@ -1,5 +1,3 @@
-// $Id$
-
 #include "player.h"
 
 // Constructor function
@@ -14,7 +12,7 @@ player::player( char* str )
 }
 
 // Better constructor function
-player::player( char* inname, char* inteam, char* inrtn, char* inpos )
+player::player( char* inname, char* inteam, char* inrtn, const char* inpos )
 {
     strcpy( name, inname );
     strcpy( team, inteam );
@@ -25,45 +23,38 @@ player::player( char* inname, char* inteam, char* inrtn, char* inpos )
     posn = getpos( pos );
 }
 
-    void 
+    void
 player::hit( int i )
 {
     h++;
     ab++;
     switch ( i ) {
-	case 2: 
-	    b2++; 
+	case 2:
+	    b2++;
 	    break;
-	case 3: 
-	    b3++; 
+	case 3:
+	    b3++;
 	    break;
-	case 4: 
-	    hr++; 
+	case 4:
+	    hr++;
 	    break;
     }
 }
 
-    void 
-player::move(char* str)
-{
-    for ( int i=0; i<2; i++ ) 
-	pos[i] = *str + i;
-}
-
-    void 
+    void
 player::sout(FILE *fp)
 {
     fprintf(fp,"%-8s %-5s%-5s%-17s%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d%3d",
 		pos,team,rtn,name,ab,r,h,rbi,b2,b3,hr,sb,cs,bb,k,pal,par);
 }
 
-    char* 
+    char*
 player::nout()
 {
     return( name );
 }
 
-    char* 
+    char*
 player::pout()
 {
     char *p;
@@ -75,20 +66,20 @@ player::pout()
     return( ++p );
 }
 
-    void 
+    void
 player::pa( char c )
 {
-    if ( c=='r' || c=='R' ) 
+    if ( c=='r' || c=='R' )
 	par++;
-    if ( c=='l' || c=='L' ) 
+    if ( c=='l' || c=='L' )
 	pal++;
 }
 
-    void 
+    void
 player::new_pos( char *newpos )
 {
     // extend pos string
-    pos = (char*) realloc( pos, strlen(pos) + strlen(newpos) );	
+    pos = (char*) realloc( pos, strlen(pos) + strlen(newpos) + 2 );
     strcat( pos, "-" );
     strcat( pos, newpos );
     posn = getpos( newpos );
@@ -98,31 +89,31 @@ player::new_pos( char *newpos )
 player::getpos( char *posstr )
 {
     switch ( *posstr ) {
-	case '1' : 
+	case '1' :
 	    return( 3 );
-        case '2' : 
+	case '2' :
 	    return( 4 );
-        case '3' : 
+	case '3' :
 	    return( 5 );
-        case 's' :
-        case 'S' : 
+	case 's' :
+	case 'S' :
 	    return( 6 );
-        case 'l' :
-        case 'L' : 
+	case 'l' :
+	case 'L' :
 	    return( 7 );
-        case 'r' :  
-        case 'R' : 
+	case 'r' :
+	case 'R' :
 	    return( 9 );
-        case 'c' : 
-        case 'C' : 
+	case 'c' :
+	case 'C' :
 	    switch ( *(posstr+1) ) {
 		case 'f' :
-		case 'F' : 
+		case 'F' :
 		    return( 8 );
-		default  : 
+		default  :
 		    return( 2 );
 	    }
-	default  : 
+	default  :
 	    return( 0 );
     }
 }

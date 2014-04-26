@@ -1,17 +1,10 @@
-// $Id$
-
 Known Bugs
-- none!
 
-Events
-- triple play
-- baserunner interference
+Missing Events
 
 Feature Requests
-- check for valid lineup after dr/dc/en
 - dice rolling
 - allow use of 4 instead of "h" for baserunning
-- baserunners allowed for current pitcher
 - handle STARTS/INJURIES
 - interactive lineup entry
 

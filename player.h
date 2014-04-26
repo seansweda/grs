@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef __PLAYER_H
 #define __PLAYER_H
 
@@ -17,7 +15,7 @@ private :
 	char *pos;
 public :
 	player(char*);
-	player(char*, char*, char*, char*);
+	player(char*, char*, char*, const char*);
 	int posn;
 	int ab;
 	int h;
@@ -33,14 +31,13 @@ public :
 	int pal;
 	int par;
 	void hit(int);
-	void move(char*);
 	void sout(FILE*);
 	char *nout();
 	char *pout();
 	void pa(char);
 	void new_pos(char*);
 	int getpos(char*);
-	~player(); 
+	~player();
 };
 
 #endif
