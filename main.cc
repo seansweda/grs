@@ -1,4 +1,4 @@
-#define VER "3.1_beta"
+#define VER "3.1.0"
 
 #include <stdio.h>
 #include <sys/stat.h>
