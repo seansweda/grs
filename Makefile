@@ -4,7 +4,9 @@
 # if you don't have getopt() use -DGETOPT and uncomment next line
 #GETOPT = getopt.o
 
+# if you're not using git comment out the next line
 GIT_VERSION := $(shell git describe --abbrev=6 --dirty --always)
+
 CC = gcc
 CPP = g++
 CFLAGS = -g -Wall -Wextra -Wconversion -DGIT=\"$(GIT_VERSION)\" #-DDEBUG
