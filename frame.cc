@@ -11,6 +11,7 @@ frame::frame(team *away, team *home, FILE *fp)
     runs = 0;
     linesize = 9;	// size of linescore array;
     errflag = 0;
+    count = 0;
 
     buffer=(char*) calloc(MAX_INPUT * 2, sizeof(char));
     *buffer='\0';
@@ -63,9 +64,11 @@ frame::frame(char *str)
     strcpy( location, stripcr( location, MAX_INPUT ) );
     strcpy( baserunning, stripcr( baserunning, MAX_INPUT ) );
 
-    cont=1;
+    cont = 1;
     bat=ibl[atbat];
     pit=ibl[(atbat+1)%2];
+
+    count++;
 }
 
     int
@@ -794,7 +797,7 @@ frame::decode()
     void
 frame::outbuf( FILE *fp, const char *str, const char *punc )
 {
-    int count;
+    int c;
     char tempstr[MAX_INPUT * 2];
     char *ptr = tempstr;
 
@@ -810,17 +813,17 @@ frame::outbuf( FILE *fp, const char *str, const char *punc )
 	strncat(tempstr, str, MAX_INPUT);
 
 	while ( strlen(tempstr) > LINEWIDTH ) {
-	    count = 0;
+	    c = 0;
 	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
 
-	    while ( count != (LINEWIDTH - 10) ) {
-		count++;
+	    while ( c != (LINEWIDTH - 10) ) {
+		c++;
 		ptr++;
 	    }
 	    while ( !(isspace(*ptr)) )
-		buffer[count++] = *(ptr++);
+		buffer[c++] = *(ptr++);
 
-	    buffer[count] = '\0';
+	    buffer[c] = '\0';
 	    ptr++;
 
 	    buffer = strcat( buffer, "\n" );

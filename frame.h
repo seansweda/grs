@@ -39,7 +39,15 @@ private :
 					// returns 1 if it is a legal command
 public :
 
-	static int undo, cont, outs, atbat, inning, runs, linesize, errflag;
+	static int undo,
+		   cont,
+		   outs,
+		   atbat,
+		   inning,
+		   runs,
+		   linesize,
+		   errflag,
+		   count;
 	static queue *runners;		// queue to handle inherited runners
 	static player *onbase[4];	// array of pointers to batter & runners
 

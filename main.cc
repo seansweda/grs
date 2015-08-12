@@ -1,4 +1,4 @@
-#define VER "3.1.0"
+#define VER "3.1.1"
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -37,7 +37,8 @@ int frame::undo,
     frame::inning,
     frame::runs,
     frame::linesize,
-    frame::errflag;
+    frame::errflag,
+    frame::count;
 
 int** frame::linescore;
 queue* frame::runners;		// queue to handle inherited runners
@@ -82,17 +83,16 @@ play()
 		    case 0:
 			tempstr[strlen(tempstr) - 1] = '\0';
 			f0->help(tempstr);
-		    case 1:
-			delete(f0);
+		    default:
 			break;
 		}
 		break;
 	    default:
 		tempstr[strlen(tempstr) - 1] = '\0';
 		f0->help(tempstr);
-		delete(f0);
 		break;
 	}
+	delete(f0);
 
 #ifdef DEBUG
     frame::runners->dump();

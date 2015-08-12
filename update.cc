@@ -117,7 +117,12 @@ frame::update()
 	char in_ext[5], out_ext[5];
 	int times = 1;
 
-	if ( undo ) {
+	if ( count == 1 ) {
+	    count--;
+	    strcpy( error, "nothing to undo!\n" );
+	    return(0);
+	}
+	else if ( undo ) {
 	    cont = 0;
 	    return(1);
 	}
@@ -137,6 +142,11 @@ frame::update()
 		sprintf( out_ext, ".un%d", ++times );
 		fclose( cmdfp );
 		fclose( undofp );
+
+		if ( times > 9 ) {
+		    fprintf( stderr, "undo may be looping, bailing!\n" );
+		    exit(1);
+		}
 	    }
 
 	    fputs( "un", undofp );
@@ -168,6 +178,7 @@ frame::update()
 	    input = stdin;
 	    undo = 0;
 	    cont = 1;
+	    count--;
 #ifdef DEBUG
 	    fprintf( stderr, "%d %d %d %d %d %d %d %d\n",
 		undo, cont, outs, atbat, inning, runs, linesize, errflag );
