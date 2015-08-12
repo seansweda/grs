@@ -9,7 +9,7 @@ GIT_VERSION := $(shell git describe --abbrev=6 --dirty --always)
 
 CC = gcc
 CPP = g++
-CFLAGS = -g -Wall -Wextra -Wconversion -DGIT=\"$(GIT_VERSION)\" #-DDEBUG
+CFLAGS = -g -Wall -Wextra -Wconversion -fno-stack-protector -DGIT=\"$(GIT_VERSION)\" #-DDEBUG
 LDFLAGS =
 
 all: grs
