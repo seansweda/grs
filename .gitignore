@@ -1,3 +1,10 @@
 *.o
 grs
 git_commit.h
+
+# Visual Studio
+Debug
+Release
+*.VC.VC.opendb
+*.VC.db
+*.user
