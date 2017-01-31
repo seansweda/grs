@@ -1,15 +1,13 @@
 # -DDEBUG turns on debugging output
 # -DWIN32 for building on Windows
 
-# if you don't have getopt() use -DGETOPT and uncomment next line
-#GETOPT = getopt.o
-
-# if you're not using git comment out the next line
-GIT_VERSION := $(shell git describe --abbrev=6 --dirty --always)
+# if you're not using git comment out these lines
+USE_GIT = -DUSE_GIT
+GIT_COMMIT = git_commit.h
 
 CC = gcc
 CPP = g++
-CFLAGS = -g -Wall -Wextra -Wconversion -fno-stack-protector -DGIT=\"$(GIT_VERSION)\" #-DDEBUG
+CFLAGS = -g -Wall -Wextra -Wconversion -fno-stack-protector $(USE_GIT) #-DDEBUG
 LDFLAGS =
 
 all: grs
@@ -19,10 +17,10 @@ tarball:
 	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc getopt grscat
 	gzip grs.tar
 
-grs: Makefile main.o frame.o update.o queue.o team.o player.o pitcher.o $(GETOPT)
-	$(CPP) $(CFLAGS) $(LDFLAGS) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o $(GETOPT)
+grs: Makefile main.o frame.o update.o queue.o team.o player.o pitcher.o
+	$(CPP) $(CFLAGS) $(LDFLAGS) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o
 
-main.o: Makefile main.cc frame.h team.h player.h pitcher.h config.h
+main.o: Makefile main.cc frame.h team.h player.h pitcher.h config.h $(GIT_COMMIT)
 	$(CPP) $(CFLAGS) -c main.cc
 
 frame.o: Makefile frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h config.h
@@ -46,6 +44,9 @@ pitcher.o: Makefile pitcher.cc pitcher.h config.h
 getopt.o: Makefile getopt/getopt.c getopt/getopt.h
 	$(CC) $(CFLAGS) -c getopt/getopt.c
 
+git_commit.h:
+	bash git_commit.sh > git_commit.h
+
 clean:
-	rm -f *.o grs grs.tar.gz
+	rm -f *.o grs grs.tar.gz git_commit.h
 

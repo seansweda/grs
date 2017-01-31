@@ -5,10 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#ifdef GETOPT
+#ifdef WIN32
 #   include "getopt/getopt.h"
 #else
 #   include <unistd.h>
+#endif
+#ifdef USE_GIT
+#   include "git_commit.h"
 #endif
 #include "config.h"
 #include "pitcher.h"
