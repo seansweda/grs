@@ -334,13 +334,11 @@ main(int argc, char *argv[])
     play();
     quit();
 
-    free(afile);
-    free(hfile);
-    free(cfile);
-
     fclose(pbpfp);
     fclose(stsfp);
     fclose(cmdfp);
+
+    exit(0);
 }
 
     char*
