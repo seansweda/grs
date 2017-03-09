@@ -7,7 +7,7 @@ GIT_COMMIT = git_commit.h
 
 CC = gcc
 CPP = g++
-CFLAGS = -g -Wall -Wextra -Wconversion -fno-stack-protector $(USE_GIT) #-DDEBUG
+CFLAGS = -g -Wall -Wextra -Wconversion -fno-stack-protector $(USE_GIT) $(OSX_COMPAT) #-DDEBUG
 LDFLAGS =
 
 all: grs
