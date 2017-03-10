@@ -322,14 +322,12 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[0] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
@@ -357,14 +355,12 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[1] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else if ( !done[1] ) {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
@@ -391,14 +387,12 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[2] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else if ( !done[2] ) {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
@@ -424,29 +418,27 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[3] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else if ( !done[3] ) {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
 	    default:
 		retval = 0;
-		strncat( errstr, str, 2 );
+		snprintf( errptr, 3, "%s", str );
 		errptr += 2;
-		*errptr = '\0';
 		break;
 	}
-	str+=2;
+	str += 2;
     }
 
     if (retval)
-	strcpy( runstr, temp );		// cleaned up baserunning string
+	// cleaned up baserunning string
+	snprintf( runstr, MAX_INPUT, "%s", temp );
 
 	if ( outsonplay(runstr) + outs > 3 ) {
 	    sprintf( error, "Too many outs on play.\n" );
