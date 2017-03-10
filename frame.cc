@@ -795,43 +795,37 @@ frame::decode()
 frame::outbuf( FILE *fp, const char *str, const char *punc )
 {
     int c;
+    char bigbuf[MAX_INPUT * 2];
     char tempstr[MAX_INPUT * 2];
-    char *ptr = tempstr;
+    char *ptr;
 
     if ( *punc == '\n' ) {
-	strncat( buffer, punc, 2 );
+	snprintf( buffer + strlen(buffer), 2, "%s", punc );
 	fputs( buffer, fp );
 	fputs( str, fp );
 	*buffer = (char) 0;
     }
-    else if ( strlen(str) + strlen(buffer) > LINEWIDTH ) {
-	strncpy(tempstr, buffer, MAX_INPUT);
-	strncat(tempstr, punc, 2);
-	strncat(tempstr, str, MAX_INPUT);
+    else {
+	snprintf( bigbuf, MAX_INPUT * 2, "%s%s%s", buffer, punc, str );
 
-	while ( strlen(tempstr) > LINEWIDTH ) {
-	    c = 0;
-	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
+	while ( strlen(bigbuf) > LINEWIDTH ) {
+	    snprintf( tempstr, MAX_INPUT * 2, "%s", bigbuf );
 
-	    while ( c != (LINEWIDTH - 10) ) {
+	    c = LINEWIDTH - 10;
+	    ptr = tempstr + c;
+	    while ( !( isspace(*ptr) ) ) {
 		c++;
 		ptr++;
 	    }
-	    while ( !(isspace(*ptr)) )
-		buffer[c++] = *(ptr++);
 
-	    buffer[c] = '\0';
 	    ptr++;
+	    tempstr[c] = '\0';
 
-	    strcat( buffer, "\n" );
+	    snprintf( buffer, LINEWIDTH, "%s\n", tempstr );
 	    fputs( buffer, fp );
-	    strncpy( tempstr, ptr, MAX_INPUT * 2 );
+	    snprintf( bigbuf, MAX_INPUT * 2, "%s", ptr );
 	}
-	strncpy( buffer, tempstr, MAX_INPUT );
-    }
-    else {
-	strncat( buffer, punc, 2 );
-	strncat( buffer, str, MAX_INPUT );
+	snprintf( buffer, MAX_INPUT * 2, "%s", bigbuf);
     }
 }
 
