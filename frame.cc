@@ -480,7 +480,6 @@ frame::runcat(int adv)
     temptr=temp;
     *temptr='\0';
 
-
     switch (adv) {
     case 0 :					// batter out
 	    strcat(baserunning,"bo");
@@ -496,7 +495,6 @@ frame::runcat(int adv)
 	    else
 	       strcat(baserunning,"b112233h");
 	    break;
-    //else {
 
     case -2 :					// runners advance 1 base
 	    for (i=1;i<=3;i++)
@@ -510,7 +508,6 @@ frame::runcat(int adv)
 	    break;
 
     case -3 :
-    //	strcat(baserunning,"1o");
 	    for (i=1;i<=3;i++)
 	       if (onbase[i]) test=i;
 	    sprintf(temptr++,"%1d",test);
@@ -545,7 +542,7 @@ frame::runcat(int adv)
     } // switch
 
     *temptr='\0';
-    strcat(baserunning,temp);
+    snprintf( baserunning + strlen(baserunning), MAX_INPUT, "%s", temp);
 }
 
     int
@@ -826,7 +823,7 @@ frame::outbuf( FILE *fp, const char *str, const char *punc )
 	    buffer[c] = '\0';
 	    ptr++;
 
-	    buffer = strcat( buffer, "\n" );
+	    strcat( buffer, "\n" );
 	    fputs( buffer, fp );
 	    strncpy( tempstr, ptr, MAX_INPUT * 2 );
 	}

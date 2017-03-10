@@ -80,8 +80,7 @@ player::new_pos( char *newpos )
 {
     // extend pos string
     pos = (char*) realloc( pos, strlen(pos) + strlen(newpos) + 2 );
-    strcat( pos, "-" );
-    strcat( pos, newpos );
+    snprintf( pos + strlen(pos), 4, "-%s", newpos );
     posn = getpos( newpos );
 }
 

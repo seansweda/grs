@@ -113,8 +113,7 @@ team::pos_change( int spot, char **comment )
 #ifdef DEBUG
     fprintf( stderr, "pos_change %d: %s DONE\n", spot, pos );
 #endif
-    sprintf( tempstr, "%s moves to %s.", oldpl->head->nout(), pos );
-    strcat( *comment, tempstr );
+    snprintf( *comment, MAX_INPUT, "%s moves to %s.", oldpl->head->nout(), pos );
 }
 
 // Adds a new player at position "spot" in the batting order
@@ -181,23 +180,23 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
 
     if ( !(strcmp(pos, def)) ) {
 	newpl->head = new player( name, ibl, mlb, def );
-	sprintf( tempstr, "%s %s for %s, batting %d.",
+	snprintf( *comment, MAX_INPUT, "%s %s for %s, batting %d.",
 		name, def, oldpl->head->nout(), spot );
     }
     else if ( pos[0] == 'p' ) {
 	newpl->head = new player( name, ibl, mlb, pos );
-	sprintf( tempstr, "%s now pitching for %s, batting %d.",
+	snprintf( *comment, MAX_INPUT, "%s now pitching for %s, batting %d.",
 		name, ibl, spot );
     }
     else if ( def[0] == '\0' ) {
 	newpl->head = new player( name, ibl, mlb, pos );
-	sprintf( tempstr, "%s now %s for %s, batting %d.",
+	snprintf( *comment, MAX_INPUT, "%s now %s for %s, batting %d.",
 		name, pos, ibl, spot );
     }
     else {
 	newpl->head = new player( name, ibl, mlb, def );
 	newpl->head->new_pos(pos);
-	sprintf( tempstr, "%s %s for %s, batting %d.",
+	snprintf( *comment, MAX_INPUT, "%s %s for %s, batting %d.",
 		name, def, oldpl->head->nout(), spot);
     }
 
@@ -209,7 +208,6 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
 #ifdef DEBUG
     fprintf( stderr, "insert %d: %s, %s, %s DONE\n", spot, name, mlb, pos );
 #endif
-    strcat( *comment, tempstr );
 }
 
 // Creates the lineups for a team

@@ -39,8 +39,8 @@ frame::update()
 	onbase[0]=bat->up();
 	runadv();
 	frameput();
-	strcat( comment, " " );
-	outbuf( pbpfp, comment );
+	snprintf( tempstr, MAX_INPUT, "%s ", comment );
+	outbuf( pbpfp, tempstr );
 	return(1);
     }
     else if ( !(strcmp( event, "pr" )) ) {
@@ -57,8 +57,8 @@ frame::update()
 		onbase[i] = ibl[atbat]->findord(tempstr[0] - '0');
 		runadv();
 		frameput();
-		strcat( comment, " " );
-		outbuf( pbpfp, comment );
+		snprintf( tempstr, MAX_INPUT, "%s ", comment );
+		outbuf( pbpfp, tempstr );
 		return(1);
 	    }
 	}
@@ -79,8 +79,8 @@ frame::update()
 	}
 	runadv();
 	frameput();
-	strcat( comment, " " );
-	outbuf( pbpfp, comment );
+	snprintf( tempstr, MAX_INPUT, "%s ", comment );
+	outbuf( pbpfp, tempstr );
 	return(1);
     }
     else if ( !(strcmp( event, "dr" )) || !(strcmp( event, "dc" )) ) {
@@ -99,8 +99,8 @@ frame::update()
 	}
 	runadv();
 	frameput();
-	strcat( comment, " " );
-	outbuf( pbpfp, comment );
+	snprintf( tempstr, MAX_INPUT, "%s ", comment );
+	outbuf( pbpfp, tempstr );
 	return(1);
     }
     else if ( !(strcmp( event, "la" )) ) {
