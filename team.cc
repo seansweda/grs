@@ -521,7 +521,9 @@ team::print_lineup()
     fprintf(output,"\nLineup for %s\n",nout());
     newpl=lineup;
     while (newpl) {
-	while (newpl->next && newpl->ord==newpl->next->ord) newpl=newpl->next;
+	while (newpl->next && newpl->ord==newpl->next->ord) {
+	    newpl=newpl->next;
+	}
 	fprintf(output,"%d. %s, %s\n",newpl->ord,newpl->head->nout(),newpl->head->pout());
 	newpl=newpl->next;
     }
@@ -542,8 +544,12 @@ team::check_defense()
 
     newpl=lineup;
     while (newpl) {
-	while (newpl->next && newpl->ord==newpl->next->ord) newpl=newpl->next;
-	field[ newpl->head->getpos( newpl->head->pout() ) - 2 ] = 1;
+	while (newpl->next && newpl->ord==newpl->next->ord) {
+	    newpl=newpl->next;
+	}
+	if ( newpl->head->getpos( newpl->head->pout() ) >= 2 ) {
+	    field[ newpl->head->getpos( newpl->head->pout() ) - 2 ]++;
+	}
 	newpl=newpl->next;
     }
 
