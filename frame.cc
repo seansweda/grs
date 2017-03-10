@@ -464,28 +464,28 @@ frame::runcat(int adv)
     runcat(x) everyone advances x base(s)
 */
 {
-    int test = 0;
     int i;
-    char temp[MAX_INPUT];
-    char *temptr;
+    int test = 0;
+    size_t b = strlen(baserunning);
 
-    temptr=temp;
+    char temp[MAX_INPUT];
+    char *temptr = temp;
     *temptr='\0';
 
     switch (adv) {
     case 0 :					// batter out
-	    strcat(baserunning,"bo");
+	    snprintf( baserunning + b, 3, "%s", "bo" );
 	    break;
 
     case -1 :					// advance if forced
 	    if (!onbase[1])
-	       strcat(baserunning,"b1");
+		snprintf( baserunning + b, 3, "%s", "b1" );
 	    else if (!onbase[2])
-	       strcat(baserunning,"b112");
+		snprintf( baserunning + b, 5, "%s", "b112" );
 	    else if (!onbase[3])
-	       strcat(baserunning,"b11223");
+		snprintf( baserunning + b, 7, "%s", "b11223" );
 	    else
-	       strcat(baserunning,"b112233h");
+		snprintf( baserunning + b, 9, "%s", "b112233h" );
 	    break;
 
     case -2 :					// runners advance 1 base
@@ -534,7 +534,7 @@ frame::runcat(int adv)
     } // switch
 
     *temptr='\0';
-    snprintf( baserunning + strlen(baserunning), MAX_INPUT, "%s", temp);
+    snprintf( baserunning + b, MAX_INPUT, "%s", temp);
 }
 
     int
