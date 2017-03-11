@@ -5,10 +5,12 @@
 USE_GIT = -DUSE_GIT
 GIT_COMMIT = git_commit.h
 
+-include Makefile.OSX
+
 CC = gcc
 CPP = g++
-CFLAGS = -g -Wall -Wextra -Wconversion $(USE_GIT) $(OSX_COMPAT) #-DDEBUG
-LDFLAGS =
+CFLAGS = -g -Wall -Wextra -Wconversion $(USE_GIT) $(OSX_COMPAT_CFLAGS) #-DDEBUG
+LDFLAGS = $(OSX_COMPAT_LDFLAGS)
 
 all: grs
 
