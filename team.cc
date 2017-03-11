@@ -4,46 +4,50 @@
 // Constructor functions
 team::team( int who )
 {
-    char str[MAX_INPUT];
+    char *inputstr;
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
     int i;
-    int flag = 1;
-
-    while ( flag ) {
-	flag = 0;
+    int loop = 1;
+    while ( loop ) {
 	fprintf(output, "Enter the three letter code for %s team:\n",
 		who == 0 ? "away" : "home" );
-	memset( str, '\0', MAX_INPUT );
-	fgets( str, MAX_INPUT, input );
 
-	if ( strlen(str) > 3 ) {
+	memset( inputstr, '\0', MAX_INPUT );
+	fgets( inputstr, MAX_INPUT, input );
+	sanitize( &inputstr, TEAMLEN, '\n' );
+
+	if ( strlen(inputstr) != 3 ) {
+	    fprintf(stderr, "Team name must be 3 letters!\n");
+	    if (input != stdin)
+		exit(1);
+	    else
+		continue;
+	} else {
 	    for ( i=0; i< 3; i++ ) {
-		if ( isalpha(str[i]) ) {
-		    if ( islower (str[i]) )
-			str[i] = (char)toupper(str[i]); // convert to uppercase
+		if ( isalpha( inputstr[i] ) ) {
+		    if ( islower( inputstr[i] ) )
+			// convert to uppercase
+			inputstr[i] = (char)toupper( inputstr[i] );
 		}
 		else {
-		    flag = 1;
+		    loop++;
 		}
 	    }
-	    if ( flag ) {
-		    fprintf(stderr, "Team name must be alphanumeric\n");
-		    if (input == stdin)
-			flag = 1;
-		    else
-			exit(1);
+	    if ( loop > 1 ) {
+		loop = 1;
+		fprintf(stderr, "Team name must be alphanumeric\n");
+		if (input != stdin)
+		    exit(1);
+		else
+		    continue;
 	    }
 	}
-	else {
-	    fprintf(stderr, "Team name must be 3 letters!\n");
-	    if (input == stdin)
-		flag = 1;
-	    else
-		exit(1);
-	}
+	// if we get here it's all good
+	break;
     }
 
-    strcpy( ibl, stripcr( str, TEAMLEN ) );
+    snprintf( ibl, TEAMLEN, "%s", inputstr );
     fprintf(cmdfp, "%s\n", ibl);
     lineup = (struct pl_list *) malloc(sizeof (struct pl_list));
     lineup->head = NULL;
@@ -65,7 +69,7 @@ team::team( int who )
 // Constructor function getting team name; Assumes name is correct
 team::team( char *str )
 {
-    strcpy( ibl, stripcr( str, TEAMLEN ) );
+    snprintf( ibl, TEAMLEN, "%s", str );
     fprintf(cmdfp, "%s\n", ibl);
     lineup = (struct pl_list *) malloc(sizeof (struct pl_list));
     lineup->head = NULL;
@@ -87,20 +91,19 @@ team::team( char *str )
     void
 team::pos_change( int spot, char **comment )
 {
-    char tempstr[MAX_INPUT];
-    memset( tempstr, '\0', MAX_INPUT );
 
-    char pos[POSLEN];
-    memset( pos, '\0', POSLEN );
+    char *pos;
+    pos = (char*) calloc(POSLEN, sizeof(char));
 
     pl_list *oldpl = lineup;
-
     while ( oldpl->next && oldpl->next->ord <= spot )
 	oldpl = oldpl->next;
 
     fprintf( output, "\nEnter new position for %d: ", spot );
-    fgets( tempstr, MAX_INPUT, input );
-    strcpy( pos, stripcr( tempstr, POSLEN ) );
+    memset( pos, '\0', POSLEN );
+    fgets( pos, POSLEN, input );
+    sanitize( &pos, POSLEN, '\n' );
+
 #ifdef DEBUG
     fprintf( stderr, "pos_change %d: %s\n", spot, pos );
 #endif
@@ -118,37 +121,37 @@ team::pos_change( int spot, char **comment )
 
 // Adds a new player at position "spot" in the batting order
     void
-team::insert( int spot, char **comment, const char *def, const char *inputstr )
+team::insert( int spot, char **comment, const char *def, const char *str )
 {
     struct pl_list *newpl, *oldpl;
-    int flag;
 
-    char tempstr[MAX_INPUT];
+    char *inputstr;
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    char mlb[MAX_INPUT];
-    char name[MAX_INPUT];
-    char pos[MAX_INPUT];
+    char *name, *mlb, *pos;
+    name = (char*) calloc(NAMELEN, sizeof(char));
+    mlb = (char*) calloc(TEAMLEN, sizeof(char));
+    pos = (char*) calloc(POSLEN, sizeof(char));
 
     newpl = (struct pl_list *) malloc( sizeof(struct pl_list) );
     newpl->ord = spot;
     newpl->next = NULL;
 
-    if ( !(*inputstr) ) {
-	flag = 1;
-	while (flag) {
-	    flag=0;
+    if ( !(*str) ) {
+	int loop = 1;
+	while ( loop ) {
 	    fprintf(output, "Player, MLB team & Position for %d: ", spot);
-	    memset( tempstr, '\0', MAX_INPUT );
-	    memset( mlb, '\0', MAX_INPUT );
-	    memset( name, '\0', MAX_INPUT );
-	    memset( pos, '\0', MAX_INPUT );
-	    fgets( tempstr, MAX_INPUT, input );
-	    fprintf( output, "\n" );
+	    memset( inputstr, '\0', MAX_INPUT );
+	    memset( name, '\0', NAMELEN );
+	    memset( mlb, '\0', TEAMLEN );
+	    memset( pos, '\0', POSLEN );
 
-	    sscanf( tempstr, "%s %s %s", name, mlb, pos );
-	    strcpy( name, stripcr( name, NAMELEN ) );
-	    strcpy( mlb, stripcr( mlb, TEAMLEN ) );
-	    strcpy( pos, stripcr( pos, POSLEN ) );
+	    fgets( inputstr, MAX_INPUT, input );
+	    sscanf( inputstr, "%s %s %s", name, mlb, pos );
+	    sanitize( &name, NAMELEN );
+	    sanitize( &mlb, TEAMLEN );
+	    sanitize( &pos, POSLEN );
+
 #ifdef DEBUG
 	    fprintf( stderr, "insert %d: %s, %s, %s\n", spot, name, mlb, pos );
 #endif
@@ -158,21 +161,24 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
 		fprintf( stderr, "insert %d: %d, %d, %d\n", spot,
 			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
-		if ( input == stdin )
-		    flag = 1;
-		else
+		if ( input != stdin )
 		    exit(1);
+		else
+		    continue;
 	    }
+	    // if we get here it's all good
+	    fprintf( output, "\n" );
+	    break;
 	}
 	if ( strcmp(def, "ph") )
 	    fprintf( cmdfp, "%d\n", spot );
-	fprintf( cmdfp, "%s", tempstr );
+	fprintf( cmdfp, "%s %s %s\n", name, mlb, pos );
     }
     else {
-	    sscanf( inputstr, "%s %s %s", name, mlb, pos );
-	    strcpy( name, stripcr( name, NAMELEN ) );
-	    strcpy( mlb, stripcr( mlb, TEAMLEN ) );
-	    strcpy( pos, stripcr( pos, POSLEN ) );
+	    sscanf( str, "%s %s %s", name, mlb, pos );
+	    sanitize( &name, NAMELEN );
+	    sanitize( &mlb, TEAMLEN );
+	    sanitize( &pos, POSLEN );
     }
 
     oldpl=lineup;
@@ -215,13 +221,15 @@ team::insert( int spot, char **comment, const char *def, const char *inputstr )
 team::make_lineups()
 {
     struct pl_list *newpl;
-    int spot, flag;
+    int spot;
 
-    char tempstr[MAX_INPUT];
+    char *inputstr;
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    char mlb[MAX_INPUT];
-    char name[MAX_INPUT];
-    char pos[MAX_INPUT];
+    char *name, *mlb, *pos;
+    name = (char*) calloc(NAMELEN, sizeof(char));
+    mlb = (char*) calloc(TEAMLEN, sizeof(char));
+    pos = (char*) calloc(POSLEN, sizeof(char));
 
     current = newpl = lineup;
     fprintf(output,"Enter lineup for %s \n", ibl);
@@ -234,21 +242,21 @@ team::make_lineups()
 	    newpl->next=NULL;
 	}
 	newpl->ord = spot;
-	flag = 1;
-	while ( flag ) {
-	    flag = 0;
-	    fprintf(output, "Player, MLB team & Position for %d: ", spot);
-	    memset( tempstr, '\0', MAX_INPUT );
-	    memset( mlb, '\0', MAX_INPUT );
-	    memset( name, '\0', MAX_INPUT );
-	    memset( pos, '\0', MAX_INPUT );
-	    fgets( tempstr, MAX_INPUT, input );
-	    // fprintf( output, "\n" );
 
-	    sscanf( tempstr, "%s %s %s", name, mlb, pos );
-	    strcpy( name, stripcr( name, NAMELEN ) );
-	    strcpy( mlb, stripcr( mlb, TEAMLEN ) );
-	    strcpy( pos, stripcr( pos, POSLEN ) );
+	int loop = 1;
+	while ( loop ) {
+	    fprintf(output, "Player, MLB team & Position for %d: ", spot);
+	    memset( inputstr, '\0', MAX_INPUT );
+	    memset( name, '\0', NAMELEN );
+	    memset( mlb, '\0', TEAMLEN );
+	    memset( pos, '\0', POSLEN );
+
+	    fgets( inputstr, MAX_INPUT, input );
+	    sscanf( inputstr, "%s %s %s", name, mlb, pos );
+	    sanitize( &name, NAMELEN );
+	    sanitize( &mlb, TEAMLEN );
+	    sanitize( &pos, POSLEN );
+
 #ifdef DEBUG
 	    fprintf( stderr, "make_lineups: %s, %s, %s\n", name, mlb, pos );
 #endif
@@ -259,17 +267,19 @@ team::make_lineups()
 		fprintf( stderr, "make_lineups: %d, %d, %d\n",
 			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
-		if ( input == stdin )
-		    flag = 1;
-		else
+		if ( input != stdin )
 		    exit(1);
+		else
+		    continue;
 	    }
+	    // if we get here it's all good
+	    break;
 	}
-	fprintf( cmdfp, "%s", tempstr );
+	fprintf( cmdfp, "%s %s %s\n", name, mlb, pos );
 	newpl->head = new player( name, ibl, mlb, pos );
     }
 
-    fprintf(output,"\n");
+    //fprintf(output,"\n");
     return 1;
 }
 
@@ -277,29 +287,27 @@ team::make_lineups()
     int
 team::make_lineups_pit()
 {
-    int flag;
+    char *inputstr;
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
+    char *name, *mlb, *throws;
+    name = (char*) calloc(NAMELEN, sizeof(char));
+    mlb = (char*) calloc(TEAMLEN, sizeof(char));
+    throws = (char*) calloc(POSLEN, sizeof(char));
 
-    char tempstr[MAX_INPUT];
-
-    char mlb[MAX_INPUT];
-    char name[MAX_INPUT];
-    char throws[MAX_INPUT];
-
-    flag = 1;
-    while ( flag ) {
-	flag=0;
+    int loop = 1;
+    while ( loop ) {
 	fprintf(output, "Starting pitcher for %s, MLB team & Throws: ", ibl);
-	memset( tempstr, '\0', MAX_INPUT );
-	memset( mlb, '\0', MAX_INPUT );
-	memset( name, '\0', MAX_INPUT );
-	memset( throws, '\0', MAX_INPUT );
-	fgets( tempstr, MAX_INPUT, input );
-	// fprintf( output, "\n" );
+	memset( inputstr, '\0', MAX_INPUT );
+	memset( name, '\0', NAMELEN );
+	memset( mlb, '\0', TEAMLEN );
+	memset( throws, '\0', POSLEN );
 
-	sscanf( tempstr, "%s %s %s", name, mlb, throws );
-	strcpy( name, stripcr( name, NAMELEN ) );
-	strcpy( mlb, stripcr( mlb, TEAMLEN ) );
-	strcpy( throws, stripcr( throws, 2 ) );
+	fgets( inputstr, MAX_INPUT, input );
+	sscanf( inputstr, "%s %s %s", name, mlb, throws );
+	sanitize( &name, NAMELEN );
+	sanitize( &mlb, TEAMLEN );
+	sanitize( &throws, 2 );
+
 #ifdef DEBUG
 	fprintf( stderr, "make_lineups_pit: %s, %s, %s\n", name, mlb, throws );
 #endif
@@ -310,20 +318,22 @@ team::make_lineups_pit()
 	    fprintf( stderr, "make_lineups_pit: %d, %d, %d\n",
 		    (int)strlen(name), (int)strlen(mlb), (int)strlen(throws) );
 #endif
-	    if ( input == stdin )
-		flag = 1;
-	    else
+	    if ( input != stdin )
 		exit(1);
+	    else
+		continue;
 	}
+	// if we get here it's all good
+	break;
     }
-    fprintf( cmdfp, "%s", tempstr );
+    fprintf( cmdfp, "%s %s %c\n", name, mlb, throws[0] );
     pitchers->head = new pitcher( name, ibl, mlb, throws[0] );
     pitchers->next = 0;
     mound=pitchers->head;
 #ifdef DEBUG
     fprintf(stderr,"%p:%s->%p\n",pitchers,pitchers->head->nout(),pitchers->next);
 #endif
-    fprintf(output,"\n");
+    //fprintf(output,"\n");
     return 1;
 }
 
@@ -424,52 +434,58 @@ team::up()
 team::new_pit()
 {
     struct pit_list *newpit,*oldpit;
-    int flag;
 
-    char tempstr[MAX_INPUT];
+    char *inputstr;
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    char mlb[MAX_INPUT];
-    char name[MAX_INPUT];
-    char throws[MAX_INPUT];
-    char bats[MAX_INPUT];
+    char *name, *mlb, *throws, *bats;
+    name = (char*) calloc(NAMELEN, sizeof(char));
+    mlb = (char*) calloc(TEAMLEN, sizeof(char));
+    throws = (char*) calloc(POSLEN, sizeof(char));
+    bats = (char*) calloc(POSLEN, sizeof(char));
 
     newpit=(struct pit_list *)malloc(sizeof (struct pit_list));
     newpit->next=NULL;
 
-    flag = 1;
-    while ( flag ) {
-	flag = 0;
+    int loop = 1;
+    while ( loop ) {
 	fprintf(output, "Relief Pitcher, MLB team & Throws: " );
-	memset( tempstr, '\0', MAX_INPUT );
-	memset( mlb, '\0', MAX_INPUT );
-	memset( name, '\0', MAX_INPUT );
-	memset( throws, '\0', MAX_INPUT );
-	memset( bats, '\0', MAX_INPUT );
-	fgets( tempstr, MAX_INPUT, input );
-	fprintf( output, "\n" );
+	memset( inputstr, '\0', MAX_INPUT );
+	memset( name, '\0', NAMELEN );
+	memset( mlb, '\0', TEAMLEN );
+	memset( throws, '\0', POSLEN );
+	memset( bats, '\0', POSLEN );
 
-	sscanf( tempstr, "%s %s %s %s", name, mlb, throws, bats );
-	strcpy( name, stripcr( name, NAMELEN ) );
-	strcpy( mlb, stripcr( mlb, TEAMLEN ) );
-	strcpy( throws, stripcr( throws, 2 ) );
-	strcpy( bats, stripcr( bats, 2 ) );
+	fgets( inputstr, MAX_INPUT, input );
+	sscanf( inputstr, "%s %s %s %s", name, mlb, throws, bats );
+	sanitize( &name, NAMELEN );
+	sanitize( &mlb, TEAMLEN );
+	sanitize( &throws, 2 );
+	sanitize( &bats, 2 );
+
 #ifdef DEBUG
 	fprintf( stderr, "new_pit: %s, %s, %s, %s\n", name, mlb, throws, bats );
 #endif
-
 	if ( strlen(name) == 0 || strlen(mlb) == 0 || strlen(throws) == 0 ) {
 	    fprintf( stderr, "formatting error\n" );
 #ifdef DEBUG
 	    fprintf( stderr, "new_pit: %d, %d, %d\n",
 		    (int)strlen(name), (int)strlen(mlb), (int)strlen(throws) );
 #endif
-	    if ( input == stdin )
-		flag = 1;
-	    else
+	    if ( input != stdin )
 		exit(1);
+	    else
+		continue;
 	}
+	// if we get here it's all good
+	fprintf( output, "\n" );
+	break;
     }
-    fprintf( cmdfp, "%s", tempstr );
+
+    if ( strlen(bats) > 0 )
+	fprintf( cmdfp, "%s %s %c %c\n", name, mlb, throws[0], bats[0] );
+    else
+	fprintf( cmdfp, "%s %s %c\n", name, mlb, throws[0] );
     newpit->head = new pitcher( name, ibl, mlb, throws[0] );
     newpit->next = 0;
     oldpit = pitchers;
@@ -737,15 +753,19 @@ team::what_ord( player *up )
 team::decisions()
 {
 
+    char *inputstr;
+    inputstr = (char*) calloc(POSLEN, sizeof(char));
+
     struct pit_list *curr = pitchers;
-    char wls[MAX_INPUT];
 
     fprintf( output, "\nEnter W/L/S for appropriate %s pitcher.  <CR> if none.\n", ibl );
     while (curr) {
 	fprintf( output, "%s: ", curr->head->nout() );
-	memset( wls, '\0', MAX_INPUT );
-	fgets( wls, MAX_INPUT, input );
-	switch (*wls) {
+	memset( inputstr, '\0', POSLEN );
+	fgets( inputstr, POSLEN, input );
+	sanitize( &inputstr, POSLEN, '\n' );
+
+	switch (*inputstr) {
 		case 'w' :
 		case 'W' : curr->head->dec = 'W';
 			   break;
@@ -769,22 +789,27 @@ team::unearned( int inning )
 {
     int numout = 0;
     int ur = 0;
-    char urstr[MAX_INPUT];
+
+    char *inputstr;
+    inputstr = (char*) calloc(POSLEN, sizeof(char));
 
     struct pit_list *curr = pitchers;
 
     while ( curr ) {
 	if ( curr->head->out + numout >= (inning-1)*3 ) {
 	    fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
-	    memset( urstr, '\0', MAX_INPUT );
-	    fgets( urstr, MAX_INPUT, input );
-	    ur = atoi(urstr);
+	    memset( inputstr, '\0', POSLEN );
+	    fgets( inputstr, POSLEN, input );
+	    sanitize( &inputstr, POSLEN, '\n' );
+	    ur = atoi(inputstr);
+
 	    while ( ur < 0 || ur > curr->head->er ) {
 		fprintf( stderr, "Invalid unearned runs total.\n" );
 		fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
-		memset( urstr, '\0', MAX_INPUT );
-		fgets( urstr, MAX_INPUT, input );
-		ur = atoi(urstr);
+		memset( inputstr, '\0', POSLEN );
+		fgets( inputstr, POSLEN, input );
+		sanitize( &inputstr, POSLEN, '\n' );
+		ur = atoi(inputstr);
 	    }
 	    numout += curr->head->out;
 	    curr->head->er = curr->head->er-ur;
