@@ -549,7 +549,7 @@ team::print_lineup()
 team::check_defense()
 {
     struct pl_list *newpl;
-    int i, field[8];
+    int i, c, field[8];
     char missing[25];
 
     missing[0] = '\0';
@@ -569,6 +569,7 @@ team::check_defense()
 	newpl=newpl->next;
     }
 
+    c = 0;
     for ( i = 0; i < 8; i++ ) {
 #ifdef DEBUG
 	fprintf( stderr, "check_defense: %d/%d : %s\n", i, field[i], missing );
@@ -576,28 +577,36 @@ team::check_defense()
 	if ( field[i] == 0 ) {
 	    switch ( i + 2 ) {
 		case 2	:
-		    strcat( missing, " c" );
+		    snprintf( missing + c, 3, "%s", " c" );
+		    c += 2;
 		    break;
 		case 3	:
-		    strcat( missing, " 1b" );
+		    snprintf( missing + c, 4, "%s", " 1b" );
+		    c += 3;
 		    break;
 		case 4	:
-		    strcat( missing, " 2b" );
+		    snprintf( missing + c, 4, "%s", " 2b" );
+		    c += 3;
 		    break;
 		case 5	:
-		    strcat( missing, " 3b" );
+		    snprintf( missing + c, 4, "%s", " 3b" );
+		    c += 3;
 		    break;
 		case 6	:
-		    strcat( missing, " ss" );
+		    snprintf( missing + c, 4, "%s", " ss" );
+		    c += 3;
 		    break;
 		case 7	:
-		    strcat( missing, " lf" );
+		    snprintf( missing + c, 4, "%s", " lf" );
+		    c += 3;
 		    break;
 		case 8	:
-		    strcat( missing, " cf" );
+		    snprintf( missing + c, 4, "%s", " cf" );
+		    c += 3;
 		    break;
 		case 9	:
-		    strcat( missing, " rf" );
+		    snprintf( missing + c, 4, "%s", " rf" );
+		    c += 3;
 		    break;
 	    }
 	}
@@ -652,7 +661,7 @@ team::newstat(char *pl_name, int stat)
 #endif
 		curr = (stat_list*) malloc(sizeof(stat_list));
 		curr->ord = 1;
-		strcpy(curr->name, pl_name);
+		snprintf( curr->name, NAMELEN, "%s", pl_name );
 		curr->next = NULL;
 		prev->next = curr;
 	    }
@@ -666,7 +675,7 @@ team::newstat(char *pl_name, int stat)
 #endif
 	    prev = (stat_list*) malloc(sizeof(stat_list));
 	    prev->ord = 1;
-	    strcpy(prev->name, pl_name);
+	    snprintf( prev->name, NAMELEN, "%s", pl_name );
 	    prev->next = NULL;
 	    extra_stats[stat].next = prev;
 #ifdef DEBUG
