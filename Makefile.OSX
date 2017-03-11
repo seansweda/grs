@@ -1,0 +1,6 @@
+
+# OSX backwards compatibility
+OSX_VER = 10.6
+OSX_COMPAT_CFLAGS = -isysroot ~/Developer/SDKs/MacOSX$(OSX_VER).sdk
+OSX_COMPAT_LDLAGS = -Wl,-macosx_version_min,$(OSX_VER)
+
