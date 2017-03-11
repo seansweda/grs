@@ -21,5 +21,6 @@ extern void setup( int );
 extern int openfile( char* );
 
 extern char* stripcr( char*, int );
+extern char* sanitize( char**, int, char = ' ' );
 
 #endif
