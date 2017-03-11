@@ -60,9 +60,9 @@ frame::frame(char *str)
     }
 
     sscanf( str, "%s %s %s", event, location, baserunning );
-    strcpy( event, stripcr( event, MAX_INPUT ) );
-    strcpy( location, stripcr( location, MAX_INPUT ) );
-    strcpy( baserunning, stripcr( baserunning, MAX_INPUT ) );
+    sanitize( &event, MAX_INPUT );
+    sanitize( &location, MAX_INPUT );
+    sanitize( &baserunning, MAX_INPUT );
 
     cont = 1;
     bat=ibl[atbat];
@@ -594,8 +594,8 @@ frame::decode()
 	return(1);			// No event to decode, ignore.
     }
 
-    if (runchck(location)) {		// Baserunning in location field?
-	strcpy( baserunning, location );
+    if ( runchck(location) ) {		// Baserunning in location field?
+	snprintf( baserunning, MAX_INPUT, "%s", location );
 	memset( location, '\0', MAX_INPUT );
     }
     else {
