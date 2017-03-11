@@ -3,7 +3,7 @@
 // Constructor function
 player::player( char* str )
 {
-    strcpy( name, str );
+    snprintf( name, NAMELEN, "%s", str );
     memset( team, '\0', TEAMLEN );
     memset( rtn, '\0', TEAMLEN );
     pos = (char*) calloc( 3, sizeof(char));
@@ -14,11 +14,11 @@ player::player( char* str )
 // Better constructor function
 player::player( char* inname, char* inteam, char* inrtn, const char* inpos )
 {
-    strcpy( name, inname );
-    strcpy( team, inteam );
-    strcpy( rtn, inrtn );
-    pos = (char*) calloc( 3, sizeof(char));
-    strcpy( pos, inpos );
+    snprintf( name, NAMELEN, "%s", inname );
+    snprintf( team, TEAMLEN, "%s", inteam );
+    snprintf( rtn, TEAMLEN, "%s", inrtn );
+    pos = (char*) calloc( POSLEN, sizeof(char));
+    snprintf( pos, POSLEN, "%s", inpos );
     ab = h = r = rbi = b2 = b3 = hr = bb = k = sb = cs = pal = par = 0;
     posn = getpos( pos );
 }
