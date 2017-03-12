@@ -1,17 +1,6 @@
 #include "player.h"
 
 // Constructor function
-player::player( char* str )
-{
-    snprintf( name, NAMELEN, "%s", str );
-    memset( team, '\0', TEAMLEN );
-    memset( rtn, '\0', TEAMLEN );
-    pos = (char*) calloc( 3, sizeof(char));
-    memset( pos, '\0', POSLEN );
-    ab = h = r = rbi = b2 = b3 = hr = bb = k = sb = cs = pal = par = 0;
-}
-
-// Better constructor function
 player::player( char* inname, char* inteam, char* inrtn, const char* inpos )
 {
     snprintf( name, NAMELEN, "%s", inname );

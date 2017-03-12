@@ -1,20 +1,6 @@
 #include "pitcher.h"
 
 // Constructor function
-
-
-pitcher::pitcher(char* str)
-{
-    snprintf( name, NAMELEN, "%s", str );
-    memset( team, '\0', TEAMLEN );
-    memset( rtn, '\0', TEAMLEN );
-    throws = '\0';
-    dec = '-';
-    out = h = r = er = hr = bb = k = bf = 0;
-}
-
-// Better constructor function
-
 pitcher::pitcher(char* inname, char* inteam, char* inrtn, char inpos)
 {
     snprintf( name, NAMELEN, "%s", inname );
