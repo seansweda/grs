@@ -30,6 +30,7 @@ private :
 
 	int runchck( char* );		// Parses baserunner advances
 	void runcat( int );		// Does default baserunner advances
+	void runcat( const char* );	// append to baserunning
 	int three();			// Checks for three operands
 
 	void batterup( int nobf = 1 );	// brings the next batter up
@@ -60,6 +61,7 @@ public :
 	void who_stat( int, int );	// add stat to player @fielding pos
 	int outsonplay( char* );	// how many outs in this play
 	int batterout( char* );		// did the batter make an out?
+	char *inputstr;
 
 	static void print_linescore( FILE* );
 	void outbuf( FILE*, const char*, const char* = "\0" );

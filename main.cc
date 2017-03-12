@@ -48,19 +48,132 @@ player* frame::onbase[4];	// array of pointers to batter & runners
 
 char* frame::buffer;		// output buffer
 
+    char*
+stripcr( char* word, int len )
+{
+    int c = 1;
+    char *ptr = word;
+
+    while ( *ptr != '\n' && *ptr != '\0' && c < len ) {
+	ptr++;
+	c++;
+    }
+
+    *ptr = '\0';
+
+    return( word );
+}
+
+    char*
+sanitize( char** word, int len, char delimiter )
+{
+    int c = 1;
+    char *ptr = *word;
+
+    while ( *ptr != '\n' && *ptr != '\0' && c < len ) {
+	if ( *ptr == delimiter ) { break; }
+	ptr++;
+	c++;
+    }
+
+    *ptr = '\0';
+
+    return( *word );
+}
+
+    int
+openfile( char *prefix )
+{
+    int result = 0;
+    char file[PATH_MAX];
+
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "pbp" );
+    if ( ( pbpfp=fopen( file, "w+" ) ) == NULL )
+	result++;
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "sts" );
+    if ( ( stsfp=fopen( file, "w+" ) ) == NULL )
+	result++;
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "cmd" );
+    file[PATH_MAX - 4] = '\0';
+    if ( ( cmdfp=fopen( file, "w+" ) ) == NULL )
+	result++;
+
+    return (result);
+}
+
+    int
+checkfile( char *prefix )
+{
+    struct stat sb;
+    int result = 0;
+    char file[PATH_MAX];
+
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "pbp" );
+    if ( stat( file, &sb ) == 0 )
+	result++;
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "sts" );
+    if ( stat( file, &sb ) == 0 )
+	result++;
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "cmd" );
+    if ( stat( file, &sb ) == 0 )
+	result++;
+
+    return (result);
+}
+
+    void
+setup( int tm )
+{
+    ibl[tm] = new team(tm);
+    ibl[tm]->make_lineups();
+}
+
+    void
+setup()
+{
+    frame *f0;		// f0 is the current frame to be decoded
+
+    char *inputstr;
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
+
+    ibl[0]->make_lineups_pit();
+    ibl[1]->make_lineups_pit();
+
+    fprintf(output, "Enter one line description of game conditions.\n");
+    memset( inputstr, '\0', MAX_INPUT );
+    fgets( inputstr, MAX_INPUT, input );
+    sanitize( &inputstr, MAX_INPUT, '\n' );
+    fprintf(output, "\n");
+    fprintf(cmdfp, "%s\n", inputstr);
+    fflush( cmdfp );
+    fprintf(pbpfp, "grs version %s", VER);
+#ifdef GIT
+    fprintf(pbpfp, " (%s)", GIT);
+#endif
+    fprintf(pbpfp, "\n");
+    fprintf(pbpfp, "%s at %s \n", ibl[0]->nout(), ibl[1]->nout());
+    fprintf(pbpfp, "%s\n", inputstr);
+    fprintf(pbpfp, "Starting pitchers - %s for %s, and %s for %s\n",
+	ibl[0]->mound->nout(), ibl[0]->nout(), ibl[1]->mound->nout(),
+	ibl[1]->nout());
+
+    f0 = new frame(ibl[0], ibl[1], pbpfp);
+
+    snprintf(inputstr, MAX_INPUT, "\n%s %d: ",
+	    ibl[frame::atbat]->nout(), frame::inning);
+    f0->outbuf(pbpfp, inputstr);
+
+    delete(f0);
+}
+
     void
 play()
 {
     frame *f0;			// f0 is the current frame to be decoded
     frame::cont = 1;		// obviously we want to execute at least once!
 
-    char tempstr[MAX_INPUT];
-    memset( tempstr, '\0', MAX_INPUT );
-
-    char cmdfile[PATH_MAX];
-    strncpy(cmdfile, filename, PATH_MAX - 5);
-    cmdfile[PATH_MAX - 4] = '\0';
-    strcat(cmdfile,".cmd");
+    char *inputstr;
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
     while (frame::cont) {
 #ifdef DEBUG
@@ -69,29 +182,27 @@ play()
 	ibl[1]->box_score(stderr);
 #endif
 #endif
-	fclose(cmdfp);
-	fgets(tempstr, MAX_INPUT, input);
-	cmdfp = fopen(cmdfile,"a");
+	memset( inputstr, '\0', MAX_INPUT );
+	fgets( inputstr, MAX_INPUT, input );
+	sanitize( &inputstr, MAX_INPUT, '\n' );
 
 #ifdef DEBUG
 	if (output != stdout)
-	    fprintf( stderr, "%s", tempstr );
+	    fprintf( stderr, "%s", inputstr );
 #endif
-	f0 = new frame( tempstr );
+	f0 = new frame( inputstr );
 
 	switch ( f0->decode() ) {
 	    case 1:
 		switch ( f0->update() ) {
 		    case 0:
-			tempstr[strlen(tempstr) - 1] = '\0';
-			f0->help(tempstr);
+			f0->help(inputstr);
 		    default:
 			break;
 		}
 		break;
 	    default:
-		tempstr[strlen(tempstr) - 1] = '\0';
-		f0->help(tempstr);
+		f0->help(inputstr);
 		break;
 	}
 	delete(f0);
@@ -134,92 +245,6 @@ quit()
     fprintf(pbpfp,"\n");
 }
 
-    void
-setup()
-{
-    frame *f0;		// f0 is the current frame to be decoded
-
-    char tempstr[MAX_INPUT];
-    memset( tempstr, '\0', MAX_INPUT );
-
-    ibl[0]->make_lineups_pit();
-    ibl[1]->make_lineups_pit();
-
-    fprintf(output, "Enter one line description of game conditions.\n");
-    fgets(tempstr, MAX_INPUT, input);
-    fprintf(output, "\n");
-    fprintf(cmdfp, "%s", tempstr);
-    fprintf(pbpfp, "grs version %s", VER);
-#ifdef GIT
-    fprintf(pbpfp, " (%s)", GIT);
-#endif
-    fprintf(pbpfp, "\n");
-    fprintf(pbpfp, "%s at %s \n", ibl[0]->nout(), ibl[1]->nout());
-    fprintf(pbpfp, "%s\n", tempstr);
-    fprintf(pbpfp, "Starting pitchers - %s for %s, and %s for %s\n",
-	ibl[0]->mound->nout(), ibl[0]->nout(), ibl[1]->mound->nout(),
-	ibl[1]->nout());
-
-    f0 = new frame(ibl[0], ibl[1], pbpfp);
-
-    sprintf(tempstr, "\n%s %d: ", ibl[frame::atbat]->nout(), frame::inning);
-    f0->outbuf(pbpfp, tempstr);
-
-    delete(f0);
-}
-
-    void
-setup( int tm )
-{
-    ibl[tm] = new team(tm);
-    ibl[tm]->make_lineups();
-}
-
-    int
-openfile( char *prefix )
-{
-    char filename[PATH_MAX];
-    int result = 0;
-
-    strncpy( filename, prefix, PATH_MAX - 5 );
-    filename[PATH_MAX - 4] = '\0';
-    if ( ( pbpfp=fopen(strcat( filename, ".pbp"), "w+" ) ) == NULL )
-	result++;
-    strncpy( filename, prefix, PATH_MAX - 5 );
-    filename[PATH_MAX - 4] = '\0';
-    if ( ( stsfp=fopen(strcat( filename, ".sts"), "w+" ) ) == NULL )
-	result++;
-    strncpy( filename, prefix, PATH_MAX - 5 );
-    filename[PATH_MAX - 4] = '\0';
-    if ( ( cmdfp=fopen(strcat( filename, ".cmd"), "w+" ) ) == NULL )
-	result++;
-
-    return (result);
-}
-
-    int
-checkfile( char *prefix )
-{
-    char filename[PATH_MAX];
-    struct stat sb;
-    int result = 0;
-
-    strncpy( filename, prefix, PATH_MAX - 5 );
-    filename[PATH_MAX - 4] = '\0';
-    if ( stat(strcat( filename, ".pbp"), &sb ) == 0 )
-	result++;
-    strncpy( filename, prefix, PATH_MAX - 5 );
-    filename[PATH_MAX - 4] = '\0';
-    if ( stat(strcat( filename, ".sts"), &sb ) == 0 )
-	result++;
-    strncpy( filename, prefix, PATH_MAX - 5 );
-    filename[PATH_MAX - 4] = '\0';
-    if ( stat(strcat( filename, ".cmd"), &sb ) == 0 )
-	result++;
-
-    return (result);
-}
-
     int
 main(int argc, char *argv[])
 {
@@ -234,13 +259,13 @@ main(int argc, char *argv[])
     while ((c = getopt(argc, argv, "a:h:f:vo")) != EOF)
     switch (c) {
 	case 'a':	afile = (char *) calloc(PATH_MAX, sizeof(char));
-			strncpy( afile, optarg, PATH_MAX );
+			snprintf( afile, PATH_MAX, "%s", optarg );
 			break;
 	case 'h':	hfile = (char *) calloc(PATH_MAX, sizeof(char));
-			strncpy( hfile, optarg, PATH_MAX );
+			snprintf( hfile, PATH_MAX, "%s", optarg );
 			break;
 	case 'f':	cfile = (char *) calloc(PATH_MAX, sizeof(char));
-			strncpy( cfile, optarg, PATH_MAX );
+			snprintf( cfile, PATH_MAX, "%s", optarg );
 			break;
 	case 'o':	overwrite = 1;
 			break;
@@ -264,8 +289,7 @@ main(int argc, char *argv[])
 	usage++;
     }
     else {
-	strncpy( filename, argv[optind], PATH_MAX - 5 );
-	filename[PATH_MAX - 4] = '\0';
+	snprintf( filename, PATH_MAX - 5, "%s", argv[optind] );
 
 	// don't overwrite existing files
 	if ( !overwrite && checkfile(filename) ) {
@@ -333,26 +357,10 @@ main(int argc, char *argv[])
     play();
     quit();
 
-    fclose(pbpfp);
-    fclose(stsfp);
-    fclose(cmdfp);
+    fclose( pbpfp );
+    fclose( stsfp );
+    fclose( cmdfp );
 
     exit(0);
-}
-
-    char*
-stripcr( char* word, int len )
-{
-    int c = 1;
-    char *ptr = word;
-
-    while ( *ptr != '\n' && *ptr != '\0' && c < len ) {
-	ptr++;
-	c++;
-    }
-
-    *ptr = '\0';
-
-    return( word );
 }
 

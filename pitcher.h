@@ -14,7 +14,6 @@ private :
 	char team[TEAMLEN];
 	char rtn[TEAMLEN];
 public :
-	pitcher(char*);
 	pitcher(char*, char*, char*, char);
 	int out;
 	int h;

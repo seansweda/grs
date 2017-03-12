@@ -49,6 +49,7 @@ frame::frame(char *str)
     baserunning = (char*) calloc(MAX_INPUT, sizeof(char));
     comment = (char*) calloc(MAX_INPUT, sizeof(char));
     error = (char*) calloc(LINEWIDTH, sizeof(char));
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
     // extra inning, grow the linescore
     if ( inning > linesize ) {
@@ -60,9 +61,9 @@ frame::frame(char *str)
     }
 
     sscanf( str, "%s %s %s", event, location, baserunning );
-    strcpy( event, stripcr( event, MAX_INPUT ) );
-    strcpy( location, stripcr( location, MAX_INPUT ) );
-    strcpy( baserunning, stripcr( baserunning, MAX_INPUT ) );
+    sanitize( &event, MAX_INPUT );
+    sanitize( &location, MAX_INPUT );
+    sanitize( &baserunning, MAX_INPUT );
 
     cont = 1;
     bat=ibl[atbat];
@@ -322,14 +323,12 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[0] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
@@ -357,14 +356,12 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[1] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else if ( !done[1] ) {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
@@ -391,14 +388,12 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[2] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else if ( !done[2] ) {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
@@ -424,29 +419,27 @@ frame::runchck(char *runstr)
 		    }
 		    if ( copy ) {
 			done[3] = 1;
-			strncat( temp, str, 2 );
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
 		    }
 		    else if ( !done[3] ) {
-			strncat( errstr, str, 2 );
+			snprintf( errptr, 3, "%s", str );
 			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
 	    default:
 		retval = 0;
-		strncat( errstr, str, 2 );
+		snprintf( errptr, 3, "%s", str );
 		errptr += 2;
-		*errptr = '\0';
 		break;
 	}
-	str+=2;
+	str += 2;
     }
 
     if (retval)
-	strcpy( runstr, temp );		// cleaned up baserunning string
+	// cleaned up baserunning string
+	snprintf( runstr, MAX_INPUT, "%s", temp );
 
 	if ( outsonplay(runstr) + outs > 3 ) {
 	    sprintf( error, "Too many outs on play.\n" );
@@ -470,30 +463,31 @@ frame::runcat(int adv)
     runcat(-1) advance 1 base if forced only (bb, hb, etc.)
     runcat(0) batter is out
     runcat(x) everyone advances x base(s)
+    runcat(string) append string
 */
 {
-    int test = 0;
     int i;
-    char temp[MAX_INPUT];
-    char *temptr;
+    int test = 0;
+    size_t b = strlen(baserunning);
 
-    temptr=temp;
+    char temp[MAX_INPUT];
+    char *temptr = temp;
     *temptr='\0';
 
     switch (adv) {
     case 0 :					// batter out
-	    strcat(baserunning,"bo");
+	    snprintf( baserunning + b, 3, "%s", "bo" );
 	    break;
 
     case -1 :					// advance if forced
 	    if (!onbase[1])
-	       strcat(baserunning,"b1");
+		snprintf( baserunning + b, 3, "%s", "b1" );
 	    else if (!onbase[2])
-	       strcat(baserunning,"b112");
+		snprintf( baserunning + b, 5, "%s", "b112" );
 	    else if (!onbase[3])
-	       strcat(baserunning,"b11223");
+		snprintf( baserunning + b, 7, "%s", "b11223" );
 	    else
-	       strcat(baserunning,"b112233h");
+		snprintf( baserunning + b, 9, "%s", "b112233h" );
 	    break;
 
     case -2 :					// runners advance 1 base
@@ -542,7 +536,15 @@ frame::runcat(int adv)
     } // switch
 
     *temptr='\0';
-    snprintf( baserunning + strlen(baserunning), MAX_INPUT, "%s", temp);
+    snprintf( baserunning + b, MAX_INPUT, "%s", temp);
+}
+
+    void
+frame::runcat( const char *str )
+// append string to baserunning
+{
+    size_t b = strlen(baserunning);
+    snprintf( baserunning + b, MAX_INPUT, "%s", str );
 }
 
     int
@@ -602,8 +604,8 @@ frame::decode()
 	return(1);			// No event to decode, ignore.
     }
 
-    if (runchck(location)) {		// Baserunning in location field?
-	strcpy( baserunning, location );
+    if ( runchck(location) ) {		// Baserunning in location field?
+	snprintf( baserunning, MAX_INPUT, "%s", location );
 	memset( location, '\0', MAX_INPUT );
     }
     else {
@@ -795,43 +797,37 @@ frame::decode()
 frame::outbuf( FILE *fp, const char *str, const char *punc )
 {
     int c;
+    char bigbuf[MAX_INPUT * 2];
     char tempstr[MAX_INPUT * 2];
-    char *ptr = tempstr;
+    char *ptr;
 
     if ( *punc == '\n' ) {
-	strncat( buffer, punc, 2 );
+	snprintf( buffer + strlen(buffer), 2, "%s", punc );
 	fputs( buffer, fp );
 	fputs( str, fp );
 	*buffer = (char) 0;
     }
-    else if ( strlen(str) + strlen(buffer) > LINEWIDTH ) {
-	strncpy(tempstr, buffer, MAX_INPUT);
-	strncat(tempstr, punc, 2);
-	strncat(tempstr, str, MAX_INPUT);
+    else {
+	snprintf( bigbuf, MAX_INPUT * 2, "%s%s%s", buffer, punc, str );
 
-	while ( strlen(tempstr) > LINEWIDTH ) {
-	    c = 0;
-	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
+	while ( strlen(bigbuf) > LINEWIDTH ) {
+	    snprintf( tempstr, MAX_INPUT * 2, "%s", bigbuf );
 
-	    while ( c != (LINEWIDTH - 10) ) {
+	    c = LINEWIDTH - 10;
+	    ptr = tempstr + c;
+	    while ( !( isspace(*ptr) ) ) {
 		c++;
 		ptr++;
 	    }
-	    while ( !(isspace(*ptr)) )
-		buffer[c++] = *(ptr++);
 
-	    buffer[c] = '\0';
 	    ptr++;
+	    tempstr[c] = '\0';
 
-	    strcat( buffer, "\n" );
+	    snprintf( buffer, LINEWIDTH, "%s\n", tempstr );
 	    fputs( buffer, fp );
-	    strncpy( tempstr, ptr, MAX_INPUT * 2 );
+	    snprintf( bigbuf, MAX_INPUT * 2, "%s", ptr );
 	}
-	strncpy( buffer, tempstr, MAX_INPUT );
-    }
-    else {
-	strncat( buffer, punc, 2 );
-	strncat( buffer, str, MAX_INPUT );
+	snprintf( buffer, MAX_INPUT * 2, "%s", bigbuf);
     }
 }
 
