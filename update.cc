@@ -1084,19 +1084,23 @@ frame::backup( char *in_ext, char *out_ext )
     void
 frame::putcmd()
 {
-    char *inputstr;
-    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
-    memset( inputstr, '\0', MAX_INPUT );
+    size_t o;
+    char *output;
+    output = (char*) calloc(MAX_INPUT, sizeof(char));
+    memset( output, '\0', MAX_INPUT );
 
-    sprintf( inputstr, "%s", event );
+    snprintf( output, MAX_INPUT, "%s", event );
+    o = strlen( output );
     if ( strlen(location) > 0 ) {
-	sprintf( inputstr, "%s %s", inputstr, location );
+	snprintf( output + o, MAX_INPUT - o, " %s", location );
+	o = strlen( output );
     }
     if ( strlen(baserunning) > 0 && strcmp( location, baserunning) ) {
-	sprintf( inputstr, "%s %s", inputstr, baserunning );
+	snprintf( output + o, MAX_INPUT - o, " %s", baserunning );
     }
 
-    fprintf( cmdfp, "%s\n", inputstr );
+    fprintf( cmdfp, "%s\n", output );
     fflush( cmdfp );
+    free( output );
 }
 
