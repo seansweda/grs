@@ -1,5 +1,3 @@
-#define VER "3.1.1"
-
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -18,6 +16,7 @@
 #include "player.h"
 #include "team.h"
 #include "frame.h"
+#include "version.h"
 
 // variables used outside of main()
 
