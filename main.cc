@@ -85,17 +85,17 @@ sanitize( char** word, int len, char delimiter )
 openfile( char *prefix )
 {
     int result = 0;
-    char filename[PATH_MAX];
+    char file[PATH_MAX];
 
-    snprintf( filename, PATH_MAX, "%s.%s", prefix, "pbp" );
-    if ( ( pbpfp=fopen( filename, "w+" ) ) == NULL )
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "pbp" );
+    if ( ( pbpfp=fopen( file, "w+" ) ) == NULL )
 	result++;
-    snprintf( filename, PATH_MAX, "%s.%s", prefix, "sts" );
-    if ( ( stsfp=fopen( filename, "w+" ) ) == NULL )
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "sts" );
+    if ( ( stsfp=fopen( file, "w+" ) ) == NULL )
 	result++;
-    snprintf( filename, PATH_MAX, "%s.%s", prefix, "cmd" );
-    filename[PATH_MAX - 4] = '\0';
-    if ( ( cmdfp=fopen( filename, "w+" ) ) == NULL )
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "cmd" );
+    file[PATH_MAX - 4] = '\0';
+    if ( ( cmdfp=fopen( file, "w+" ) ) == NULL )
 	result++;
 
     return (result);
@@ -106,16 +106,16 @@ checkfile( char *prefix )
 {
     struct stat sb;
     int result = 0;
-    char filename[PATH_MAX];
+    char file[PATH_MAX];
 
-    snprintf( filename, PATH_MAX, "%s.%s", prefix, "pbp" );
-    if ( stat( filename, &sb ) == 0 )
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "pbp" );
+    if ( stat( file, &sb ) == 0 )
 	result++;
-    snprintf( filename, PATH_MAX, "%s.%s", prefix, "sts" );
-    if ( stat( filename, &sb ) == 0 )
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "sts" );
+    if ( stat( file, &sb ) == 0 )
 	result++;
-    snprintf( filename, PATH_MAX, "%s.%s", prefix, "cmd" );
-    if ( stat( filename, &sb ) == 0 )
+    snprintf( file, PATH_MAX, "%s.%s", prefix, "cmd" );
+    if ( stat( file, &sb ) == 0 )
 	result++;
 
     return (result);
@@ -133,9 +133,6 @@ setup()
 {
     frame *f0;		// f0 is the current frame to be decoded
 
-    char tempstr[MAX_INPUT];
-    memset( tempstr, '\0', MAX_INPUT );
-
     char *inputstr;
     inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
@@ -148,6 +145,7 @@ setup()
     sanitize( &inputstr, MAX_INPUT, '\n' );
     fprintf(output, "\n");
     fprintf(cmdfp, "%s\n", inputstr);
+    fflush( cmdfp );
     fprintf(pbpfp, "grs version %s", VER);
 #ifdef GIT
     fprintf(pbpfp, " (%s)", GIT);
@@ -161,9 +159,9 @@ setup()
 
     f0 = new frame(ibl[0], ibl[1], pbpfp);
 
-    snprintf(tempstr, MAX_INPUT, "\n%s %d: ",
+    snprintf(inputstr, MAX_INPUT, "\n%s %d: ",
 	    ibl[frame::atbat]->nout(), frame::inning);
-    f0->outbuf(pbpfp, tempstr);
+    f0->outbuf(pbpfp, inputstr);
 
     delete(f0);
 }
@@ -177,9 +175,6 @@ play()
     char *inputstr;
     inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    char cmdfile[PATH_MAX];
-    snprintf( cmdfile, PATH_MAX, "%s.%s", filename, "cmd" );
-
     while (frame::cont) {
 #ifdef DEBUG
 #if DEBUG == 2
@@ -187,11 +182,9 @@ play()
 	ibl[1]->box_score(stderr);
 #endif
 #endif
-	fclose(cmdfp);
 	memset( inputstr, '\0', MAX_INPUT );
 	fgets( inputstr, MAX_INPUT, input );
 	sanitize( &inputstr, MAX_INPUT, '\n' );
-	cmdfp = fopen(cmdfile,"a");
 
 #ifdef DEBUG
 	if (output != stdout)
@@ -364,9 +357,9 @@ main(int argc, char *argv[])
     play();
     quit();
 
-    fclose(pbpfp);
-    fclose(stsfp);
-    fclose(cmdfp);
+    fclose( pbpfp );
+    fclose( stsfp );
+    fclose( cmdfp );
 
     exit(0);
 }

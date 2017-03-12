@@ -144,8 +144,6 @@ frame::update()
 	    while ( !(backup( in_ext, out_ext )) ) {
 		snprintf( in_ext, 5, "%s", out_ext );
 		snprintf( out_ext, 5, ".un%d", ++times );
-		fclose( cmdfp );
-		fclose( undofp );
 
 		if ( times > 9 ) {
 		    fprintf( stderr, "undo may be looping, bailing!\n" );
@@ -153,8 +151,6 @@ frame::update()
 		}
 	    }
 
-	    fclose( undofp );
-	    fclose( cmdfp );
 	    snprintf( inputstr, PATH_MAX, "%s%s", filename, out_ext );
 	    undofp = fopen( inputstr, "r" );
 	    openfile( filename );
@@ -265,6 +261,7 @@ frame::update()
 	sanitize( &inputstr, MAX_INPUT, '\n' );
 	snprintf( comment, MAX_INPUT, "%s", inputstr );
 	fprintf( cmdfp, "%s", comment );
+	fflush( cmdfp );
 	frameput();
 	comment[strlen(comment) - 1] = ' ';
 	outbuf( pbpfp, comment );
@@ -1036,16 +1033,19 @@ frame::backup( char *in_ext, char *out_ext )
     currstr = (char*) calloc(MAX_INPUT, sizeof(char));
     nextstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
+#ifdef DEBUG_UNDO
+    fprintf( stderr, "backup(%s):\n", filestr );
+#endif
     snprintf( filestr, PATH_MAX, "%s%s", filename, out_ext );
     if ( ( undofp = fopen(filestr,"w") ) == NULL ) {
 	fprintf( stderr, "fatal error - can't open undo file\n" );
 	exit(1);
     }
-#ifdef DEBUG_UNDO
-    fprintf( stderr, "backup(%s):\n", filestr );
-#endif
     snprintf( filestr, PATH_MAX, "%s%s", filename, in_ext );
-    cmdfp = fopen(filestr,"r");
+    if ( ( cmdfp = fopen(filestr,"r") ) == NULL ) {
+	fprintf( stderr, "fatal error - can't open cmd file\n" );
+	exit(1);
+    }
 
     memset( currstr, '\0', MAX_INPUT );
     fgets( currstr, MAX_INPUT, cmdfp );
@@ -1058,7 +1058,7 @@ frame::backup( char *in_ext, char *out_ext )
     while ( !(feof(cmdfp)) ) {
 	cmdlen = strlen(currstr);
 #ifdef DEBUG_UNDO
-	fprintf( stderr, "1: (%d) %s2: %s",
+	fprintf( stderr, "1: (%d) %s\n2: %s\n",
 		(int)cmdlen, currstr, nextstr);
 #endif
 	fprintf( undofp, "%s\n", currstr );
@@ -1068,6 +1068,8 @@ frame::backup( char *in_ext, char *out_ext )
 	fgets( nextstr, MAX_INPUT, cmdfp );
 	sanitize( &nextstr, MAX_INPUT, '\n' );
     }
+    fclose( undofp );
+    fclose( cmdfp );
 
     // on dc/dr skip decode, fail early
     if ( cmdlen == 2 ) {
@@ -1098,5 +1100,6 @@ frame::putcmd()
     }
 
     fprintf( cmdfp, "%s\n", inputstr );
+    fflush( cmdfp );
 }
 

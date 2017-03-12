@@ -48,7 +48,8 @@ team::team( int who )
     }
 
     snprintf( ibl, TEAMLEN, "%s", inputstr );
-    fprintf(cmdfp, "%s\n", ibl);
+    fprintf( cmdfp, "%s\n", ibl );
+    fflush( cmdfp );
     lineup = (struct pl_list *) malloc(sizeof (struct pl_list));
     lineup->head = NULL;
     lineup->next = NULL;
@@ -70,7 +71,8 @@ team::team( int who )
 team::team( char *str )
 {
     snprintf( ibl, TEAMLEN, "%s", str );
-    fprintf(cmdfp, "%s\n", ibl);
+    fprintf( cmdfp, "%s\n", ibl );
+    fflush( cmdfp );
     lineup = (struct pl_list *) malloc(sizeof (struct pl_list));
     lineup->head = NULL;
     lineup->next = NULL;
@@ -110,6 +112,7 @@ team::pos_change( int spot, char **comment )
 
     fprintf( cmdfp, "%d\n", spot );
     fprintf( cmdfp, "%s\n", pos );
+    fflush( cmdfp );
     fprintf( output, "\n" );
 
     oldpl->head->new_pos(pos);
@@ -173,6 +176,7 @@ team::insert( int spot, char **comment, const char *def, const char *str )
 	if ( strcmp(def, "ph") )
 	    fprintf( cmdfp, "%d\n", spot );
 	fprintf( cmdfp, "%s %s %s\n", name, mlb, pos );
+	fflush( cmdfp );
     }
     else {
 	    sscanf( str, "%s %s %s", name, mlb, pos );
@@ -276,6 +280,7 @@ team::make_lineups()
 	    break;
 	}
 	fprintf( cmdfp, "%s %s %s\n", name, mlb, pos );
+	fflush( cmdfp );
 	newpl->head = new player( name, ibl, mlb, pos );
     }
 
@@ -327,6 +332,7 @@ team::make_lineups_pit()
 	break;
     }
     fprintf( cmdfp, "%s %s %c\n", name, mlb, throws[0] );
+    fflush( cmdfp );
     pitchers->head = new pitcher( name, ibl, mlb, throws[0] );
     pitchers->next = 0;
     mound=pitchers->head;
@@ -486,6 +492,7 @@ team::new_pit()
 	fprintf( cmdfp, "%s %s %c %c\n", name, mlb, throws[0], bats[0] );
     else
 	fprintf( cmdfp, "%s %s %c\n", name, mlb, throws[0] );
+    fflush( cmdfp );
     newpit->head = new pitcher( name, ibl, mlb, throws[0] );
     newpit->next = 0;
     oldpit = pitchers;
@@ -789,6 +796,7 @@ team::decisions()
 	    fprintf( cmdfp, "\n" );
 	else
 	    fprintf( cmdfp, "%c\n", curr->head->dec );
+	fflush( cmdfp );
 	curr = curr->next;
     }
 }
@@ -823,6 +831,7 @@ team::unearned( int inning )
 	    numout += curr->head->out;
 	    curr->head->er = curr->head->er-ur;
 	    fprintf( cmdfp, "%d\n", ur );
+	    fflush( cmdfp );
 	}
 	else
 	    numout += curr->head->out;
