@@ -9,8 +9,9 @@ GIT_COMMIT = git_commit.h
 
 CC = gcc
 CPP = g++
-CFLAGS = -g -Wall -Wextra -Wconversion $(USE_GIT) $(OSX_COMPAT_CFLAGS) #-DDEBUG
+CFLAGS = -g -Wall -Wextra -Wconversion $(DEBUG) $(USE_GIT) $(OSX_COMPAT_CFLAGS)
 LDFLAGS = $(OSX_COMPAT_LDFLAGS)
+#DEBUG = -g3 -O0 -fstack-protector-all -fstack-protector-strong -Wstack-protector -Wpedantic -Wformat=2 -Wcast-qual #-DDEBUG
 
 all: grs
 
