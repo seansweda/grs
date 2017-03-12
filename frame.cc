@@ -462,6 +462,7 @@ frame::runcat(int adv)
     runcat(-1) advance 1 base if forced only (bb, hb, etc.)
     runcat(0) batter is out
     runcat(x) everyone advances x base(s)
+    runcat(string) append string
 */
 {
     int i;
@@ -535,6 +536,14 @@ frame::runcat(int adv)
 
     *temptr='\0';
     snprintf( baserunning + b, MAX_INPUT, "%s", temp);
+}
+
+    void
+frame::runcat( const char *str )
+// append string to baserunning
+{
+    size_t b = strlen(baserunning);
+    snprintf( baserunning + b, MAX_INPUT, "%s", str );
 }
 
     int

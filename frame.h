@@ -30,6 +30,7 @@ private :
 
 	int runchck( char* );		// Parses baserunner advances
 	void runcat( int );		// Does default baserunner advances
+	void runcat( const char* );	// append to baserunning
 	int three();			// Checks for three operands
 
 	void batterup( int nobf = 1 );	// brings the next batter up
