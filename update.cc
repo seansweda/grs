@@ -7,9 +7,6 @@ frame::update()
     int i, j;
     char spc;
 
-    char tempstr[MAX_INPUT];
-    memset( tempstr, '\0', MAX_INPUT );
-
     char *inputstr;
     inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
@@ -126,7 +123,7 @@ frame::update()
 
 	if ( count == 1 ) {
 	    count--;
-	    strcpy( error, "nothing to undo!\n" );
+	    snprintf( error, LINEWIDTH, "%s\n", "nothing to undo!" );
 	    return(0);
 	}
 	else if ( undo ) {
@@ -141,12 +138,12 @@ frame::update()
 
 	    cleanup();
 
-	    sprintf( in_ext, ".cmd" );
-	    sprintf( out_ext, ".un%d", times );
+	    snprintf( in_ext, 5, "%s", ".cmd" );
+	    snprintf( out_ext, 5, ".un%d", times );
 
 	    while ( !(backup( in_ext, out_ext )) ) {
-		strcpy( in_ext, out_ext );
-		sprintf( out_ext, ".un%d", ++times );
+		snprintf( in_ext, 5, "%s", out_ext );
+		snprintf( out_ext, 5, ".un%d", ++times );
 		fclose( cmdfp );
 		fclose( undofp );
 
@@ -156,12 +153,10 @@ frame::update()
 		}
 	    }
 
-	    fputs( "un", undofp );
 	    fclose( undofp );
 	    fclose( cmdfp );
-	    strcpy( tempstr, filename );
-	    strcat( tempstr, out_ext );
-	    undofp = fopen( tempstr, "r" );
+	    snprintf( inputstr, PATH_MAX, "%s%s", filename, out_ext );
+	    undofp = fopen( inputstr, "r" );
 	    openfile( filename );
 	    output = fopen( NULLDEV , "w" );
 	    input = undofp;
@@ -200,7 +195,7 @@ frame::update()
 #endif
 #ifndef DEBUG
 	if ( outs != 3 ) {
-	    strcpy( error, "Use \"eg\" to end inning with less than 2 outs.\n" );
+	    snprintf( error, LINEWIDTH, "Use \"eg\" to end inning with less than 2 outs.\n" );
 	    return(0);
 	}
 #endif
@@ -208,9 +203,9 @@ frame::update()
 	if ( errflag && runs )
 	    pit->unearned(inning);
 
-	sprintf( tempstr, "%s %d %s %d\n", ibl[0]->nout(), ibl[0]->score,
+	sprintf( inputstr, "%s %d %s %d\n", ibl[0]->nout(), ibl[0]->score,
 					   ibl[1]->nout(), ibl[1]->score );
-	outbuf( pbpfp, tempstr, "\n" );
+	outbuf( pbpfp, inputstr, "\n" );
 	outbuf( pbpfp, "", "\n" );
 
 	linescore[atbat][inning - 1] = runs;
@@ -228,8 +223,8 @@ frame::update()
 	    onbase[i] = NULL;
 	if ( !(atbat) )
 	    inning++;
-	sprintf( tempstr, "%s %d: ", ibl[atbat]->nout(), inning );
-	outbuf( pbpfp, tempstr );
+	sprintf( inputstr, "%s %d: ", ibl[atbat]->nout(), inning );
+	outbuf( pbpfp, inputstr );
 	pit = bat;
 	bat = ibl[atbat];
 //	runadv();
@@ -246,9 +241,9 @@ frame::update()
 	if ( errflag && runs )
 	    pit->unearned(inning);
 
-	sprintf( tempstr, "%s %d %s %d\n", ibl[0]->nout(),ibl[0]->score,
+	sprintf( inputstr, "%s %d %s %d\n", ibl[0]->nout(),ibl[0]->score,
 					   ibl[1]->nout(),ibl[1]->score );
-	outbuf( pbpfp, tempstr, "\n");
+	outbuf( pbpfp, inputstr, "\n");
 	outbuf( pbpfp, "", "\n" );
 	outbuf( pbpfp, " " );
 
@@ -1030,18 +1025,18 @@ frame::update()
 }
 
     int
-frame::backup( char *infile, char *outfile )
+frame::backup( char *in_ext, char *out_ext )
 {
     int result;
     size_t cmdlen;
-    char filestr[MAX_INPUT];
-    char currstr[MAX_INPUT];
-    char nextstr[MAX_INPUT];
-
     frame *test;
 
-    strcpy( filestr,filename );
-    strcat( filestr, outfile );
+    char *filestr, *currstr, *nextstr;
+    filestr = (char*) calloc(PATH_MAX, sizeof(char));
+    currstr = (char*) calloc(MAX_INPUT, sizeof(char));
+    nextstr = (char*) calloc(MAX_INPUT, sizeof(char));
+
+    snprintf( filestr, PATH_MAX, "%s%s", filename, out_ext );
     if ( ( undofp = fopen(filestr,"w") ) == NULL ) {
 	fprintf( stderr, "fatal error - can't open undo file\n" );
 	exit(1);
@@ -1049,21 +1044,29 @@ frame::backup( char *infile, char *outfile )
 #ifdef DEBUG_UNDO
     fprintf( stderr, "backup(%s):\n", filestr );
 #endif
-    strcpy( filestr, filename );
-    strcat( filestr, infile );
+    snprintf( filestr, PATH_MAX, "%s%s", filename, in_ext );
     cmdfp = fopen(filestr,"r");
 
+    memset( currstr, '\0', MAX_INPUT );
     fgets( currstr, MAX_INPUT, cmdfp );
+    sanitize( &currstr, MAX_INPUT, '\n' );
+
+    memset( nextstr, '\0', MAX_INPUT );
     fgets( nextstr, MAX_INPUT, cmdfp );
+    sanitize( &nextstr, MAX_INPUT, '\n' );
+
     while ( !(feof(cmdfp)) ) {
 	cmdlen = strlen(currstr);
 #ifdef DEBUG_UNDO
 	fprintf( stderr, "1: (%d) %s2: %s",
 		(int)cmdlen, currstr, nextstr);
 #endif
-	fputs( currstr, undofp );
-	strcpy( currstr, nextstr );
+	fprintf( undofp, "%s\n", currstr );
+	snprintf( currstr, MAX_INPUT, "%s", nextstr );
+
+	memset( nextstr, '\0', MAX_INPUT );
 	fgets( nextstr, MAX_INPUT, cmdfp );
+	sanitize( &nextstr, MAX_INPUT, '\n' );
     }
 
     // on dc/dr skip decode, fail early
