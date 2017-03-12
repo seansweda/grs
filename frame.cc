@@ -49,6 +49,7 @@ frame::frame(char *str)
     baserunning = (char*) calloc(MAX_INPUT, sizeof(char));
     comment = (char*) calloc(MAX_INPUT, sizeof(char));
     error = (char*) calloc(LINEWIDTH, sizeof(char));
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
     // extra inning, grow the linescore
     if ( inning > linesize ) {

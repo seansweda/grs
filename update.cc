@@ -7,9 +7,6 @@ frame::update()
     int i, j;
     char spc;
 
-    char *inputstr;
-    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
-
     if ( strlen(location) == 0 ) {
 	spc = '\0';
     }

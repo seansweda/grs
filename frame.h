@@ -61,6 +61,7 @@ public :
 	void who_stat( int, int );	// add stat to player @fielding pos
 	int outsonplay( char* );	// how many outs in this play
 	int batterout( char* );		// did the batter make an out?
+	char *inputstr;
 
 	static void print_linescore( FILE* );
 	void outbuf( FILE*, const char*, const char* = "\0" );

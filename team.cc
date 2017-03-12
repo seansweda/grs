@@ -65,6 +65,7 @@ team::team( int who )
 	extra_stats[i].name[0] = '\n';
 	extra_stats[i].next = NULL;
     }
+    free( inputstr );
 }
 
 // Constructor function getting team name; Assumes name is correct
@@ -218,6 +219,7 @@ team::insert( int spot, char **comment, const char *def, const char *str )
 #ifdef DEBUG
     fprintf( stderr, "insert %d: %s, %s, %s DONE\n", spot, name, mlb, pos );
 #endif
+    free( inputstr );
 }
 
 // Creates the lineups for a team
@@ -285,6 +287,7 @@ team::make_lineups()
     }
 
     //fprintf(output,"\n");
+    free( inputstr );
     return 1;
 }
 
@@ -340,6 +343,7 @@ team::make_lineups_pit()
     fprintf(stderr,"%p:%s->%p\n",pitchers,pitchers->head->nout(),pitchers->next);
 #endif
     //fprintf(output,"\n");
+    free( inputstr );
     return 1;
 }
 
@@ -507,6 +511,7 @@ team::new_pit()
     }
     oldpit->next = newpit;
     mound = newpit->head;
+    free( inputstr );
     return ( bats[0] - '0' );
 }
 
@@ -799,6 +804,7 @@ team::decisions()
 	fflush( cmdfp );
 	curr = curr->next;
     }
+    free( inputstr );
 }
 
     void
@@ -838,6 +844,7 @@ team::unearned( int inning )
 
 	curr = curr->next;
     }
+    free( inputstr );
 }
 
 team::~team()
