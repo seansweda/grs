@@ -49,7 +49,7 @@ frame::update()
 	    fprintf( output, "\nEnter batting order of player: " );
 	    memset( inputstr, '\0', MAX_INPUT );
 	    fgets( inputstr, MAX_INPUT, input );
-	    sanitize( &inputstr, POSLEN, '\n' );
+	    sanitize( &inputstr, POSLEN );
 	    // fprintf(output,"\n");
 	}
 	for (i = 1; i < 4; i++ ) {
@@ -91,7 +91,7 @@ frame::update()
 	    fprintf( output, "\nEnter batting order of player: " );
 	    memset( inputstr, '\0', MAX_INPUT );
 	    fgets( inputstr, MAX_INPUT, input );
-	    sanitize( &inputstr, POSLEN, '\n' );
+	    sanitize( &inputstr, POSLEN );
 	    // fprintf(output,"\n");
 	}
 	if ( inputstr[0] > '0' ) {

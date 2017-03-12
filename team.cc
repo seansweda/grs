@@ -15,7 +15,7 @@ team::team( int who )
 
 	memset( inputstr, '\0', MAX_INPUT );
 	fgets( inputstr, MAX_INPUT, input );
-	sanitize( &inputstr, TEAMLEN, '\n' );
+	sanitize( &inputstr, TEAMLEN );
 
 	if ( strlen(inputstr) != 3 ) {
 	    fprintf(stderr, "Team name must be 3 letters!\n");
@@ -102,7 +102,7 @@ team::pos_change( int spot, char **comment )
     fprintf( output, "\nEnter new position for %d: ", spot );
     memset( pos, '\0', POSLEN );
     fgets( pos, POSLEN, input );
-    sanitize( &pos, POSLEN, '\n' );
+    sanitize( &pos, POSLEN );
 
 #ifdef DEBUG
     fprintf( stderr, "pos_change %d: %s\n", spot, pos );
@@ -306,7 +306,7 @@ team::make_lineups_pit()
 	sscanf( inputstr, "%s %s %s", name, mlb, throws );
 	sanitize( &name, NAMELEN );
 	sanitize( &mlb, TEAMLEN );
-	sanitize( &throws, 2 );
+	sanitize( &throws, POSLEN );
 
 #ifdef DEBUG
 	fprintf( stderr, "make_lineups_pit: %s, %s, %s\n", name, mlb, throws );
@@ -460,8 +460,8 @@ team::new_pit()
 	sscanf( inputstr, "%s %s %s %s", name, mlb, throws, bats );
 	sanitize( &name, NAMELEN );
 	sanitize( &mlb, TEAMLEN );
-	sanitize( &throws, 2 );
-	sanitize( &bats, 2 );
+	sanitize( &throws, POSLEN );
+	sanitize( &bats, POSLEN );
 
 #ifdef DEBUG
 	fprintf( stderr, "new_pit: %s, %s, %s, %s\n", name, mlb, throws, bats );
@@ -772,7 +772,7 @@ team::decisions()
 	fprintf( output, "%s: ", curr->head->nout() );
 	memset( inputstr, '\0', POSLEN );
 	fgets( inputstr, POSLEN, input );
-	sanitize( &inputstr, POSLEN, '\n' );
+	sanitize( &inputstr, POSLEN );
 
 	switch (*inputstr) {
 		case 'w' :
@@ -809,7 +809,7 @@ team::unearned( int inning )
 	    fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
 	    memset( inputstr, '\0', POSLEN );
 	    fgets( inputstr, POSLEN, input );
-	    sanitize( &inputstr, POSLEN, '\n' );
+	    sanitize( &inputstr, POSLEN );
 	    ur = atoi(inputstr);
 
 	    while ( ur < 0 || ur > curr->head->er ) {
@@ -817,7 +817,7 @@ team::unearned( int inning )
 		fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
 		memset( inputstr, '\0', POSLEN );
 		fgets( inputstr, POSLEN, input );
-		sanitize( &inputstr, POSLEN, '\n' );
+		sanitize( &inputstr, POSLEN );
 		ur = atoi(inputstr);
 	    }
 	    numout += curr->head->out;
