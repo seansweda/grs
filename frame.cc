@@ -477,7 +477,7 @@ frame::runcat(int adv)
     switch (adv) {
     case 0 :					// batter out
 	    snprintf( baserunning + b, 3, "%s", "bo" );
-	    break;
+	    return;
 
     case -1 :					// advance if forced
 	    if (!onbase[1])
@@ -488,7 +488,7 @@ frame::runcat(int adv)
 		snprintf( baserunning + b, 7, "%s", "b11223" );
 	    else
 		snprintf( baserunning + b, 9, "%s", "b112233h" );
-	    break;
+	    return;
 
     case -2 :					// runners advance 1 base
 	    for (i=1;i<=3;i++)
