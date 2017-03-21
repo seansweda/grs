@@ -48,6 +48,7 @@ team::team( int who )
     }
 
     snprintf( ibl, TEAMLEN, "%s", inputstr );
+    cmd->add( ibl );
     fprintf( cmdfp, "%s\n", ibl );
     fflush( cmdfp );
     lineup = (struct pl_list *) malloc(sizeof (struct pl_list));
@@ -72,6 +73,7 @@ team::team( int who )
 team::team( char *str )
 {
     snprintf( ibl, TEAMLEN, "%s", str );
+    cmd->add( ibl );
     fprintf( cmdfp, "%s\n", ibl );
     fflush( cmdfp );
     lineup = (struct pl_list *) malloc(sizeof (struct pl_list));
@@ -98,6 +100,8 @@ team::pos_change( int spot, char **comment )
     char *pos;
     pos = (char*) calloc(POSLEN, sizeof(char));
 
+    char tempstr[POSLEN];
+
     pl_list *oldpl = lineup;
     while ( oldpl->next && oldpl->next->ord <= spot )
 	oldpl = oldpl->next;
@@ -111,7 +115,10 @@ team::pos_change( int spot, char **comment )
     fprintf( stderr, "pos_change %d: %s\n", spot, pos );
 #endif
 
-    fprintf( cmdfp, "%d\n", spot );
+    snprintf( tempstr, POSLEN, "%d", spot );
+    cmd->add( tempstr );
+    fprintf( cmdfp, "%s\n", tempstr );
+    cmd->add( pos );
     fprintf( cmdfp, "%s\n", pos );
     fflush( cmdfp );
     fprintf( output, "\n" );
@@ -136,6 +143,8 @@ team::insert( int spot, char **comment, const char *def, const char *str )
     name = (char*) calloc(NAMELEN, sizeof(char));
     mlb = (char*) calloc(TEAMLEN, sizeof(char));
     pos = (char*) calloc(POSLEN, sizeof(char));
+
+    char tempstr[MAX_INPUT];
 
     newpl = (struct pl_list *) malloc( sizeof(struct pl_list) );
     newpl->ord = spot;
@@ -174,9 +183,14 @@ team::insert( int spot, char **comment, const char *def, const char *str )
 	    fprintf( output, "\n" );
 	    break;
 	}
-	if ( strcmp(def, "ph") )
-	    fprintf( cmdfp, "%d\n", spot );
-	fprintf( cmdfp, "%s %s %s\n", name, mlb, pos );
+	if ( strcmp(def, "ph") ) {
+	    snprintf( tempstr, POSLEN, "%d", spot );
+	    cmd->add( tempstr );
+	    fprintf( cmdfp, "%s\n", tempstr );
+	}
+	snprintf( tempstr, MAX_INPUT, "%s %s %s", name, mlb, pos );
+	cmd->add( tempstr );
+	fprintf( cmdfp, "%s\n", tempstr );
 	fflush( cmdfp );
     }
     else {
@@ -237,6 +251,8 @@ team::make_lineups()
     mlb = (char*) calloc(TEAMLEN, sizeof(char));
     pos = (char*) calloc(POSLEN, sizeof(char));
 
+    char tempstr[MAX_INPUT];
+
     current = newpl = lineup;
     fprintf(output,"Enter lineup for %s \n", ibl);
     for ( spot = 1; spot < 10; spot++ ) {
@@ -281,7 +297,9 @@ team::make_lineups()
 	    // if we get here it's all good
 	    break;
 	}
-	fprintf( cmdfp, "%s %s %s\n", name, mlb, pos );
+	snprintf( tempstr, MAX_INPUT, "%s %s %s", name, mlb, pos );
+	cmd->add( tempstr );
+	fprintf( cmdfp, "%s\n", tempstr );
 	fflush( cmdfp );
 	newpl->head = new player( name, ibl, mlb, pos );
     }
@@ -301,6 +319,8 @@ team::make_lineups_pit()
     name = (char*) calloc(NAMELEN, sizeof(char));
     mlb = (char*) calloc(TEAMLEN, sizeof(char));
     throws = (char*) calloc(POSLEN, sizeof(char));
+
+    char tempstr[MAX_INPUT];
 
     int loop = 1;
     while ( loop ) {
@@ -334,7 +354,9 @@ team::make_lineups_pit()
 	// if we get here it's all good
 	break;
     }
-    fprintf( cmdfp, "%s %s %c\n", name, mlb, throws[0] );
+    snprintf( tempstr, MAX_INPUT, "%s %s %c", name, mlb, throws[0] );
+    cmd->add( tempstr );
+    fprintf( cmdfp, "%s\n", tempstr );
     fflush( cmdfp );
     pitchers->head = new pitcher( name, ibl, mlb, throws[0] );
     pitchers->next = 0;
@@ -454,6 +476,8 @@ team::new_pit()
     throws = (char*) calloc(POSLEN, sizeof(char));
     bats = (char*) calloc(POSLEN, sizeof(char));
 
+    char tempstr[MAX_INPUT];
+
     newpit=(struct pit_list *)malloc(sizeof (struct pit_list));
     newpit->next=NULL;
 
@@ -492,10 +516,16 @@ team::new_pit()
 	break;
     }
 
-    if ( strlen(bats) > 0 )
-	fprintf( cmdfp, "%s %s %c %c\n", name, mlb, throws[0], bats[0] );
-    else
-	fprintf( cmdfp, "%s %s %c\n", name, mlb, throws[0] );
+    if ( strlen(bats) > 0 ) {
+	snprintf( tempstr, MAX_INPUT, "%s %s %c %c", name, mlb, throws[0], bats[0] );
+	cmd->add( tempstr );
+	fprintf( cmdfp, "%s\n", tempstr );
+    }
+    else {
+	snprintf( tempstr, MAX_INPUT, "%s %s %c", name, mlb, throws[0] );
+	cmd->add( tempstr );
+	fprintf( cmdfp, "%s\n", tempstr );
+    }
     fflush( cmdfp );
     newpit->head = new pitcher( name, ibl, mlb, throws[0] );
     newpit->next = 0;
@@ -816,6 +846,8 @@ team::unearned( int inning )
     char *inputstr;
     inputstr = (char*) calloc(POSLEN, sizeof(char));
 
+    char tempstr[POSLEN];
+
     struct pit_list *curr = pitchers;
 
     while ( curr ) {
@@ -836,7 +868,9 @@ team::unearned( int inning )
 	    }
 	    numout += curr->head->out;
 	    curr->head->er = curr->head->er-ur;
-	    fprintf( cmdfp, "%d\n", ur );
+	    snprintf( tempstr, POSLEN, "%d", ur );
+	    cmd->add( tempstr );
+	    fprintf( cmdfp, "%s\n", tempstr );
 	    fflush( cmdfp );
 	}
 	else

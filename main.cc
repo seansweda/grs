@@ -16,6 +16,7 @@
 #include "player.h"
 #include "team.h"
 #include "frame.h"
+#include "list.h"
 #include "version.h"
 
 // variables used outside of main()
@@ -27,6 +28,8 @@ FILE	*pbpfp,		// play-by-play output file
 
 FILE *output = stdout;	// where to direct output (default = stdout)
 FILE *input = stdin;	// where to read in data
+
+list* cmd = new list;	// in-memory .cmd file
 
 char filename[PATH_MAX];	// prefix for all output files
 team *ibl[2];			// pointers to the two teams
@@ -128,6 +131,7 @@ setup()
     fgets( inputstr, MAX_INPUT, input );
     sanitize( &inputstr, MAX_INPUT, '\n' );
     fprintf(output, "\n");
+    cmd->add( inputstr );
     fprintf(cmdfp, "%s\n", inputstr);
     fflush( cmdfp );
     fprintf(pbpfp, "grs version %s", VER);
@@ -193,6 +197,7 @@ play()
 
 #ifdef DEBUG
     frame::runners->dump();
+    cmd->dump();
     fprintf( stderr, "\n" );
 #endif
     }

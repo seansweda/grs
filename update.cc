@@ -1101,6 +1101,7 @@ frame::putcmd()
 	snprintf( output + o, MAX_INPUT - o, " %s", baserunning );
     }
 
+    cmd->add( output );
     fprintf( cmdfp, "%s\n", output );
     fflush( cmdfp );
     free( output );
