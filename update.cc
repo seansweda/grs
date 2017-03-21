@@ -257,7 +257,7 @@ frame::update()
 	fgets( inputstr, MAX_INPUT, input );
 	sanitize( &inputstr, MAX_INPUT, '\n' );
 	snprintf( comment, MAX_INPUT, "%s", inputstr );
-	fprintf( cmdfp, "%s", comment );
+	fprintf( cmdfp, "%s\n", comment );
 	fflush( cmdfp );
 	frameput();
 	comment[strlen(comment) - 1] = ' ';
