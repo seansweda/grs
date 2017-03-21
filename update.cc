@@ -1077,7 +1077,7 @@ frame::backup( char *in_ext, char *out_ext )
     test = new frame(currstr);
     result = test->decode();
 #ifdef DEBUG_UNDO
-    fprintf( stderr, "decode(%s) = %d\n", stripcr(currstr, MAX_INPUT), result );
+    fprintf( stderr, "decode(%s) = %d\n", currstr, result );
 #endif
     delete(test);
     return(result);

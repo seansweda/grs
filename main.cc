@@ -49,22 +49,6 @@ player* frame::onbase[4];	// array of pointers to batter & runners
 char* frame::buffer;		// output buffer
 
     char*
-stripcr( char* word, int len )
-{
-    int c = 1;
-    char *ptr = word;
-
-    while ( *ptr != '\n' && *ptr != '\0' && c < len ) {
-	ptr++;
-	c++;
-    }
-
-    *ptr = '\0';
-
-    return( word );
-}
-
-    char*
 sanitize( char** word, int len, char delimiter )
 {
     int c = 1;
