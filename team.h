@@ -9,8 +9,6 @@
 #include "player.h"
 #include "pitcher.h"
 
-extern FILE *pbpfp,*stsfp,*cmdfp,*undofp,*output,*input;
-
 // Linked list of players
 struct pl_list {
 	int ord;

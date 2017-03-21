@@ -32,7 +32,7 @@ frame.o: Makefile frame.cc update.cc frame.h queue.h team.h player.h pitcher.h e
 update.o: Makefile frame.cc update.cc frame.h queue.h team.h player.h pitcher.h extern.h config.h
 	$(CPP) $(CFLAGS) -c update.cc
 
-team.o: Makefile team.cc team.h player.h pitcher.h config.h
+team.o: Makefile team.cc team.h player.h pitcher.h extern.h config.h
 	$(CPP) $(CFLAGS) -c team.cc
 
 queue.o: Makefile queue.cc queue.h pitcher.h

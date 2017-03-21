@@ -1,7 +1,8 @@
 #include "frame.h"
+#include "extern.h"
 
 // Constructor which initializes the static fields
-frame::frame(team *away, team *home, FILE *fp)
+frame::frame(team *away, team *home)
 {
     undo = 0;		// if in the process of undo, set = 1
     cont = 1;		// continue reading commands?
@@ -22,8 +23,6 @@ frame::frame(team *away, team *home, FILE *fp)
 
     bat = away;
     pit = home;
-
-    pbpfp = fp;
 
     event = NULL;
     location = NULL;

@@ -1,5 +1,6 @@
 #include "frame.h"
 #include "queue.h"
+#include "extern.h"
 
     int
 frame::update()

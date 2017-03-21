@@ -157,7 +157,7 @@ setup()
 	ibl[0]->mound->nout(), ibl[0]->nout(), ibl[1]->mound->nout(),
 	ibl[1]->nout());
 
-    f0 = new frame(ibl[0], ibl[1], pbpfp);
+    f0 = new frame(ibl[0], ibl[1]);
 
     snprintf(inputstr, MAX_INPUT, "\n%s %d: ",
 	    ibl[frame::atbat]->nout(), frame::inning);

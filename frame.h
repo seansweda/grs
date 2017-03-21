@@ -9,7 +9,6 @@
 #include "pitcher.h"
 #include "team.h"
 #include "queue.h"
-#include "extern.h"
 
 class frame {
 private :
@@ -53,7 +52,7 @@ public :
 	static player *onbase[4];	// array of pointers to batter & runners
 
 	frame( char* );
-	frame( team*, team*, FILE* );	// First constructor called
+	frame( team*, team* );		// First constructor called
 	int decode();			// decode the parsed command line
 	int update();			// update the stats
 	void help( char* );		// Prints helpful? messages
