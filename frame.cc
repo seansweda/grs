@@ -115,7 +115,7 @@ frame::runadv()
 		    break;
 		default :
 		    // if we get here, runchck didn't do its job!
-		    sprintf( error, "Fatal baserunning error: %s\n", baserunning );
+		    snprintf( error, LINEWIDTH, "Fatal baserunning error: %s\n", baserunning );
 		    exit(1);
 	    }
 	}
@@ -167,11 +167,11 @@ frame::runstats( int fc )
 		case 'o' :		// If runner made an out
 		    pit->mound->out++;
 		    if ( (i == 0) && (fc > 0) ) {
-			sprintf( tempstr, "%s out", onbase[i]->nout() );
+			snprintf( tempstr, MAX_INPUT, "%s out", onbase[i]->nout() );
 			outbuf( pbpfp, tempstr, ", " );
 		    }
 		    else if ( i > 0 ) {
-			sprintf( tempstr, "%s out", onbase[i]->nout() );
+			snprintf( tempstr, MAX_INPUT, "%s out", onbase[i]->nout() );
 			outbuf( pbpfp, tempstr, ", " );
 		    }
 		    break;
@@ -182,18 +182,18 @@ frame::runstats( int fc )
 		    onbase[i]->r++;
 		    bat->score++;
 		    runs++;
-		    sprintf( tempstr, "%s scores", onbase[i]->nout() );
+		    snprintf( tempstr, MAX_INPUT, "%s scores", onbase[i]->nout() );
 		    outbuf( pbpfp, tempstr, ", " );
 		    break;
 		case '1' :		// If runner (batter) went to 1st
 		case '2' :		// If runner went to second
 		case '3' :		// If runner went to third
 		    if ( (i == 0) && (fc > 0) ) {
-			sprintf( tempstr, "%s %s", onbase[i]->nout(), b[j] );
+			snprintf( tempstr, MAX_INPUT, "%s %s", onbase[i]->nout(), b[j] );
 			outbuf( pbpfp, tempstr, ", " );
 		    }
 		    else if ( i > 0 ) {
-			sprintf( tempstr, "%s %s", onbase[i]->nout(), b[j] );
+			snprintf( tempstr, MAX_INPUT, "%s %s", onbase[i]->nout(), b[j] );
 			outbuf( pbpfp, tempstr, ", " );
 		    }
 		   break;
@@ -442,11 +442,11 @@ frame::runchck(char *runstr)
 	snprintf( runstr, MAX_INPUT, "%s", temp );
 
 	if ( outsonplay(runstr) + outs > 3 ) {
-	    sprintf( error, "Too many outs on play.\n" );
+	    snprintf( error, LINEWIDTH, "Too many outs on play.\n" );
 	    retval = 0;
 	}
     else
-	sprintf( error, "Baserunning error: %s\n", errstr );
+	snprintf( error, LINEWIDTH, "Baserunning error: %s\n", errstr );
 
 #ifdef DEBUG
     fprintf( stderr, "post runchck: %s\n", runstr );
@@ -492,47 +492,48 @@ frame::runcat(int adv)
 
     case -2 :					// runners advance 1 base
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) {
-		    sprintf(temptr++,"%1d",i);
+		if (onbase[i]) {
+		    snprintf( temptr++, 2, "%1d", i );
 		    test=i+1;
 		    if (test >= 4)
-		       *temptr++='h';
+			snprintf( temptr++, 2, "h" );
 		    else
-		       sprintf(temptr++,"%1d",test);}
+			snprintf( temptr++, 2, "%1d", test );
+		}
 	    break;
 
     case -3 :
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) test=i;
-	    sprintf(temptr++,"%1d",test);
-	    sprintf(temptr++,"o");
+		if (onbase[i]) test=i;
+	    snprintf( temptr++, 2, "%1d", test );
+	    snprintf( temptr++, 2, "o" );
 	    break;
 
     case -4 :
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) test=i;
-	    sprintf(temptr++,"%1d",test);
+		if (onbase[i]) test=i;
+	    snprintf( temptr++, 2, "%1d", test );
 	    if (++test == 4)
-	       sprintf(temptr++,"h");
+		snprintf( temptr++, 2, "h" );
 	    else if (test > 0)
-	       sprintf(temptr++,"%1d",test);
+		snprintf( temptr++, 2, "%1d", test );
 	    break;
 
     default :
-	    *temptr++='b';
+	    snprintf( temptr++, 2, "b" );
 	    if (adv == 4)
-	       *temptr++='h';
+		snprintf( temptr++, 2, "h" );
 	    else
-	       sprintf(temptr++,"%1d",adv);
-
+		snprintf( temptr++, 2, "%1d", adv );
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) {
-		    sprintf(temptr++,"%1d",i);
+		if (onbase[i]) {
+		    snprintf( temptr++, 2, "%1d", i );
 		    test=i+adv;
 		    if (test >= 4)
-		       *temptr++='h';
+			snprintf( temptr++, 2, "h" );
 		    else
-		       sprintf(temptr++,"%1d",test);}
+			snprintf( temptr++, 2, "%1d", test );
+	       }
     } // switch
 
     *temptr='\0';
@@ -551,7 +552,7 @@ frame::runcat( const char *str )
 frame::three()
 {
     if (baserunning[0] == '\0') {
-	sprintf(error,"%s must have baserunning data.",event);
+	snprintf( error, LINEWIDTH, "%s must have baserunning data.", event );
 	return(0);
     }
     else
@@ -634,7 +635,7 @@ frame::decode()
 
     // the rest are not
     if ( outs == 3 && !undo ) {
-	sprintf( error, "End of inning (3 outs).  Invalid command: %s\n", event );
+	snprintf( error, LINEWIDTH, "End of inning (3 outs).  Invalid command: %s\n", event );
 	return(0);
     }
     else if ( !(strcmp(event,"ph")) ) {
@@ -788,7 +789,7 @@ frame::decode()
 	return(1);
     }
     else {
-	sprintf( error, "Invalid command: %s\n", event );
+	snprintf( error, LINEWIDTH, "Invalid command: %s\n", event );
 	return(0);
     }
 }
