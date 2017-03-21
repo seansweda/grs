@@ -161,7 +161,7 @@ setup()
 
     snprintf(inputstr, MAX_INPUT, "\n%s %d: ",
 	    ibl[frame::atbat]->nout(), frame::inning);
-    f0->outbuf(pbpfp, inputstr);
+    f0->outbuf( inputstr );
 
     delete(f0);
 }

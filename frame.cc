@@ -167,11 +167,11 @@ frame::runstats( int fc )
 		    pit->mound->out++;
 		    if ( (i == 0) && (fc > 0) ) {
 			snprintf( tempstr, MAX_INPUT, "%s out", onbase[i]->nout() );
-			outbuf( pbpfp, tempstr, ", " );
+			outbuf( tempstr, ", " );
 		    }
 		    else if ( i > 0 ) {
 			snprintf( tempstr, MAX_INPUT, "%s out", onbase[i]->nout() );
-			outbuf( pbpfp, tempstr, ", " );
+			outbuf( tempstr, ", " );
 		    }
 		    break;
 		case 'h' :		// If runner scored a run
@@ -182,18 +182,18 @@ frame::runstats( int fc )
 		    bat->score++;
 		    runs++;
 		    snprintf( tempstr, MAX_INPUT, "%s scores", onbase[i]->nout() );
-		    outbuf( pbpfp, tempstr, ", " );
+		    outbuf( tempstr, ", " );
 		    break;
 		case '1' :		// If runner (batter) went to 1st
 		case '2' :		// If runner went to second
 		case '3' :		// If runner went to third
 		    if ( (i == 0) && (fc > 0) ) {
 			snprintf( tempstr, MAX_INPUT, "%s %s", onbase[i]->nout(), b[j] );
-			outbuf( pbpfp, tempstr, ", " );
+			outbuf( tempstr, ", " );
 		    }
 		    else if ( i > 0 ) {
 			snprintf( tempstr, MAX_INPUT, "%s %s", onbase[i]->nout(), b[j] );
-			outbuf( pbpfp, tempstr, ", " );
+			outbuf( tempstr, ", " );
 		    }
 		   break;
 		default : ;
@@ -202,7 +202,7 @@ frame::runstats( int fc )
 	str++;
     }
 
-    outbuf( pbpfp, "", ". " );
+    outbuf( "", ". " );
 
     // at this point we need fc binary
     if ( fc != 1 ) {
@@ -794,7 +794,7 @@ frame::decode()
 }
 
     void
-frame::outbuf( FILE *fp, const char *str, const char *punc )
+frame::outbuf( const char *str, const char *punc )
 {
     int c;
     char bigbuf[MAX_INPUT * 2];
@@ -803,8 +803,8 @@ frame::outbuf( FILE *fp, const char *str, const char *punc )
 
     if ( *punc == '\n' ) {
 	snprintf( buffer + strlen(buffer), 2, "%s", punc );
-	fputs( buffer, fp );
-	fputs( str, fp );
+	fputs( buffer, pbpfp );
+	fputs( str, pbpfp );
 	*buffer = (char) 0;
     }
     else {
@@ -824,7 +824,7 @@ frame::outbuf( FILE *fp, const char *str, const char *punc )
 	    tempstr[c] = '\0';
 
 	    snprintf( buffer, LINEWIDTH, "%s\n", tempstr );
-	    fputs( buffer, fp );
+	    fputs( buffer, pbpfp );
 	    snprintf( bigbuf, MAX_INPUT * 2, "%s", ptr );
 	}
 	snprintf( buffer, MAX_INPUT * 2, "%s", bigbuf);

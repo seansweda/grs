@@ -63,7 +63,7 @@ public :
 	char *inputstr;
 
 	static void print_linescore( FILE* );
-	void outbuf( FILE*, const char*, const char* = "\0" );
+	void outbuf( const char*, const char* = "\0" );
 	void putcmd();
 
 	~frame();
