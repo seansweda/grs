@@ -1,4 +1,5 @@
 #include "frame.h"
+#include "commands.h"
 #include "extern.h"
 
 // Constructor which initializes the static fields
@@ -596,14 +597,38 @@ frame::cleanup()
 }
 
     int
+frame::validate( const char *str )
+{
+    // return 0 if invalid
+    // return 1 if valid
+    // return 3 if valid anytime (i.e. w/3 outs)
+
+    int i, tot;
+
+    tot = sizeof valid / sizeof *valid;
+    for( i = 0; i != tot; i++ )
+	if ( strcmp( str, valid[i] ) == 0 )
+	    return( 1 );
+
+    tot = sizeof valid3 / sizeof *valid3;
+    for( i = 0; i != tot; i++ )
+	if ( strcmp( str, valid3[i] ) == 0 )
+	    return( 3 );
+
+    if ( strlen( str ) == 0 )
+	return ( 3 );
+    else
+	return( 0 );
+}
+
+    int
 frame::decode()
 {
 #ifdef DEBUG
 	fprintf(stderr,"decode: %s %s %s\n", event, location, baserunning);
 #endif
-    if (event[0] == '\0') {
-	return(1);			// No event to decode, ignore.
-    }
+
+    int result;
 
     if ( runchck(location) ) {		// Baserunning in location field?
 	snprintf( baserunning, MAX_INPUT, "%s", location );
@@ -613,184 +638,18 @@ frame::decode()
 	memset( error, '\0', LINEWIDTH );	// clean up after runchck
     }
 
-    // these events are legal with three outs
-    if ( !(strcmp(event,"lh")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"la")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"un")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"en")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"eg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"cm")) ) {
-	return(1);
-    }
+    result = validate( event );
 
-    // the rest are not
-    if ( outs == 3 && !undo ) {
+    if ( result == 3 || (result == 1 && outs != 3) ) {
+	return( 1 );
+    }
+    else if ( result == 1 && outs == 3 ) {
 	snprintf( error, LINEWIDTH, "End of inning (3 outs).  Invalid command: %s\n", event );
-	return(0);
-    }
-    else if ( !(strcmp(event,"ph")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"pr")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"np")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"dr") ) || !(strcmp(event,"dc")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"so")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"kd")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"bb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"iw")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ci")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hp")) || !(strcmp(event,"hb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"wp")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"pb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"bk")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"th")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"di")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"cs")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"kc")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ks")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"pk")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"oa")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ri")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"1b")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"2b")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"3b")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hr")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"tp")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"gd")) || !(strcmp(event,"dp")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fd")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ld")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"lo")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fc")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"rg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"go")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"po")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fp")) || !(strcmp(event,"pf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sh")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"lf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"df")) || !(strcmp(event,"wt")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fo")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"er")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ea")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"nj")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fa")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"in")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ic")) ) {
-	return(1);
+	return( 0 );
     }
     else {
 	snprintf( error, LINEWIDTH, "Invalid command: %s\n", event );
-	return(0);
+	return( 0 );
     }
 }
 

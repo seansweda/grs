@@ -54,6 +54,7 @@ public :
 	frame( char* );
 	frame( team*, team* );		// First constructor called
 	int decode();			// decode the parsed command line
+	int validate( const char* );	// valid command?
 	int update();			// update the stats
 	void help( char* );		// Prints helpful? messages
 	void frameput();		// Outputs info useful to user
