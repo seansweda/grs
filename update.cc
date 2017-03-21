@@ -115,117 +115,6 @@ frame::update()
 	frameput();
 	return(1);
     }
-    else if ( !(strcmp( event, "un" )) ) {
-	char in_ext[5], out_ext[5];
-	int times = 1;
-
-	if ( count == 1 ) {
-	    count--;
-	    snprintf( error, LINEWIDTH, "%s\n", "nothing to undo!" );
-	    return(0);
-	}
-	else if ( undo ) {
-	    cont = 0;
-	    return(1);
-	}
-	else {
-	    undo = 1;
-	    fclose( pbpfp );
-	    fclose( stsfp );
-	    fclose( cmdfp );
-
-	    cleanup();
-
-	    snprintf( in_ext, 5, "%s", ".cmd" );
-	    snprintf( out_ext, 5, ".un%d", times );
-
-	    while ( !(backup( in_ext, out_ext )) ) {
-		snprintf( in_ext, 5, "%s", out_ext );
-		snprintf( out_ext, 5, ".un%d", ++times );
-
-		if ( times > 9 ) {
-		    fprintf( stderr, "undo may be looping, bailing!\n" );
-		    exit(1);
-		}
-	    }
-
-	    snprintf( inputstr, PATH_MAX, "%s%s", filename, out_ext );
-	    undofp = fopen( inputstr, "r" );
-	    openfile( filename );
-	    output = fopen( NULLDEV , "w" );
-	    input = undofp;
-#ifdef DEBUG
-	    fprintf( stderr, "setup 0\n" );
-#endif
-	    setup(0);
-#ifdef DEBUG
-	    fprintf( stderr, "setup 1\n" );
-#endif
-	    setup(1);
-#ifdef DEBUG
-	    fprintf( stderr, "setup 2\n" );
-#endif
-	    setup();
-#ifdef DEBUG
-	    fprintf( stderr, "reloading\n" );
-#endif
-	    play();
-	    output = stdout;
-	    input = stdin;
-	    undo = 0;
-	    cont = 1;
-	    count--;
-#ifdef DEBUG
-	    fprintf( stderr, "%d %d %d %d %d %d %d %d\n",
-		undo, cont, outs, atbat, inning, runs, linesize, errflag );
-#endif
-	    return(2);		// we already deleted the frame pointer
-				// so return 2
-	}
-    }
-    else if ( !(strcmp( event, "en" )) ) {
-#ifdef DEBUG
-	print_linescore(stderr);
-#endif
-#ifndef DEBUG
-	if ( outs != 3 ) {
-	    snprintf( error, LINEWIDTH, "Use \"eg\" to end inning with less than 2 outs.\n" );
-	    return(0);
-	}
-#endif
-	putcmd();
-	if ( errflag && runs )
-	    pit->unearned(inning);
-
-	snprintf( inputstr, MAX_INPUT, "%s %d %s %d\n",
-		ibl[0]->nout(), ibl[0]->score, ibl[1]->nout(), ibl[1]->score );
-	outbuf( pbpfp, inputstr, "\n" );
-	outbuf( pbpfp, "", "\n" );
-
-	linescore[atbat][inning - 1] = runs;
-	for ( i = 1; i < 4; i++ )
-	    if ( onbase[i] )
-		bat->lob++;
-
-	runners->clear();
-
-	atbat = (atbat + 1) % 2;
-	outs = 0;
-	runs = 0;
-	errflag = 0;
-	for ( i = 0; i < 4; i++ )
-	    onbase[i] = NULL;
-	if ( !(atbat) )
-	    inning++;
-	snprintf( inputstr, MAX_INPUT, "%s %d: ", ibl[atbat]->nout(), inning );
-	outbuf( pbpfp, inputstr );
-	pit = bat;
-	bat = ibl[atbat];
-//	runadv();
-	onbase[0] = bat->up();
-	frameput();
-	return(1);
-    }
     else if ( !(strcmp( event, "eg" )) ) {
 #ifdef DEBUG
 	print_linescore(stderr);
@@ -1012,6 +901,117 @@ frame::update()
 	    snprintf( inputstr, MAX_INPUT, "Infield in. " );
 	putcmd();
 	outbuf( pbpfp, inputstr );
+	frameput();
+	return(1);
+    }
+    else if ( !(strcmp( event, "un" )) ) {
+	char in_ext[5], out_ext[5];
+	int times = 1;
+
+	if ( count == 1 ) {
+	    count--;
+	    snprintf( error, LINEWIDTH, "%s\n", "nothing to undo!" );
+	    return(0);
+	}
+	else if ( undo ) {
+	    cont = 0;
+	    return(1);
+	}
+	else {
+	    undo = 1;
+	    fclose( pbpfp );
+	    fclose( stsfp );
+	    fclose( cmdfp );
+
+	    cleanup();
+
+	    snprintf( in_ext, 5, "%s", ".cmd" );
+	    snprintf( out_ext, 5, ".un%d", times );
+
+	    while ( !(backup( in_ext, out_ext )) ) {
+		snprintf( in_ext, 5, "%s", out_ext );
+		snprintf( out_ext, 5, ".un%d", ++times );
+
+		if ( times > 9 ) {
+		    fprintf( stderr, "undo may be looping, bailing!\n" );
+		    exit(1);
+		}
+	    }
+
+	    snprintf( inputstr, PATH_MAX, "%s%s", filename, out_ext );
+	    undofp = fopen( inputstr, "r" );
+	    openfile( filename );
+	    output = fopen( NULLDEV , "w" );
+	    input = undofp;
+#ifdef DEBUG
+	    fprintf( stderr, "setup 0\n" );
+#endif
+	    setup(0);
+#ifdef DEBUG
+	    fprintf( stderr, "setup 1\n" );
+#endif
+	    setup(1);
+#ifdef DEBUG
+	    fprintf( stderr, "setup 2\n" );
+#endif
+	    setup();
+#ifdef DEBUG
+	    fprintf( stderr, "reloading\n" );
+#endif
+	    play();
+	    output = stdout;
+	    input = stdin;
+	    undo = 0;
+	    cont = 1;
+	    count--;
+#ifdef DEBUG
+	    fprintf( stderr, "%d %d %d %d %d %d %d %d\n",
+		undo, cont, outs, atbat, inning, runs, linesize, errflag );
+#endif
+	    return(2);		// we already deleted the frame pointer
+				// so return 2
+	}
+    }
+    else if ( !(strcmp( event, "en" )) ) {
+#ifdef DEBUG
+	print_linescore(stderr);
+#endif
+#ifndef DEBUG
+	if ( outs != 3 ) {
+	    snprintf( error, LINEWIDTH, "Use \"eg\" to end inning with less than 2 outs.\n" );
+	    return(0);
+	}
+#endif
+	putcmd();
+	if ( errflag && runs )
+	    pit->unearned(inning);
+
+	snprintf( inputstr, MAX_INPUT, "%s %d %s %d\n",
+		ibl[0]->nout(), ibl[0]->score, ibl[1]->nout(), ibl[1]->score );
+	outbuf( pbpfp, inputstr, "\n" );
+	outbuf( pbpfp, "", "\n" );
+
+	linescore[atbat][inning - 1] = runs;
+	for ( i = 1; i < 4; i++ )
+	    if ( onbase[i] )
+		bat->lob++;
+
+	runners->clear();
+
+	atbat = (atbat + 1) % 2;
+	outs = 0;
+	runs = 0;
+	errflag = 0;
+	for ( i = 0; i < 4; i++ )
+	    onbase[i] = NULL;
+	if ( !(atbat) )
+	    inning++;
+	snprintf( inputstr, MAX_INPUT, "%s %d: ", ibl[atbat]->nout(), inning );
+	outbuf( pbpfp, inputstr );
+	pit = bat;
+	bat = ibl[atbat];
+//	runadv();
+	onbase[0] = bat->up();
 	frameput();
 	return(1);
     }
