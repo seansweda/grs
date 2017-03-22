@@ -937,8 +937,7 @@ frame::update()
 	return(1);
     }
     else if ( !(strcmp( event, "un" )) ) {
-	count--;
-	if ( count == 1 ) {
+	if ( count == 0 ) {
 	    snprintf( error, LINEWIDTH, "%s\n", "nothing to undo!" );
 	    return( 0 );
 	}
@@ -951,12 +950,13 @@ frame::update()
 	snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
 	sanitize( &outputstr, MAX_INPUT );
 	cmd->pop();
+	count--;
 	while ( validate( outputstr ) == 0 || strlen( cmd->peek() ) == 1 ) {
 	    snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
 	    sanitize( &outputstr, MAX_INPUT );
 	    cmd->pop();
+	    count--;
 	}
-	count--;
 
 	// diag
 	// cmd->dump();
@@ -1038,6 +1038,8 @@ frame::putcmd()
     cmd->add( output );
     fprintf( cmdfp, "%s\n", output );
     fflush( cmdfp );
+    // increment count when we write to cmd file
+    count++;
     free( output );
 }
 

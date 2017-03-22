@@ -69,7 +69,6 @@ frame::frame(char *str)
     bat=ibl[atbat];
     pit=ibl[(atbat+1)%2];
 
-    count++;
 }
 
     int
