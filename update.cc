@@ -951,7 +951,7 @@ frame::update()
 	snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
 	sanitize( &outputstr, MAX_INPUT );
 	cmd->pop();
-	while ( validate( outputstr ) == 0 ) {
+	while ( validate( outputstr ) == 0 || strlen( cmd->peek() ) == 1 ) {
 	    snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
 	    sanitize( &outputstr, MAX_INPUT );
 	    cmd->pop();
