@@ -128,6 +128,7 @@ team::pos_change( int spot, char **comment )
     fprintf( stderr, "pos_change %d: %s DONE\n", spot, pos );
 #endif
     snprintf( *comment, MAX_INPUT, "%s moves to %s.", oldpl->head->nout(), pos );
+    free( pos );
 }
 
 // Adds a new player at position "spot" in the batting order
@@ -234,6 +235,9 @@ team::insert( int spot, char **comment, const char *def, const char *str )
     fprintf( stderr, "insert %d: %s, %s, %s DONE\n", spot, name, mlb, pos );
 #endif
     free( inputstr );
+    free( name );
+    free( mlb );
+    free( pos );
 }
 
 // Creates the lineups for a team
@@ -306,6 +310,9 @@ team::make_lineups()
 
     //fprintf(output,"\n");
     free( inputstr );
+    free( name );
+    free( mlb );
+    free( pos );
     return 1;
 }
 
@@ -366,6 +373,9 @@ team::make_lineups_pit()
 #endif
     //fprintf(output,"\n");
     free( inputstr );
+    free( name );
+    free( mlb );
+    free( throws );
     return 1;
 }
 
@@ -541,8 +551,14 @@ team::new_pit()
     }
     oldpit->next = newpit;
     mound = newpit->head;
+
+    int val = bats[0] - '0';
     free( inputstr );
-    return ( bats[0] - '0' );
+    free( name );
+    free( mlb );
+    free( throws );
+    free( bats );
+    return ( val );
 }
 
     char*
