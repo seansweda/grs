@@ -977,6 +977,7 @@ frame::update()
 	    old->next();
 	}
 	fclose( undofp );
+	delete( old );
 
 	// read from undo file
 	if ( (undofp = fopen( outputstr, "r" )) == NULL ) {
@@ -1010,8 +1011,9 @@ frame::update()
 	fprintf( stderr, "%d %d %d %d %d %d %d %d\n",
 	    count, cont, outs, atbat, inning, runs, linesize, errflag );
 #endif
-	return(2);	// we already deleted the frame pointer, return 2
+	return(1);
     }
+    // final iteration of if(strcmp) block, no match
     else
 	return(0);
 }
