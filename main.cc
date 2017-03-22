@@ -151,18 +151,21 @@ setup()
     f0->outbuf( inputstr );
 
     delete(f0);
+    free( inputstr );
 }
 
     void
 play()
 {
     frame *f0;			// f0 is the current frame to be decoded
-    frame::cont = 1;		// obviously we want to execute at least once!
+    int status;
 
     char *inputstr;
     inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    while (frame::cont) {
+    int loop = 1;
+    while ( loop && frame::cont ) {
+
 #ifdef DEBUG
 #if DEBUG == 2
 	ibl[0]->box_score(stderr);
@@ -180,27 +183,37 @@ play()
 	    fprintf( stderr, "play:(%d) %s", f0->count, inputstr );
 #endif
 
-	switch ( f0->decode() ) {
-	    case 1:
-		switch ( f0->update() ) {
-		    case 0:
-			f0->help(inputstr);
-		    default:
-			break;
-		}
-		break;
-	    default:
-		f0->help(inputstr);
-		break;
+	status = f0->decode();
+	// decode:
+	// 0 = invalid command
+	// 1 = valid command
+	if ( status ) {
+
+	    status = f0->update();
+	    // update:
+	    // 0 = error
+	    // 1 = ok
+	    // 2 = EOF
 	}
-	delete(f0);
+
+	if ( status == 0 ) {
+	    f0->help( inputstr );
+	}
 
 #ifdef DEBUG
     frame::runners->dump();
     cmd->dump();
     fprintf( stderr, "\n" );
 #endif
+
+	delete( f0 );
+	if ( status == 2 )
+	    // EOF input
+	    break;
+    // end while loop
     }
+
+    free( inputstr );
 }
 
     void

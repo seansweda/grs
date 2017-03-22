@@ -20,10 +20,9 @@ frame::update()
 #endif
 
     if ( (input != stdin) && feof(input) ) {
-	cont = 0;
 	output = stdout;
 	frameput();
-	return(1);
+	return(2);
     }
 
     if ( event[0] == '\0' ) {
@@ -109,7 +108,6 @@ frame::update()
 	print_linescore(stderr);
 #endif
 	putcmd();
-	cont = 0;
 	if ( errflag && runs )
 	    pit->unearned(inning);
 
@@ -127,6 +125,8 @@ frame::update()
 	ibl[0]->decisions();
 	ibl[1]->decisions();
 
+	// game over
+	cont = 0;
 	return(1);
     }
     else if ( !(strcmp( event, "cm" )) ) {
@@ -1006,7 +1006,6 @@ frame::update()
 	play();
 	output = stdout;
 	input = stdin;
-	cont = 1;
 #ifdef DEBUG
 	fprintf( stderr, "%d %d %d %d %d %d %d %d\n",
 	    count, cont, outs, atbat, inning, runs, linesize, errflag );
