@@ -756,6 +756,28 @@ frame::batterout( char *brun )
     }
 }
 
+    int
+frame::get_spot()
+{
+    int val, loop;
+    char *spot;
+    spot = (char*) calloc(MAX_INPUT, sizeof(char));
+
+    loop = 1;
+    while ( loop ) {
+	fprintf( output, "Enter batting order of player: " );
+	memset( spot, '\0', MAX_INPUT );
+	fgets( spot, MAX_INPUT, input );
+	sanitize( &spot, POSLEN );
+	val = spot[0] - '0';
+	if ( strlen( spot ) == 1 && val >= 0 && val <= 9 )
+	    break;
+    }
+
+    free( spot );
+    return( val );
+}
+
 frame::~frame()
 {
     if ( event ) {

@@ -43,18 +43,12 @@ frame::update()
     }
     else if ( !(strcmp( event, "pr" )) ) {
 	ibl[atbat]->print_lineup();
-	while ( outputstr[0] < '0' || outputstr[0] > '9' ) {
-	    fprintf( output, "\nEnter batting order of player: " );
-	    memset( outputstr, '\0', MAX_INPUT );
-	    fgets( outputstr, MAX_INPUT, input );
-	    sanitize( &outputstr, POSLEN );
-	    // fprintf(output,"\n");
-	}
+	int spot = get_spot();
 	for (i = 1; i < 4; i++ ) {
-	    if ( onbase[i] == ibl[atbat]->findord(outputstr[0] - '0') ) {
+	    if ( onbase[i] == ibl[atbat]->findord( spot ) ) {
 		putcmd();
-		ibl[atbat]->insert( (int) outputstr[0] - '0', &comment, "pr" );
-		onbase[i] = ibl[atbat]->findord(outputstr[0] - '0');
+		ibl[atbat]->insert( spot, &comment, "pr" );
+		onbase[i] = ibl[atbat]->findord( spot );
 		runadv();
 		frameput();
 		snprintf( outputstr, MAX_INPUT, "%s ", comment );
@@ -86,19 +80,13 @@ frame::update()
     }
     else if ( !(strcmp( event, "dr" )) || !(strcmp( event, "dc" )) ) {
 	pit->print_lineup();
-	while ( outputstr[0] < '0' || outputstr[0] > '9' ) {
-	    fprintf( output, "\nEnter batting order of player: " );
-	    memset( outputstr, '\0', MAX_INPUT );
-	    fgets( outputstr, MAX_INPUT, input );
-	    sanitize( &outputstr, POSLEN );
-	    // fprintf(output,"\n");
-	}
-	if ( outputstr[0] > '0' ) {
+	int spot = get_spot();
+	if ( spot > 0 ) {
 	    putcmd();
 	    if ( !(strcmp( event, "dr" )) )
-		pit->insert( ( outputstr[0] -'0' ), &comment );
+		pit->insert( spot, &comment );
 	    else
-		pit->pos_change( ( outputstr[0] - '0' ), &comment );
+		pit->pos_change( spot, &comment );
 	}
 	runadv();
 	frameput();
