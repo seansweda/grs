@@ -98,7 +98,7 @@ team::pos_change( int spot, char **comment )
 {
 
     char *pos;
-    pos = (char*) calloc(POSLEN, sizeof(char));
+    pos = (char*) calloc(MAX_INPUT, sizeof(char));
 
     char tempstr[POSLEN];
 
@@ -107,8 +107,8 @@ team::pos_change( int spot, char **comment )
 	oldpl = oldpl->next;
 
     fprintf( output, "\nEnter new position for %d: ", spot );
-    memset( pos, '\0', POSLEN );
-    fgets( pos, POSLEN, input );
+    memset( pos, '\0', MAX_INPUT );
+    fgets( pos, MAX_INPUT, input );
     sanitize( &pos, POSLEN );
 
 #ifdef DEBUG
@@ -805,15 +805,15 @@ team::decisions()
 {
 
     char *inputstr;
-    inputstr = (char*) calloc(POSLEN, sizeof(char));
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
     struct pit_list *curr = pitchers;
 
     fprintf( output, "\nEnter W/L/S for appropriate %s pitcher.  <CR> if none.\n", ibl );
     while (curr) {
 	fprintf( output, "%s: ", curr->head->nout() );
-	memset( inputstr, '\0', POSLEN );
-	fgets( inputstr, POSLEN, input );
+	memset( inputstr, '\0', MAX_INPUT );
+	fgets( inputstr, MAX_INPUT, input );
 	sanitize( &inputstr, POSLEN );
 
 	switch (*inputstr) {
@@ -844,31 +844,31 @@ team::unearned( int inning )
     int ur = 0;
 
     char *inputstr;
-    inputstr = (char*) calloc(POSLEN, sizeof(char));
+    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    char tempstr[POSLEN];
+    char tempstr[MAX_INPUT];
 
     struct pit_list *curr = pitchers;
 
     while ( curr ) {
 	if ( curr->head->out + numout >= (inning-1)*3 ) {
 	    fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
-	    memset( inputstr, '\0', POSLEN );
-	    fgets( inputstr, POSLEN, input );
-	    sanitize( &inputstr, POSLEN );
+	    memset( inputstr, '\0', MAX_INPUT );
+	    fgets( inputstr, MAX_INPUT, input );
+	    sanitize( &inputstr, MAX_INPUT );
 	    ur = atoi(inputstr);
 
 	    while ( ur < 0 || ur > curr->head->er ) {
 		fprintf( stderr, "Invalid unearned runs total.\n" );
 		fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
-		memset( inputstr, '\0', POSLEN );
-		fgets( inputstr, POSLEN, input );
-		sanitize( &inputstr, POSLEN );
+		memset( inputstr, '\0', MAX_INPUT );
+		fgets( inputstr, MAX_INPUT, input );
+		sanitize( &inputstr, MAX_INPUT );
 		ur = atoi(inputstr);
 	    }
 	    numout += curr->head->out;
 	    curr->head->er = curr->head->er-ur;
-	    snprintf( tempstr, POSLEN, "%d", ur );
+	    snprintf( tempstr, MAX_INPUT, "%d", ur );
 	    cmd->add( tempstr );
 	    fprintf( cmdfp, "%s\n", tempstr );
 	    fflush( cmdfp );
