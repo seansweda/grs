@@ -136,6 +136,7 @@ frame::update()
 	fgets( outputstr, MAX_INPUT, input );
 	sanitize( &outputstr, MAX_INPUT, '\n' );
 	snprintf( comment, MAX_INPUT, "%s", outputstr );
+	cmd->add( comment );
 	fprintf( cmdfp, "%s\n", comment );
 	fflush( cmdfp );
 	frameput();
@@ -951,7 +952,9 @@ frame::update()
 	sanitize( &outputstr, MAX_INPUT );
 	cmd->pop();
 	count--;
-	while ( validate( outputstr ) == 0 || strlen( cmd->peek() ) == 1 ) {
+	while ( validate( outputstr ) == 0 ||
+		strlen( cmd->peek() ) == 1 ||
+		strcmp( cmd->peek(), "cm" ) == 0 ) {
 	    snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
 	    sanitize( &outputstr, MAX_INPUT );
 	    cmd->pop();
