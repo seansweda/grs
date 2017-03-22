@@ -35,8 +35,7 @@ char filename[PATH_MAX];	// prefix for all output files
 team *ibl[2];			// pointers to the two teams
 
 // instantiate static objects
-int frame::undo,
-    frame::cont,
+int frame::cont,
     frame::outs,
     frame::atbat,
     frame::inning,
@@ -174,11 +173,12 @@ play()
 	fgets( inputstr, MAX_INPUT, input );
 	sanitize( &inputstr, MAX_INPUT, '\n' );
 
+	f0 = new frame( inputstr );
+
 #ifdef DEBUG
 	if (output != stdout)
-	    fprintf( stderr, "%s", inputstr );
+	    fprintf( stderr, "play:(%d) %s", f0->count, inputstr );
 #endif
-	f0 = new frame( inputstr );
 
 	switch ( f0->decode() ) {
 	    case 1:

@@ -5,7 +5,6 @@
 // Constructor which initializes the static fields
 frame::frame(team *away, team *home)
 {
-    undo = 0;		// if in the process of undo, set = 1
     cont = 1;		// continue reading commands?
     outs = 0;
     atbat = 0;

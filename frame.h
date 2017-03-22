@@ -39,8 +39,7 @@ private :
 					// returns 1 if it is a legal command
 public :
 
-	static int undo,
-		   cont,
+	static int cont,
 		   outs,
 		   atbat,
 		   inning,
