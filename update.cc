@@ -37,28 +37,28 @@ frame::update()
 	onbase[0]=bat->up();
 	runadv();
 	frameput();
-	snprintf( inputstr, MAX_INPUT, "%s ", comment );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s ", comment );
+	outbuf( outputstr );
 	return(1);
     }
     else if ( !(strcmp( event, "pr" )) ) {
 	ibl[atbat]->print_lineup();
-	while ( inputstr[0] < '0' || inputstr[0] > '9' ) {
+	while ( outputstr[0] < '0' || outputstr[0] > '9' ) {
 	    fprintf( output, "\nEnter batting order of player: " );
-	    memset( inputstr, '\0', MAX_INPUT );
-	    fgets( inputstr, MAX_INPUT, input );
-	    sanitize( &inputstr, POSLEN );
+	    memset( outputstr, '\0', MAX_INPUT );
+	    fgets( outputstr, MAX_INPUT, input );
+	    sanitize( &outputstr, POSLEN );
 	    // fprintf(output,"\n");
 	}
 	for (i = 1; i < 4; i++ ) {
-	    if ( onbase[i] == ibl[atbat]->findord(inputstr[0] - '0') ) {
+	    if ( onbase[i] == ibl[atbat]->findord(outputstr[0] - '0') ) {
 		putcmd();
-		ibl[atbat]->insert( (int) inputstr[0] - '0', &comment, "pr" );
-		onbase[i] = ibl[atbat]->findord(inputstr[0] - '0');
+		ibl[atbat]->insert( (int) outputstr[0] - '0', &comment, "pr" );
+		onbase[i] = ibl[atbat]->findord(outputstr[0] - '0');
 		runadv();
 		frameput();
-		snprintf( inputstr, MAX_INPUT, "%s ", comment );
-		outbuf( inputstr );
+		snprintf( outputstr, MAX_INPUT, "%s ", comment );
+		outbuf( outputstr );
 		return(1);
 	    }
 	}
@@ -74,36 +74,36 @@ frame::update()
 	    snprintf( comment, MAX_INPUT, "%s now pitching for %s. ",
 		    pit->mound->nout(), pit->nout() );
 	else {
-	    snprintf( inputstr, MAX_INPUT, "%s %s p",
+	    snprintf( outputstr, MAX_INPUT, "%s %s p",
 		    pit->mound->nout(), pit->mound->tout() );
-	    pit->insert( bats, &comment, "", inputstr );
+	    pit->insert( bats, &comment, "", outputstr );
 	}
 	runadv();
 	frameput();
-	snprintf( inputstr, MAX_INPUT, "%s ", comment );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s ", comment );
+	outbuf( outputstr );
 	return(1);
     }
     else if ( !(strcmp( event, "dr" )) || !(strcmp( event, "dc" )) ) {
 	pit->print_lineup();
-	while ( inputstr[0] < '0' || inputstr[0] > '9' ) {
+	while ( outputstr[0] < '0' || outputstr[0] > '9' ) {
 	    fprintf( output, "\nEnter batting order of player: " );
-	    memset( inputstr, '\0', MAX_INPUT );
-	    fgets( inputstr, MAX_INPUT, input );
-	    sanitize( &inputstr, POSLEN );
+	    memset( outputstr, '\0', MAX_INPUT );
+	    fgets( outputstr, MAX_INPUT, input );
+	    sanitize( &outputstr, POSLEN );
 	    // fprintf(output,"\n");
 	}
-	if ( inputstr[0] > '0' ) {
+	if ( outputstr[0] > '0' ) {
 	    putcmd();
 	    if ( !(strcmp( event, "dr" )) )
-		pit->insert( ( inputstr[0] -'0' ), &comment );
+		pit->insert( ( outputstr[0] -'0' ), &comment );
 	    else
-		pit->pos_change( ( inputstr[0] - '0' ), &comment );
+		pit->pos_change( ( outputstr[0] - '0' ), &comment );
 	}
 	runadv();
 	frameput();
-	snprintf( inputstr, MAX_INPUT, "%s ", comment );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s ", comment );
+	outbuf( outputstr );
 	return(1);
     }
     else if ( !(strcmp( event, "la" )) ) {
@@ -125,9 +125,9 @@ frame::update()
 	if ( errflag && runs )
 	    pit->unearned(inning);
 
-	snprintf( inputstr, MAX_INPUT, "%s %d %s %d\n",
+	snprintf( outputstr, MAX_INPUT, "%s %d %s %d\n",
 		ibl[0]->nout(),ibl[0]->score, ibl[1]->nout(),ibl[1]->score );
-	outbuf( inputstr, "\n");
+	outbuf( outputstr, "\n");
 	outbuf( "", "\n" );
 	outbuf( " " );
 
@@ -144,10 +144,10 @@ frame::update()
     else if ( !(strcmp( event, "cm" )) ) {
 	putcmd();
 	fprintf( output, "Input a one line comment\n" );
-	memset( inputstr, '\0', MAX_INPUT );
-	fgets( inputstr, MAX_INPUT, input );
-	sanitize( &inputstr, MAX_INPUT, '\n' );
-	snprintf( comment, MAX_INPUT, "%s", inputstr );
+	memset( outputstr, '\0', MAX_INPUT );
+	fgets( outputstr, MAX_INPUT, input );
+	sanitize( &outputstr, MAX_INPUT, '\n' );
+	snprintf( comment, MAX_INPUT, "%s", outputstr );
 	fprintf( cmdfp, "%s\n", comment );
 	fflush( cmdfp );
 	frameput();
@@ -160,8 +160,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s K%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s K%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	pit->mound->k++;
 	onbase[0]->k++;
@@ -177,8 +177,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s dropped K%c%s", onbase[0]->nout(), spc, location);
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s dropped K%c%s", onbase[0]->nout(), spc, location);
+	outbuf( outputstr );
 	runstats(2);
 	pit->mound->k++;
 	onbase[0]->k++;
@@ -194,8 +194,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s BB", onbase[0]->nout() );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s BB", onbase[0]->nout() );
+	outbuf( outputstr );
 	runstats();
 	pit->mound->bb++;
 	onbase[0]->bb++;
@@ -211,8 +211,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s IBB", onbase[0]->nout() );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s IBB", onbase[0]->nout() );
+	outbuf( outputstr );
 	runstats();
 	bat->newstat( onbase[0]->nout(), 7 );
 	pit->mound->bb++;
@@ -230,8 +230,8 @@ frame::update()
 	putcmd();
 	if ( !(runchck(baserunning)) )
 	    return(0);
-	snprintf( inputstr, MAX_INPUT, "%s CI", onbase[0]->nout() );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s CI", onbase[0]->nout() );
+	outbuf( outputstr );
 	runstats(2);
 	pit->errors++;
 	pit->newstat( pit->posout(2), 0 );
@@ -246,8 +246,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s HBP", onbase[0]->nout() );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s HBP", onbase[0]->nout() );
+	outbuf( outputstr );
 	runstats();
 	bat->newstat( onbase[0]->nout(), 5 );
 	onbase[0]->pa(pit->mound->throws);
@@ -262,8 +262,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "WP" );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "WP" );
+	outbuf( outputstr );
 	runstats();
 	pit->newstat( pit->mound->nout(), 6 );
 	runadv();
@@ -276,8 +276,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "PB" );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "PB" );
+	outbuf( outputstr );
 	runstats();
 	runadv();
 	frameput();
@@ -288,8 +288,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "Balk" );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "Balk" );
+	outbuf( outputstr );
 	runstats();
 	pit->newstat( pit->mound->nout(), 8 );
 	runadv();
@@ -302,8 +302,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "On throw" );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "On throw" );
+	outbuf( outputstr );
 	runstats();
 	runadv();
 	frameput();
@@ -315,8 +315,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "On defensive indifference" );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "On defensive indifference" );
+	outbuf( outputstr );
 	runstats();
 	runadv();
 	frameput();
@@ -328,8 +328,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "SB" );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "SB" );
+	outbuf( outputstr );
 	runstats();
 	for ( i = 0; i < (int) strlen(baserunning); i += 2 )
 	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 )
@@ -344,8 +344,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "CS%c%s", spc, location);
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "CS%c%s", spc, location);
+	outbuf( outputstr );
 	runstats();
 	for ( i = 0; i < (int) strlen(baserunning); i += 2 )
 	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 && baserunning[i+1] == 'o' )
@@ -361,8 +361,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s K, CS%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s K, CS%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	for ( i = 0; i < (int) strlen(baserunning); i += 2 )
 	    if ( (( j = baserunning[i] - '0' ) > 0 ) && j < 4 && baserunning[i+1] == 'o' )
@@ -383,8 +383,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s K, SB%c%s", onbase[0]->nout(),spc,location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s K, SB%c%s", onbase[0]->nout(),spc,location );
+	outbuf( outputstr );
 	runstats();
 	pit->mound->k++;
 	onbase[0]->k++;
@@ -404,8 +404,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "Pickoff%c%s", spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "Pickoff%c%s", spc, location );
+	outbuf( outputstr );
 	runstats();
 	runadv();
 	frameput();
@@ -417,8 +417,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "Trying to advance%c%s", spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "Trying to advance%c%s", spc, location );
+	outbuf( outputstr );
 	runstats();
 	runadv();
 	frameput();
@@ -430,8 +430,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "On baserunner interference%c%s", spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "On baserunner interference%c%s", spc, location );
+	outbuf( outputstr );
 	runstats();
 	runadv();
 	frameput();
@@ -442,8 +442,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s 1b%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s 1b%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	pit->mound->h++;
 	onbase[0]->h++;
@@ -460,8 +460,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s 2b%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s 2b%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	pit->mound->h++;
 	onbase[0]->h++;
@@ -479,8 +479,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s 3b%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s 3b%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	pit->mound->h++;
 	onbase[0]->h++;
@@ -498,8 +498,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s HR%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s HR%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	pit->mound->h++;
 	pit->mound->hr++;
@@ -520,8 +520,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s triple play%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s triple play%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	onbase[0]->pa(pit->mound->throws);
 	onbase[0]->ab++;
@@ -537,8 +537,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s GDP%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s GDP%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	bat->newstat( onbase[0]->nout(), 2 );
 	onbase[0]->pa(pit->mound->throws);
@@ -555,8 +555,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s FDP%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s FDP%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	onbase[0]->pa(pit->mound->throws);
 	onbase[0]->ab++;
@@ -572,8 +572,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s LDP%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s LDP%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	onbase[0]->pa(pit->mound->throws);
 	onbase[0]->ab++;
@@ -587,8 +587,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s line drive%c%s", onbase[0]->nout(), spc, location);
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s line drive%c%s", onbase[0]->nout(), spc, location);
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -604,8 +604,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s FC%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s FC%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats(1);
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -620,8 +620,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s HG%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s HG%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -636,8 +636,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s RG%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s RG%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -652,8 +652,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s ground out%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s ground out%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -668,8 +668,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s SG%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s SG%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -684,8 +684,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s HF%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s HF%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -700,8 +700,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s PO%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s PO%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -716,8 +716,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s foul PO%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s foul PO%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	rbi();
 	onbase[0]->pa(pit->mound->throws);
@@ -733,8 +733,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s SF%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s SF%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	bat->newstat( onbase[0]->nout(), 4 );
 	rbi();
@@ -749,8 +749,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s Sac%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s Sac%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats(2);
 	bat->newstat( onbase[0]->nout(), 3 );
 	rbi();
@@ -765,8 +765,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s LF%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s LF%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	onbase[0]->pa(pit->mound->throws);
 	onbase[0]->ab++;
@@ -780,8 +780,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s WT%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s WT%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	onbase[0]->pa(pit->mound->throws);
 	onbase[0]->ab++;
@@ -795,8 +795,8 @@ frame::update()
 	if ( !(runchck(baserunning)) )
 	    return(0);
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s fly out%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s fly out%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats();
 	onbase[0]->pa(pit->mound->throws);
 	onbase[0]->ab++;
@@ -821,8 +821,8 @@ frame::update()
 	    return(0);
 	}
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s safe on E%c%s", onbase[0]->nout(), spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s safe on E%c%s", onbase[0]->nout(), spc, location );
+	outbuf( outputstr );
 	runstats(2);
 	pit->errors++;
 	who_stat(0, (int) location[0] - '0');
@@ -850,8 +850,8 @@ frame::update()
 	    return(0);
 	}
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "Error%c%s", spc, location );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "Error%c%s", spc, location );
+	outbuf( outputstr );
 	runstats();
 	pit->errors++;
 	who_stat(0, (int) location[0] - '0');
@@ -876,32 +876,32 @@ frame::update()
 	    return(0);
 	}
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s can't get jump. ", onbase[i]->nout() );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s can't get jump. ", onbase[i]->nout() );
+	outbuf( outputstr );
 	frameput();
 	return(1);
     }
     else if ( !(strcmp(event,"fa")) ) {
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "%s fatigues. ", pit->mound->nout() );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s fatigues. ", pit->mound->nout() );
+	outbuf( outputstr );
 	frameput();
 	return(1);
     }
     else if ( !(strcmp(event,"ic")) ) {
 	putcmd();
-	snprintf( inputstr, MAX_INPUT, "Infield in @ 1b/3b. " );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "Infield in @ 1b/3b. " );
+	outbuf( outputstr );
 	frameput();
 	return(1);
     }
     else if ( !(strcmp(event,"in")) ) {
 	if ( strlen(location) > 0 )
-	    snprintf( inputstr, MAX_INPUT, "Infield in @ %s. ", location );
+	    snprintf( outputstr, MAX_INPUT, "Infield in @ %s. ", location );
 	else
-	    snprintf( inputstr, MAX_INPUT, "Infield in. " );
+	    snprintf( outputstr, MAX_INPUT, "Infield in. " );
 	putcmd();
-	outbuf( inputstr );
+	outbuf( outputstr );
 	frameput();
 	return(1);
     }
@@ -939,8 +939,8 @@ frame::update()
 		}
 	    }
 
-	    snprintf( inputstr, PATH_MAX, "%s%s", filename, out_ext );
-	    undofp = fopen( inputstr, "r" );
+	    snprintf( outputstr, PATH_MAX, "%s%s", filename, out_ext );
+	    undofp = fopen( outputstr, "r" );
 	    openfile( filename );
 	    output = fopen( NULLDEV , "w" );
 	    input = undofp;
@@ -987,9 +987,9 @@ frame::update()
 	if ( errflag && runs )
 	    pit->unearned(inning);
 
-	snprintf( inputstr, MAX_INPUT, "%s %d %s %d\n",
+	snprintf( outputstr, MAX_INPUT, "%s %d %s %d\n",
 		ibl[0]->nout(), ibl[0]->score, ibl[1]->nout(), ibl[1]->score );
-	outbuf( inputstr, "\n" );
+	outbuf( outputstr, "\n" );
 	outbuf( "", "\n" );
 
 	linescore[atbat][inning - 1] = runs;
@@ -1007,8 +1007,8 @@ frame::update()
 	    onbase[i] = NULL;
 	if ( !(atbat) )
 	    inning++;
-	snprintf( inputstr, MAX_INPUT, "%s %d: ", ibl[atbat]->nout(), inning );
-	outbuf( inputstr );
+	snprintf( outputstr, MAX_INPUT, "%s %d: ", ibl[atbat]->nout(), inning );
+	outbuf( outputstr );
 	pit = bat;
 	bat = ibl[atbat];
 //	runadv();

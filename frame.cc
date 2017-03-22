@@ -29,6 +29,7 @@ frame::frame(team *away, team *home)
     baserunning = NULL;
     comment = NULL;
     error = NULL;
+    outputstr = NULL;
 
     runners = new queue;
 
@@ -48,7 +49,7 @@ frame::frame(char *str)
     baserunning = (char*) calloc(MAX_INPUT, sizeof(char));
     comment = (char*) calloc(MAX_INPUT, sizeof(char));
     error = (char*) calloc(LINEWIDTH, sizeof(char));
-    inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
+    outputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
     // extra inning, grow the linescore
     if ( inning > linesize ) {
@@ -908,5 +909,6 @@ frame::~frame()
 	free(baserunning);
 	free(comment);
 	free(error);
+	free(outputstr);
     }
 }
