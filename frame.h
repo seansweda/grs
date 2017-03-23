@@ -39,8 +39,7 @@ private :
 					// returns 1 if it is a legal command
 public :
 
-	static int undo,
-		   cont,
+	static int cont,
 		   outs,
 		   atbat,
 		   inning,
@@ -54,12 +53,14 @@ public :
 	frame( char* );
 	frame( team*, team* );		// First constructor called
 	int decode();			// decode the parsed command line
+	int validate( const char* );	// valid command?
 	int update();			// update the stats
 	void help( char* );		// Prints helpful? messages
 	void frameput();		// Outputs info useful to user
 	void who_stat( int, int );	// add stat to player @fielding pos
 	int outsonplay( char* );	// how many outs in this play
 	int batterout( char* );		// did the batter make an out?
+	int get_spot();			// prompt user for spot in order
 	char *outputstr;
 
 	static void print_linescore( FILE* );

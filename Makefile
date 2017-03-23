@@ -20,8 +20,8 @@ tarball:
 	tar cf grs.tar README CHANGES TODO Makefile *.h *.cc getopt grscat
 	gzip grs.tar
 
-grs: Makefile main.o frame.o update.o queue.o team.o player.o pitcher.o
-	$(CPP) $(CFLAGS) $(LDFLAGS) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o
+grs: Makefile main.o frame.o update.o queue.o team.o player.o pitcher.o list.o
+	$(CPP) $(CFLAGS) $(LDFLAGS) -o grs main.o frame.o update.o queue.o team.o player.o pitcher.o list.o
 
 main.o: Makefile main.cc frame.h team.h player.h pitcher.h config.h $(GIT_COMMIT)
 	$(CPP) $(CFLAGS) -c main.cc
@@ -43,6 +43,9 @@ player.o: Makefile player.cc player.h config.h
 
 pitcher.o: Makefile pitcher.cc pitcher.h config.h
 	$(CPP) $(CFLAGS) -c pitcher.cc
+
+list.o: Makefile list.cc list.h
+	$(CPP) $(CFLAGS) -c list.cc
 
 getopt.o: Makefile getopt/getopt.c getopt/getopt.h
 	$(CC) $(CFLAGS) -c getopt/getopt.c

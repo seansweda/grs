@@ -16,6 +16,7 @@
 #include "player.h"
 #include "team.h"
 #include "frame.h"
+#include "list.h"
 #include "version.h"
 
 // variables used outside of main()
@@ -28,12 +29,13 @@ FILE	*pbpfp,		// play-by-play output file
 FILE *output = stdout;	// where to direct output (default = stdout)
 FILE *input = stdin;	// where to read in data
 
+list* cmd = new list;	// in-memory .cmd file
+
 char filename[PATH_MAX];	// prefix for all output files
 team *ibl[2];			// pointers to the two teams
 
 // instantiate static objects
-int frame::undo,
-    frame::cont,
+int frame::cont,
     frame::outs,
     frame::atbat,
     frame::inning,
@@ -128,6 +130,7 @@ setup()
     fgets( inputstr, MAX_INPUT, input );
     sanitize( &inputstr, MAX_INPUT, '\n' );
     fprintf(output, "\n");
+    cmd->add( inputstr );
     fprintf(cmdfp, "%s\n", inputstr);
     fflush( cmdfp );
     fprintf(pbpfp, "grs version %s", VER);
@@ -148,18 +151,21 @@ setup()
     f0->outbuf( inputstr );
 
     delete(f0);
+    free( inputstr );
 }
 
     void
 play()
 {
     frame *f0;			// f0 is the current frame to be decoded
-    frame::cont = 1;		// obviously we want to execute at least once!
+    int status;
 
     char *inputstr;
     inputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
-    while (frame::cont) {
+    int loop = 1;
+    while ( loop && frame::cont ) {
+
 #ifdef DEBUG
 #if DEBUG == 2
 	ibl[0]->box_score(stderr);
@@ -170,32 +176,43 @@ play()
 	fgets( inputstr, MAX_INPUT, input );
 	sanitize( &inputstr, MAX_INPUT, '\n' );
 
-#ifdef DEBUG
-	if (output != stdout)
-	    fprintf( stderr, "%s", inputstr );
-#endif
 	f0 = new frame( inputstr );
 
-	switch ( f0->decode() ) {
-	    case 1:
-		switch ( f0->update() ) {
-		    case 0:
-			f0->help(inputstr);
-		    default:
-			break;
-		}
-		break;
-	    default:
-		f0->help(inputstr);
-		break;
+#ifdef DEBUG
+	fprintf( stderr, "play:(%d) %s", f0->count, inputstr );
+#endif
+
+	status = f0->decode();
+	// decode:
+	// 0 = invalid command
+	// 1 = valid command
+	if ( status ) {
+
+	    status = f0->update();
+	    // update:
+	    // 0 = error
+	    // 1 = ok
+	    // 2 = EOF
 	}
-	delete(f0);
+
+	if ( status == 0 ) {
+	    f0->help( inputstr );
+	}
 
 #ifdef DEBUG
     frame::runners->dump();
-    fprintf( stderr, "\n" );
+    cmd->dump();
+    fprintf( stderr, "play:(%d) %s", f0->count, inputstr );
 #endif
+
+	delete( f0 );
+	if ( status == 2 )
+	    // EOF input
+	    break;
+    // end while loop
     }
+
+    free( inputstr );
 }
 
     void

@@ -20,10 +20,9 @@ frame::update()
 #endif
 
     if ( (input != stdin) && feof(input) ) {
-	cont = 0;
 	output = stdout;
 	frameput();
-	return(1);
+	return(2);
     }
 
     if ( event[0] == '\0' ) {
@@ -43,18 +42,12 @@ frame::update()
     }
     else if ( !(strcmp( event, "pr" )) ) {
 	ibl[atbat]->print_lineup();
-	while ( outputstr[0] < '0' || outputstr[0] > '9' ) {
-	    fprintf( output, "\nEnter batting order of player: " );
-	    memset( outputstr, '\0', MAX_INPUT );
-	    fgets( outputstr, MAX_INPUT, input );
-	    sanitize( &outputstr, POSLEN );
-	    // fprintf(output,"\n");
-	}
+	int spot = get_spot();
 	for (i = 1; i < 4; i++ ) {
-	    if ( onbase[i] == ibl[atbat]->findord(outputstr[0] - '0') ) {
+	    if ( onbase[i] == ibl[atbat]->findord( spot ) ) {
 		putcmd();
-		ibl[atbat]->insert( (int) outputstr[0] - '0', &comment, "pr" );
-		onbase[i] = ibl[atbat]->findord(outputstr[0] - '0');
+		ibl[atbat]->insert( spot, &comment, "pr" );
+		onbase[i] = ibl[atbat]->findord( spot );
 		runadv();
 		frameput();
 		snprintf( outputstr, MAX_INPUT, "%s ", comment );
@@ -86,19 +79,13 @@ frame::update()
     }
     else if ( !(strcmp( event, "dr" )) || !(strcmp( event, "dc" )) ) {
 	pit->print_lineup();
-	while ( outputstr[0] < '0' || outputstr[0] > '9' ) {
-	    fprintf( output, "\nEnter batting order of player: " );
-	    memset( outputstr, '\0', MAX_INPUT );
-	    fgets( outputstr, MAX_INPUT, input );
-	    sanitize( &outputstr, POSLEN );
-	    // fprintf(output,"\n");
-	}
-	if ( outputstr[0] > '0' ) {
+	int spot = get_spot();
+	if ( spot > 0 ) {
 	    putcmd();
 	    if ( !(strcmp( event, "dr" )) )
-		pit->insert( ( outputstr[0] -'0' ), &comment );
+		pit->insert( spot, &comment );
 	    else
-		pit->pos_change( ( outputstr[0] - '0' ), &comment );
+		pit->pos_change( spot, &comment );
 	}
 	runadv();
 	frameput();
@@ -121,7 +108,6 @@ frame::update()
 	print_linescore(stderr);
 #endif
 	putcmd();
-	cont = 0;
 	if ( errflag && runs )
 	    pit->unearned(inning);
 
@@ -139,6 +125,8 @@ frame::update()
 	ibl[0]->decisions();
 	ibl[1]->decisions();
 
+	// game over
+	cont = 0;
 	return(1);
     }
     else if ( !(strcmp( event, "cm" )) ) {
@@ -148,6 +136,7 @@ frame::update()
 	fgets( outputstr, MAX_INPUT, input );
 	sanitize( &outputstr, MAX_INPUT, '\n' );
 	snprintf( comment, MAX_INPUT, "%s", outputstr );
+	cmd->add( comment );
 	fprintf( cmdfp, "%s\n", comment );
 	fflush( cmdfp );
 	frameput();
@@ -905,74 +894,6 @@ frame::update()
 	frameput();
 	return(1);
     }
-    else if ( !(strcmp( event, "un" )) ) {
-	char in_ext[5], out_ext[5];
-	int times = 1;
-
-	if ( count == 1 ) {
-	    count--;
-	    snprintf( error, LINEWIDTH, "%s\n", "nothing to undo!" );
-	    return(0);
-	}
-	else if ( undo ) {
-	    cont = 0;
-	    return(1);
-	}
-	else {
-	    undo = 1;
-	    fclose( pbpfp );
-	    fclose( stsfp );
-	    fclose( cmdfp );
-
-	    cleanup();
-
-	    snprintf( in_ext, 5, "%s", ".cmd" );
-	    snprintf( out_ext, 5, ".un%d", times );
-
-	    while ( !(backup( in_ext, out_ext )) ) {
-		snprintf( in_ext, 5, "%s", out_ext );
-		snprintf( out_ext, 5, ".un%d", ++times );
-
-		if ( times > 9 ) {
-		    fprintf( stderr, "undo may be looping, bailing!\n" );
-		    exit(1);
-		}
-	    }
-
-	    snprintf( outputstr, PATH_MAX, "%s%s", filename, out_ext );
-	    undofp = fopen( outputstr, "r" );
-	    openfile( filename );
-	    output = fopen( NULLDEV , "w" );
-	    input = undofp;
-#ifdef DEBUG
-	    fprintf( stderr, "setup 0\n" );
-#endif
-	    setup(0);
-#ifdef DEBUG
-	    fprintf( stderr, "setup 1\n" );
-#endif
-	    setup(1);
-#ifdef DEBUG
-	    fprintf( stderr, "setup 2\n" );
-#endif
-	    setup();
-#ifdef DEBUG
-	    fprintf( stderr, "reloading\n" );
-#endif
-	    play();
-	    output = stdout;
-	    input = stdin;
-	    undo = 0;
-	    cont = 1;
-	    count--;
-#ifdef DEBUG
-	    fprintf( stderr, "%d %d %d %d %d %d %d %d\n",
-		undo, cont, outs, atbat, inning, runs, linesize, errflag );
-#endif
-	    return(2);		// we already deleted the frame pointer
-				// so return 2
-	}
-    }
     else if ( !(strcmp( event, "en" )) ) {
 #ifdef DEBUG
 	print_linescore(stderr);
@@ -1016,71 +937,87 @@ frame::update()
 	frameput();
 	return(1);
     }
+    else if ( !(strcmp( event, "un" )) ) {
+	if ( count == 0 ) {
+	    snprintf( error, LINEWIDTH, "%s\n", "nothing to undo!" );
+	    return( 0 );
+	}
+
+	fclose( pbpfp );
+	fclose( stsfp );
+	fclose( cmdfp );
+
+	cmd->end();
+	snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
+	sanitize( &outputstr, MAX_INPUT );
+	cmd->pop();
+	count--;
+	while ( validate( outputstr ) == 0 ||
+		strlen( cmd->peek() ) == 1 ||
+		strcmp( cmd->peek(), "cm" ) == 0 ) {
+	    snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
+	    sanitize( &outputstr, MAX_INPUT );
+	    cmd->pop();
+	    count--;
+	}
+
+	// diag
+	// cmd->dump();
+
+	list *old = cmd;
+	cmd = new list;
+	cleanup();
+
+	// write undo file
+	snprintf( outputstr, PATH_MAX, "%s.un1", filename );
+	if ( (undofp = fopen( outputstr, "w+" )) == NULL ) {
+	    fprintf( stderr, "fatal error: could write %s\n", outputstr );
+	    exit( 1 );
+	}
+	old->start();
+	while ( strlen( old->peek() ) > 0 ) {
+	    fprintf( undofp, "%s\n", old->peek() );
+	    old->next();
+	}
+	fclose( undofp );
+	delete( old );
+
+	// read from undo file
+	if ( (undofp = fopen( outputstr, "r" )) == NULL ) {
+	    fprintf( stderr, "fatal error: could read %s\n", outputstr );
+	    exit( 1 );
+	}
+	openfile( filename );
+	input = undofp;
+	output = fopen( NULLDEV , "w" );
+
+#ifdef DEBUG
+	fprintf( stderr, "setup 0\n" );
+#endif
+	setup(0);
+#ifdef DEBUG
+	fprintf( stderr, "setup 1\n" );
+#endif
+	setup(1);
+#ifdef DEBUG
+	fprintf( stderr, "setup 2\n" );
+#endif
+	setup();
+#ifdef DEBUG
+	fprintf( stderr, "reloading\n" );
+#endif
+	play();
+	output = stdout;
+	input = stdin;
+#ifdef DEBUG
+	fprintf( stderr, "%d %d %d %d %d %d %d %d\n",
+	    count, cont, outs, atbat, inning, runs, linesize, errflag );
+#endif
+	return(1);
+    }
+    // final iteration of if(strcmp) block, no match
     else
 	return(0);
-}
-
-    int
-frame::backup( char *in_ext, char *out_ext )
-{
-    int result;
-    size_t cmdlen;
-    frame *test;
-
-    char *filestr, *currstr, *nextstr;
-    filestr = (char*) calloc(PATH_MAX, sizeof(char));
-    currstr = (char*) calloc(MAX_INPUT, sizeof(char));
-    nextstr = (char*) calloc(MAX_INPUT, sizeof(char));
-
-#ifdef DEBUG_UNDO
-    fprintf( stderr, "backup(%s):\n", filestr );
-#endif
-    snprintf( filestr, PATH_MAX, "%s%s", filename, out_ext );
-    if ( ( undofp = fopen(filestr,"w") ) == NULL ) {
-	fprintf( stderr, "fatal error - can't open undo file\n" );
-	exit(1);
-    }
-    snprintf( filestr, PATH_MAX, "%s%s", filename, in_ext );
-    if ( ( cmdfp = fopen(filestr,"r") ) == NULL ) {
-	fprintf( stderr, "fatal error - can't open cmd file\n" );
-	exit(1);
-    }
-
-    memset( currstr, '\0', MAX_INPUT );
-    fgets( currstr, MAX_INPUT, cmdfp );
-    sanitize( &currstr, MAX_INPUT, '\n' );
-
-    memset( nextstr, '\0', MAX_INPUT );
-    fgets( nextstr, MAX_INPUT, cmdfp );
-    sanitize( &nextstr, MAX_INPUT, '\n' );
-
-    while ( !(feof(cmdfp)) ) {
-	cmdlen = strlen(currstr);
-#ifdef DEBUG_UNDO
-	fprintf( stderr, "1: (%d) %s\n2: %s\n",
-		(int)cmdlen, currstr, nextstr);
-#endif
-	fprintf( undofp, "%s\n", currstr );
-	snprintf( currstr, MAX_INPUT, "%s", nextstr );
-
-	memset( nextstr, '\0', MAX_INPUT );
-	fgets( nextstr, MAX_INPUT, cmdfp );
-	sanitize( &nextstr, MAX_INPUT, '\n' );
-    }
-    fclose( undofp );
-    fclose( cmdfp );
-
-    // on dc/dr skip decode, fail early
-    if ( cmdlen == 2 ) {
-	return(0);
-    }
-    test = new frame(currstr);
-    result = test->decode();
-#ifdef DEBUG_UNDO
-    fprintf( stderr, "decode(%s) = %d\n", currstr, result );
-#endif
-    delete(test);
-    return(result);
 }
 
     void
@@ -1101,8 +1038,11 @@ frame::putcmd()
 	snprintf( output + o, MAX_INPUT - o, " %s", baserunning );
     }
 
+    cmd->add( output );
     fprintf( cmdfp, "%s\n", output );
     fflush( cmdfp );
+    // increment count when we write to cmd file
+    count++;
     free( output );
 }
 
