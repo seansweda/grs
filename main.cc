@@ -137,7 +137,7 @@ setup()
 #ifdef GIT
     fprintf(pbpfp, " (%s)", GIT);
 #endif
-    fprintf(pbpfp, "\n");
+    fprintf(pbpfp, "\n\n");
     fprintf(pbpfp, "%s at %s \n", ibl[0]->nout(), ibl[1]->nout());
     fprintf(pbpfp, "%s\n", inputstr);
     fprintf(pbpfp, "Starting pitchers - %s for %s, and %s for %s\n",

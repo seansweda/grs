@@ -661,18 +661,25 @@ frame::outbuf( const char *str, const char *punc )
     char *ptr;
 
     if ( *punc == '\n' ) {
-	snprintf( buffer + strlen(buffer), 2, "%s", punc );
-	fputs( buffer, pbpfp );
+	if ( strlen( buffer ) > 0 ) {
+	    snprintf( buffer + strlen(buffer), 2, "%s", punc );
+	    fputs( buffer, pbpfp );
+	}
 	fputs( str, pbpfp );
-	*buffer = (char) 0;
+	memset( buffer, '\0', MAX_INPUT * 2 );
+    }
+    else if ( *punc == '.' && strlen(buffer) > LINEWIDTH - 10 ) {
+	snprintf( tempstr, MAX_INPUT * 2, "%s%c\n", buffer, punc[0] );
+	fputs( tempstr, pbpfp );
+	snprintf( buffer, MAX_INPUT * 2, "%s", str );
     }
     else {
 	snprintf( bigbuf, MAX_INPUT * 2, "%s%s%s", buffer, punc, str );
 
-	while ( strlen(bigbuf) > LINEWIDTH ) {
+	while ( strlen( bigbuf ) > LINEWIDTH - 5 ) {
 	    snprintf( tempstr, MAX_INPUT * 2, "%s", bigbuf );
 
-	    c = LINEWIDTH - 10;
+	    c = LINEWIDTH - 15;
 	    ptr = tempstr + c;
 	    while ( !( isspace(*ptr) ) ) {
 		c++;
@@ -682,7 +689,7 @@ frame::outbuf( const char *str, const char *punc )
 	    ptr++;
 	    tempstr[c] = '\0';
 
-	    snprintf( buffer, LINEWIDTH, "%s\n", tempstr );
+	    snprintf( buffer, MAX_INPUT * 2, "%s\n", tempstr );
 	    fputs( buffer, pbpfp );
 	    snprintf( bigbuf, MAX_INPUT * 2, "%s", ptr );
 	}

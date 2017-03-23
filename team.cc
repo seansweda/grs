@@ -106,7 +106,7 @@ team::pos_change( int spot, char **comment )
     while ( oldpl->next && oldpl->next->ord <= spot )
 	oldpl = oldpl->next;
 
-    fprintf( output, "\nEnter new position for %d: ", spot );
+    fprintf( output, "Enter new position for %d: ", spot );
     memset( pos, '\0', MAX_INPUT );
     fgets( pos, MAX_INPUT, input );
     sanitize( &pos, POSLEN );
@@ -592,7 +592,7 @@ team::print_lineup()
 {
     struct pl_list *newpl;
 
-    fprintf(output,"\nLineup for %s\n",nout());
+    fprintf(output,"Lineup for %s\n",nout());
     newpl=lineup;
     while (newpl) {
 	while (newpl->next && newpl->ord==newpl->next->ord) {
@@ -868,19 +868,24 @@ team::unearned( int inning )
 
     while ( curr ) {
 	if ( curr->head->out + numout >= (inning-1)*3 ) {
-	    fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
-	    memset( inputstr, '\0', MAX_INPUT );
-	    fgets( inputstr, MAX_INPUT, input );
-	    sanitize( &inputstr, MAX_INPUT );
-	    ur = atoi(inputstr);
-
-	    while ( ur < 0 || ur > curr->head->er ) {
-		fprintf( stderr, "Invalid unearned runs total.\n" );
+	    int loop = 1;
+	    while( loop ) {
 		fprintf( output, "Enter unearned runs for %s: ", curr->head->nout() );
 		memset( inputstr, '\0', MAX_INPUT );
 		fgets( inputstr, MAX_INPUT, input );
 		sanitize( &inputstr, MAX_INPUT );
+
+		if ( isalpha( inputstr[0] ) ) {
+		    fprintf( stderr, "Invalid unearned runs total.\n" );
+		    continue;
+		}
 		ur = atoi(inputstr);
+		if ( ur < 0 || ur > curr->head->er ) {
+		    fprintf( stderr, "Invalid unearned runs total.\n" );
+		    continue;
+		}
+		// if we get here it's all good
+		break;
 	    }
 	    numout += curr->head->out;
 	    curr->head->er = curr->head->er-ur;
@@ -894,6 +899,7 @@ team::unearned( int inning )
 
 	curr = curr->next;
     }
+    fprintf( output, "\n" );
     free( inputstr );
 }
 

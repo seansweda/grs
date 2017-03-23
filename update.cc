@@ -64,7 +64,7 @@ frame::update()
 	fprintf( stderr, "batting %d\n", bats );
 #endif
 	if ( (bats < 1) || (bats > 9) )
-	    snprintf( comment, MAX_INPUT, "%s now pitching for %s. ",
+	    snprintf( comment, MAX_INPUT, "%s now pitching for %s.",
 		    pit->mound->nout(), pit->nout() );
 	else {
 	    snprintf( outputstr, MAX_INPUT, "%s %s p",
@@ -114,8 +114,7 @@ frame::update()
 	snprintf( outputstr, MAX_INPUT, "%s %d %s %d\n",
 		ibl[0]->nout(),ibl[0]->score, ibl[1]->nout(),ibl[1]->score );
 	outbuf( outputstr, "\n");
-	outbuf( "", "\n" );
-	outbuf( " " );
+	outbuf( "\n" );
 
 	linescore[atbat][inning-1] = runs;
 	for ( i = 1; i < 4; i++ )
@@ -140,8 +139,12 @@ frame::update()
 	fprintf( cmdfp, "%s\n", comment );
 	fflush( cmdfp );
 	frameput();
-	comment[strlen(comment) - 1] = ' ';
 	outbuf( comment );
+	if ( comment[strlen(outputstr) - 1] == '.' ) {
+	    outbuf( "", " ");
+	} else {
+	    outbuf( "", ". ");
+	}
 	return(1);
     }
     else if ( !(strcmp( event, "so" )) ) {
@@ -911,7 +914,7 @@ frame::update()
 	snprintf( outputstr, MAX_INPUT, "%s %d %s %d\n",
 		ibl[0]->nout(), ibl[0]->score, ibl[1]->nout(), ibl[1]->score );
 	outbuf( outputstr, "\n" );
-	outbuf( "", "\n" );
+	outbuf( "\n" );
 
 	linescore[atbat][inning - 1] = runs;
 	for ( i = 1; i < 4; i++ )
