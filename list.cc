@@ -11,6 +11,7 @@ list::list()
 list::add( char *str )
 {
     node *temp = new node;
+    temp->prev = NULL;
     temp->next = NULL;
     snprintf( temp->cmd, MAX_INPUT, "%s", str );
 
@@ -43,7 +44,13 @@ list::pop()
     if ( this->last ) {
 	node *temp = this->last;
 	this->last = this->last->prev;
-	this->last->next = NULL;
+	if ( this->last ) {
+	    this->last->next = NULL;
+	}
+	else {
+	// empty list
+	    this->first = NULL;
+	}
 	// set cursor to last node
 	this->cursor = this->last;
 	delete( temp );
