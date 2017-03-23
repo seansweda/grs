@@ -270,6 +270,7 @@ frame::update()
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "PB" );
 	outbuf( outputstr );
+	who_stat(1, 2);
 	runstats();
 	runadv();
 	frameput();
