@@ -121,6 +121,7 @@
   <ItemGroup>
     <ClCompile Include="frame.cc" />
     <ClCompile Include="getopt\getopt.c" />
+    <ClCompile Include="list.cc" />
     <ClCompile Include="main.cc">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"git_commit.h"</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"git_commit.h"</ForcedIncludeFiles>
@@ -134,14 +135,17 @@
     <ClCompile Include="update.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="commands.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="extern.h" />
     <ClInclude Include="frame.h" />
     <ClInclude Include="getopt\getopt.h" />
+    <ClInclude Include="list.h" />
     <ClInclude Include="pitcher.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="team.h" />
+    <ClInclude Include="version.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
