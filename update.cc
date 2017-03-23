@@ -953,8 +953,12 @@ frame::update()
 	cmd->pop();
 	count--;
 	while ( validate( outputstr ) == 0 ||
-		strlen( cmd->peek() ) == 1 ||
-		strcmp( cmd->peek(), "cm" ) == 0 ) {
+		// catch 2-line cmds
+		strcmp( cmd->peek(), "ph" ) == 0 ||
+		strcmp( cmd->peek(), "np" ) == 0 ||
+		strcmp( cmd->peek(), "cm" ) == 0 ||
+		// catch 3-line cmds (pr, dr, dc)
+		strlen( cmd->peek() ) == 1 ) {
 	    snprintf( outputstr, MAX_INPUT, "%s", cmd->peek() );
 	    sanitize( &outputstr, MAX_INPUT );
 	    cmd->pop();
