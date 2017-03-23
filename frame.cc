@@ -1,5 +1,6 @@
 #include "frame.h"
 #include "commands.h"
+#include "list.h"
 #include "extern.h"
 
 // Constructor which initializes the static fields
