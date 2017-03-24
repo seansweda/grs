@@ -29,6 +29,7 @@ public :
 	int cs;
 	int pal;
 	int par;
+
 	void hit(int);
 	void sout(FILE*);
 	char *nout();

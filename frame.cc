@@ -548,17 +548,6 @@ frame::runcat( const char *str )
     snprintf( baserunning + b, MAX_INPUT, "%s", str );
 }
 
-    int
-frame::three()
-{
-    if (baserunning[0] == '\0') {
-	snprintf( error, LINEWIDTH, "%s must have baserunning data.", event );
-	return(0);
-    }
-    else
-	return(1);
-}
-
     void
 frame::who_stat( int stat, int who )
 // adds stat to player at fielding position "who"
@@ -783,6 +772,32 @@ frame::get_spot()
 
     free( spot );
     return( val );
+}
+
+    void
+frame::putcmd()
+{
+    size_t o;
+    char *output;
+    output = (char*) calloc(MAX_INPUT, sizeof(char));
+    memset( output, '\0', MAX_INPUT );
+
+    snprintf( output, MAX_INPUT, "%s", event );
+    o = strlen( output );
+    if ( strlen(location) > 0 ) {
+	snprintf( output + o, MAX_INPUT - o, " %s", location );
+	o = strlen( output );
+    }
+    if ( strlen(baserunning) > 0 && strcmp( location, baserunning) ) {
+	snprintf( output + o, MAX_INPUT - o, " %s", baserunning );
+    }
+
+    cmd->add( output );
+    fprintf( cmdfp, "%s\n", output );
+    fflush( cmdfp );
+    // increment count when we write to cmd file
+    count++;
+    free( output );
 }
 
 frame::~frame()

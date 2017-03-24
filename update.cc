@@ -32,7 +32,7 @@ frame::update()
 
     if ( !(strcmp( event, "ph" )) ) {
 	putcmd();
-	ibl[atbat]->insert( bat->what_ord(onbase[0]), &comment, "ph" );
+	ibl[atbat]->insert( bat->findord(onbase[0]), &comment, "ph" );
 	onbase[0]=bat->up();
 	runadv();
 	frameput();
@@ -1027,30 +1027,3 @@ frame::update()
     else
 	return(0);
 }
-
-    void
-frame::putcmd()
-{
-    size_t o;
-    char *output;
-    output = (char*) calloc(MAX_INPUT, sizeof(char));
-    memset( output, '\0', MAX_INPUT );
-
-    snprintf( output, MAX_INPUT, "%s", event );
-    o = strlen( output );
-    if ( strlen(location) > 0 ) {
-	snprintf( output + o, MAX_INPUT - o, " %s", location );
-	o = strlen( output );
-    }
-    if ( strlen(baserunning) > 0 && strcmp( location, baserunning) ) {
-	snprintf( output + o, MAX_INPUT - o, " %s", baserunning );
-    }
-
-    cmd->add( output );
-    fprintf( cmdfp, "%s\n", output );
-    fflush( cmdfp );
-    // increment count when we write to cmd file
-    count++;
-    free( output );
-}
-

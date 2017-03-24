@@ -453,17 +453,6 @@ team::next_up()
     return current->head;
 }
 
-    player*
-team::back_up()
-{
-    if (current->ord != 1)
-	current=findord_pl(current->ord-1);
-    else
-	current=findord_pl(9);
-
-    return current->head;
-}
-
 // Returns the current batter
     player*
 team::up()
@@ -565,6 +554,17 @@ team::new_pit()
 team::nout()
 {
     return(ibl);
+}
+
+    int
+team::findord( player *up )
+{
+   struct pl_list *curr = lineup;
+
+   while (curr->head != up)
+	curr = curr->next;
+
+   return (curr->ord);
 }
 
     player*
@@ -802,18 +802,6 @@ team::posout( int position )
 	return (curr->head->nout());
     else
 	return ( (char*)NULL );
-}
-
-    int
-team::what_ord( player *up )
-{
-
-   struct pl_list *curr = lineup;
-
-   while (curr->head != up)
-	curr = curr->next;
-
-   return (curr->ord);
 }
 
     void

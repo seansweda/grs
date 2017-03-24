@@ -37,3 +37,10 @@ pitcher::hit(int i)
     if (i==4) hr++;
 }
 
+pitcher::~pitcher()
+{
+#ifdef DEBUG
+    fprintf(stderr,"deleted %s\n",this->nout());
+#endif
+}
+
