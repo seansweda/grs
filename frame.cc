@@ -281,23 +281,44 @@ frame::help(char *str)
 }
 
     int
-frame::runcheck(char *runstr)
-// Checks baserunning, removes double occurances.
+frame::base( const char c )
+{
+    switch( c ) {
+	case 'o':
+	    return 0;
+	case 'h':
+	    return 4;
+	case '1':
+	    return 1;
+	case '2':
+	    return 2;
+	case '3':
+	    return 3;
+	default:
+	    return 0;
+    }
+}
+
+    int
+frame::runcheck(char *runstr, int copy)
+// Checks baserunning, removes double occurances (first one wins).
+// copy 0 = just check
+// copy 1 = rewrite (default)
 {
     char *str, *temptr, *errptr;
-    int copy = 1, retval = 1;
-    int done[4];
 
-    for ( int j=0; j<=3; j++ )
-       done[j] = 0;
+    // -1       = not done
+    //  0       = out
+    //  1,2,3,4 = base advanced
+    int dest[4] = { -1, -1, -1, -1 };
 
     char temp[MAX_INPUT];
+    memset( temp, '\0', MAX_INPUT );
     char errstr[MAX_INPUT];
+    memset( errstr, '\0', MAX_INPUT );
 
     temptr = temp;
-    *temptr = '\0';
     errptr = errstr;
-    *errptr = '\0';
 
 #ifdef DEBUG
     fprintf( stderr, "pre runcheck: %s\n", runstr );
@@ -307,129 +328,99 @@ frame::runcheck(char *runstr)
     while ( *str ) {
 	switch ( *str ) {
 	    case 'b':
-		copy = 1;
-		if ( !done[0] ) {
+		if ( dest[0] == -1 ) {
 		    switch ( *(str+1) ) {
 			case 'o':
 			case 'h':
 			case '1':
 			case '2':
 			case '3':
+			    dest[0] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( copy ) {
-			done[0] = 1;
+		    if ( dest[0] >= 0 ) {
 			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-		    }
-		    else {
-			snprintf( errptr, 3, "%s", str );
-			errptr += 2;
 		    }
 		}
 		break;
 	    case '1':
-		copy = 1;
-		if ( !done[1] ) {
+		if ( !(onbase[1]) ) {
+		    snprintf( errptr, 3, "%s", str );
+		    errptr += 2;
+		}
+		else if ( dest[1] == -1 ) {
 		    switch ( *(str+1) ) {
-			case '1':
-			    copy = 0;
-			    done[1] = 1;
-			    break;
 			case 'o':
 			case 'h':
+			case '1':
 			case '2':
 			case '3':
+			    dest[1] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( !(onbase[1]) ) {
-			copy = 0;
-			retval = 0;
-		    }
-		    if ( copy ) {
-			done[1] = 1;
+		    if ( dest[1] >= 0 ) {
 			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-		    }
-		    else if ( !done[1] ) {
-			snprintf( errptr, 3, "%s", str );
-			errptr += 2;
 		    }
 		}
 		break;
 	    case '2':
-		copy = 1;
-		if ( !done[2] ) {
+		if ( !(onbase[2]) ) {
+		    snprintf( errptr, 3, "%s", str );
+		    errptr += 2;
+		}
+		else if ( dest[2] == -1 ) {
 		    switch ( *(str+1) ) {
-			case '2':
-			    copy = 0;
-			    done[2] = 1;
-			    break;
 			case 'o':
 			case 'h':
+			case '2':
 			case '3':
+			    dest[2] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( !(onbase[2]) ) {
-			copy = 0;
-			retval = 0;
-		    }
-		    if ( copy ) {
-			done[2] = 1;
+		    if ( dest[2] >= 0 ) {
 			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-		    }
-		    else if ( !done[2] ) {
-			snprintf( errptr, 3, "%s", str );
-			errptr += 2;
 		    }
 		}
 		break;
 	    case '3':
-		copy = 1;
-		if ( !done[3] ) {
+		if ( !(onbase[3]) ) {
+		    snprintf( errptr, 3, "%s", str );
+		    errptr += 3;
+		}
+		else if ( dest[3] == -1 ) {
 		    switch ( *(str+1) ) {
-			case '3':
-			    copy = 0;
-			    done[3] = 1;
-			    break;
 			case 'o':
 			case 'h':
+			case '3':
+			    dest[3] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( !(onbase[3]) ) {
-			copy = 0;
-			retval = 0;
-		    }
-		    if ( copy ) {
-			done[3] = 1;
+		    if ( dest[3] >= 0 ) {
 			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-		    }
-		    else if ( !done[3] ) {
-			snprintf( errptr, 3, "%s", str );
-			errptr += 2;
 		    }
 		}
 		break;
 	    default:
-		retval = 0;
 		snprintf( errptr, 3, "%s", str );
 		errptr += 2;
 		break;
@@ -437,21 +428,25 @@ frame::runcheck(char *runstr)
 	str += 2;
     }
 
-    if (retval)
-	// cleaned up baserunning string
-	snprintf( runstr, MAX_INPUT, "%s", temp );
-
-	if ( outsonplay(runstr) + outs > 3 ) {
-	    snprintf( error, LINEWIDTH, "Too many outs on play.\n" );
-	    retval = 0;
-	}
-    else
-	snprintf( error, LINEWIDTH, "Baserunning error: %s\n", errstr );
+    if ( outsonplay(runstr) + outs > 3 ) {
+	snprintf( errstr, MAX_INPUT, "%s [too many outs on play]", runstr );
+    }
 
 #ifdef DEBUG
-    fprintf( stderr, "post runcheck: %s\n", runstr );
+    fprintf( stderr, "post runcheck: %s (%s)\n", temp, errstr );
 #endif
-    return(retval);
+
+    if ( strlen( errstr ) == 0 ) {
+	if ( copy == 1 ) {
+	    // copy cleaned up baserunning string
+	    snprintf( runstr, MAX_INPUT, "%s", temp );
+	}
+	return( 1 );
+    }
+    else {
+	snprintf( error, LINEWIDTH, "Baserunning error: %s\n", errstr );
+	return( 0 );
+    }
 }
 
     void
@@ -618,13 +613,16 @@ frame::decode()
 
     int result;
 
-    if ( runcheck(location) ) {		// Baserunning in location field?
+    // Baserunning in location field?
+    if ( runcheck( location, 0 ) ) {
 	snprintf( baserunning, MAX_INPUT, "%s", location );
 	memset( location, '\0', MAX_INPUT );
     }
+    /*
     else {
-	memset( error, '\0', LINEWIDTH );	// clean up after runcheck
+	memset( error, '\0', LINEWIDTH );// clean up after runcheck
     }
+    */
 
     result = validate( event );
 
