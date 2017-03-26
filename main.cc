@@ -179,7 +179,7 @@ play()
 	f0 = new frame( inputstr );
 
 #ifdef DEBUG
-	fprintf( stderr, "play:(%d) %s", f0->count, inputstr );
+	fprintf( stderr, "play:(%d) %s\n", f0->count, inputstr );
 #endif
 
 	status = f0->decode();
@@ -202,7 +202,7 @@ play()
 #ifdef DEBUG
     frame::runners->dump();
     cmd->dump();
-    fprintf( stderr, "play:(%d) %s", f0->count, inputstr );
+    fprintf( stderr, "play:(%d) %s\n", f0->count, inputstr );
 #endif
 
 	delete( f0 );
