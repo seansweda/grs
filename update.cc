@@ -149,7 +149,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "so" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s K%c%s", onbase[0]->nout(), spc, location );
@@ -166,7 +166,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "kd" ))) {
 	runcat(1);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s dropped K%c%s", onbase[0]->nout(), spc, location);
@@ -183,7 +183,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "bb" )) ) {
 	runcat(-1);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s BB", onbase[0]->nout() );
@@ -200,7 +200,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "iw" )) ) {
 	runcat(-1);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s IBB", onbase[0]->nout() );
@@ -220,7 +220,7 @@ frame::update()
 	errflag = 1;
 	runcat(-1);
 	putcmd();
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	snprintf( outputstr, MAX_INPUT, "%s CI", onbase[0]->nout() );
 	outbuf( outputstr );
@@ -235,7 +235,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "hp" )) || !(strcmp( event, "hb" )) ) {
 	runcat(-1);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s HBP", onbase[0]->nout() );
@@ -251,7 +251,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "wp" )) ) {
 	runcat(-2);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "WP" );
@@ -265,7 +265,7 @@ frame::update()
     else if ( !(strcmp( event, "pb" )) ) {
 	errflag = 1;
 	runcat(-2);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "PB" );
@@ -278,7 +278,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "bk" )) ) {
 	runcat(-2);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "Balk" );
@@ -292,7 +292,7 @@ frame::update()
     else if ( !(strcmp( event, "th" )) ) {
 	if ( !(*baserunning) )
 	    runcat(-2);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "On throw" );
@@ -305,7 +305,7 @@ frame::update()
     else if ( !(strcmp( event, "di" )) ) {
 	if ( !(*baserunning) )
 	    runcat(-2);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "On defensive indifference" );
@@ -318,7 +318,7 @@ frame::update()
     else if ( !(strcmp( event, "sb" )) ) {
 	if ( !(*baserunning) )
 	    runcat(-4);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "SB" );
@@ -334,7 +334,7 @@ frame::update()
     else if ( !(strcmp( event, "cs" )) ) {
 	if ( !(*baserunning) )
 	    runcat(-3);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "CS%c%s", spc, location);
@@ -351,7 +351,7 @@ frame::update()
 	if ( !(*baserunning) )
 	    runcat(-3);
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s K, CS%c%s", onbase[0]->nout(), spc, location );
@@ -373,7 +373,7 @@ frame::update()
 	if ( !(*baserunning) )
 	    runcat(-4);
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s K, SB%c%s", onbase[0]->nout(),spc,location );
@@ -394,7 +394,7 @@ frame::update()
     else if ( !(strcmp( event, "pk" )) ) {
 	if ( !(*baserunning) )
 	    runcat(-3);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "Pickoff%c%s", spc, location );
@@ -407,7 +407,7 @@ frame::update()
     else if ( !(strcmp( event, "oa" )) ) {
 	if ( !(*baserunning) )
 	    runcat(-3);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "Trying to advance%c%s", spc, location );
@@ -420,7 +420,7 @@ frame::update()
     else if ( !(strcmp( event, "ri" )) ) {
 	if ( !(*baserunning) )
 	    runcat(-3);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "On baserunner interference%c%s", spc, location );
@@ -432,7 +432,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "1b" )) ) {
 	runcat(1);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s 1b%c%s", onbase[0]->nout(), spc, location );
@@ -450,7 +450,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "2b" )) ) {
 	runcat(2);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s 2b%c%s", onbase[0]->nout(), spc, location );
@@ -469,7 +469,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "3b" )) ) {
 	runcat(3);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s 3b%c%s", onbase[0]->nout(), spc, location );
@@ -488,7 +488,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "hr" )) ) {
 	runcat(4);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s HR%c%s", onbase[0]->nout(), spc, location );
@@ -510,7 +510,7 @@ frame::update()
 	if ( !(*baserunning) )
 	    runcat( "2o1o" );
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s triple play%c%s", onbase[0]->nout(), spc, location );
@@ -527,7 +527,7 @@ frame::update()
 	if ( !(*baserunning) )
 	    runcat( "1o" );
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s GDP%c%s", onbase[0]->nout(), spc, location );
@@ -545,7 +545,7 @@ frame::update()
 	if ( !(*baserunning) )
 	    runcat( "1o" );
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s FDP%c%s", onbase[0]->nout(), spc, location );
@@ -562,7 +562,7 @@ frame::update()
 	if ( !(*baserunning) )
 	    runcat( "1o" );
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s LDP%c%s", onbase[0]->nout(), spc, location );
@@ -577,7 +577,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "lo" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s line drive%c%s", onbase[0]->nout(), spc, location);
@@ -594,7 +594,7 @@ frame::update()
     else if ( !(strcmp( event, "fc" )) ) {
 	if ( !(*baserunning) )
 	    runcat( "b11o" );
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s FC%c%s", onbase[0]->nout(), spc, location );
@@ -610,7 +610,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "hg" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s HG%c%s", onbase[0]->nout(), spc, location );
@@ -626,7 +626,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "rg" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s RG%c%s", onbase[0]->nout(), spc, location );
@@ -642,7 +642,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "go" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s ground out%c%s", onbase[0]->nout(), spc, location );
@@ -658,7 +658,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "sg" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s SG%c%s", onbase[0]->nout(), spc, location );
@@ -674,7 +674,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "hf" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s HF%c%s", onbase[0]->nout(), spc, location );
@@ -690,7 +690,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "po" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s PO%c%s", onbase[0]->nout(), spc, location );
@@ -706,7 +706,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "fp") ) || !(strcmp( event, "pf" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s foul PO%c%s", onbase[0]->nout(), spc, location );
@@ -723,7 +723,7 @@ frame::update()
     else if ( !(strcmp( event, "sf" )) ) {
 	runcat( "3h" );
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s SF%c%s", onbase[0]->nout(), spc, location );
@@ -739,7 +739,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "sh" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s Sac%c%s", onbase[0]->nout(), spc, location );
@@ -755,7 +755,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "lf" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s LF%c%s", onbase[0]->nout(), spc, location );
@@ -770,7 +770,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "df" )) || !(strcmp( event, "wt" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s WT%c%s", onbase[0]->nout(), spc, location );
@@ -785,7 +785,7 @@ frame::update()
     }
     else if ( !(strcmp( event, "fo" )) ) {
 	runcat(0);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	putcmd();
 	snprintf( outputstr, MAX_INPUT, "%s fly out%c%s", onbase[0]->nout(), spc, location );
@@ -801,7 +801,7 @@ frame::update()
     else if ( !(strcmp( event, "er" )) ) {
 	errflag = 1;
 	runcat(1);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	if ( strlen(location) > 0 ) {
 	    if ( location[0] < '1' || location[0] > '9' ) {
@@ -830,7 +830,7 @@ frame::update()
 	errflag = 1;
 	if ( !(*baserunning) )
 	    runcat(-2);
-	if ( !(runchck(baserunning)) )
+	if ( !(runcheck(baserunning)) )
 	    return(0);
 	if ( strlen(location) > 0 ) {
 	    if ( location[0] < '1' || location[0] > '9' ) {

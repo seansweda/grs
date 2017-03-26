@@ -27,7 +27,7 @@ private :
 	void runstats( int fc = 0 );	// Does runners stats and pbp
 	void rbi();			// Does RBIs
 
-	int runchck( char* );		// Parses baserunner advances
+	int runcheck( char* );		// Parses baserunner advances
 	void runcat( int );		// Does default baserunner advances
 	void runcat( const char* );	// append to baserunning
 

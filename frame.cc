@@ -114,7 +114,7 @@ frame::runadv()
 			newbase[i] = NULL;
 		    break;
 		default :
-		    // if we get here, runchck didn't do its job!
+		    // if we get here, runcheck didn't do its job!
 		    snprintf( error, LINEWIDTH, "Fatal baserunning error: %s\n", baserunning );
 		    exit(1);
 	    }
@@ -281,7 +281,7 @@ frame::help(char *str)
 }
 
     int
-frame::runchck(char *runstr)
+frame::runcheck(char *runstr)
 // Checks baserunning, removes double occurances.
 {
     char *str, *temptr, *errptr;
@@ -300,7 +300,7 @@ frame::runchck(char *runstr)
     *errptr = '\0';
 
 #ifdef DEBUG
-    fprintf( stderr, "pre runchck: %s\n", runstr );
+    fprintf( stderr, "pre runcheck: %s\n", runstr );
 #endif
     str = runstr;
 
@@ -449,7 +449,7 @@ frame::runchck(char *runstr)
 	snprintf( error, LINEWIDTH, "Baserunning error: %s\n", errstr );
 
 #ifdef DEBUG
-    fprintf( stderr, "post runchck: %s\n", runstr );
+    fprintf( stderr, "post runcheck: %s\n", runstr );
 #endif
     return(retval);
 }
@@ -618,12 +618,12 @@ frame::decode()
 
     int result;
 
-    if ( runchck(location) ) {		// Baserunning in location field?
+    if ( runcheck(location) ) {		// Baserunning in location field?
 	snprintf( baserunning, MAX_INPUT, "%s", location );
 	memset( location, '\0', MAX_INPUT );
     }
     else {
-	memset( error, '\0', LINEWIDTH );	// clean up after runchck
+	memset( error, '\0', LINEWIDTH );	// clean up after runcheck
     }
 
     result = validate( event );
