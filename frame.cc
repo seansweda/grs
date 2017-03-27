@@ -435,6 +435,22 @@ frame::runcheck(char *runstr, int copy)
 	}
     }
 
+    // prevent illegal advancement
+    int trail, lead;
+    for ( trail = 0; trail < 3; trail++ ) {
+	for ( lead = trail + 1; lead < 4; lead++ ) {
+	    if ( dest[trail] > 0 && dest[lead] > 0 ) {
+		// trailing runner past leading runner
+		if ( (dest[trail] > dest[lead])
+			// OR two at the same base
+			|| (dest[trail] < 4 && dest[trail] == dest[lead]) ) {
+		    snprintf( errstr, MAX_INPUT,
+			    "%s [illegal advancement]", temp );
+		}
+	    }
+	}
+    }
+
     if ( outsonplay( temp ) + outs > 3 ) {
 	snprintf( errstr, MAX_INPUT, "%s [too many outs on play]", runstr );
     }
