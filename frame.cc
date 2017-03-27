@@ -430,7 +430,7 @@ frame::runcheck(char *runstr, int copy)
 	str += 2;
     }
 
-    if ( outsonplay(runstr) + outs > 3 ) {
+    if ( outsonplay( temp ) + outs > 3 ) {
 	snprintf( errstr, MAX_INPUT, "%s [too many outs on play]", runstr );
     }
 
