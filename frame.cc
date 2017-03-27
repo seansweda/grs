@@ -428,6 +428,11 @@ frame::runcheck(char *runstr, int copy)
 		break;
 	}
 	str += 2;
+
+	// break early if we have an error in check mode
+	if ( copy == 0 && strlen( errstr ) > 0 ) {
+	    break;
+	}
     }
 
     if ( outsonplay( temp ) + outs > 3 ) {
