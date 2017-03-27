@@ -88,29 +88,31 @@ frame::runadv()
 
     while ( *str ) {
 	if ( *str == 'b' ) {
+	    i = 0;
 	    runner = bat->up();
-	    i=0;
 	}
-	else
-	    runner = onbase[ i = (int)( *str - '0' ) ];
+	else {
+	    i = (int)( *str - '0' );
+	    runner = onbase[i];
+	}
 
 	if ( runner ) {				// If runner is onbase
 	    j = (int)( *(++str) - '0' );
 	    switch ( *str ) {
 		case 'o' :			// If runner made an out
 		    outs = outs + 1;
-		    if ( newbase[i] == runner && i )
+		    if ( newbase[i] == runner && i && i != j )
 			newbase[i] = NULL;
 		    break;
 		case 'h' :			// If runner scored a run
-		    if ( newbase[i] == runner && i )
+		    if ( newbase[i] == runner && i && i != j )
 			newbase[i] = NULL;
 		    break;
-		case '1' :			// If runner (batter) went to 1st
+		case '1' :			// If runner went to first
 		case '2' :			// If runner went to second
 		case '3' :			// If runner went to third
 		    newbase[j] = runner;
-		    if ( newbase[i] == runner && i )
+		    if ( newbase[i] == runner && i && i != j )
 			newbase[i] = NULL;
 		    break;
 		default :
