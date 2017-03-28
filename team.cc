@@ -106,10 +106,23 @@ team::pos_change( int spot, char **comment )
     while ( oldpl->next && oldpl->next->ord <= spot )
 	oldpl = oldpl->next;
 
-    fprintf( output, "Enter new position for %d: ", spot );
-    memset( pos, '\0', MAX_INPUT );
-    fgets( pos, MAX_INPUT, input );
-    sanitize( &pos, POSLEN );
+    int loop = 1;
+    while ( loop ) {
+	fprintf( output, "Enter new position for %d: ", spot );
+	memset( pos, '\0', MAX_INPUT );
+	fgets( pos, MAX_INPUT, input );
+	sanitize( &pos, POSLEN );
+
+	if ( verify_pos( pos ) == 0 ) {
+	    fprintf( stderr, "invalid position: %s\n", pos );
+	    if ( input != stdin )
+		exit(1);
+	    else
+		continue;
+	}
+	// if we get here it's all good
+	break;
+    }
 
 #ifdef DEBUG
     fprintf( stderr, "pos_change %d: %s\n", spot, pos );
@@ -175,6 +188,13 @@ team::insert( int spot, char **comment, const char *def, const char *str )
 		fprintf( stderr, "insert %d: %d, %d, %d\n", spot,
 			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
+		if ( input != stdin )
+		    exit(1);
+		else
+		    continue;
+	    }
+	    if ( verify_pos( pos ) == 0 ) {
+		fprintf( stderr, "invalid position: %s\n", pos );
 		if ( input != stdin )
 		    exit(1);
 		else
@@ -293,6 +313,13 @@ team::make_lineups()
 		fprintf( stderr, "make_lineups: %d, %d, %d\n",
 			(int)strlen(name), (int)strlen(mlb), (int)strlen(pos) );
 #endif
+		if ( input != stdin )
+		    exit(1);
+		else
+		    continue;
+	    }
+	    if ( verify_pos( pos ) == 0 ) {
+		fprintf( stderr, "invalid position: %s\n", pos );
 		if ( input != stdin )
 		    exit(1);
 		else
@@ -674,6 +701,37 @@ team::check_defense()
 	fprintf(output,"defense missing:%s\n", missing);
     }
 
+}
+
+    int
+team::verify_pos( const char *str )
+{
+    // return 0 if invalid
+    // return 1 if valid
+
+    // valid positions
+    const char* valid_pos[] = {
+	"p", "P",
+	"c", "C",
+	"1b", "1B",
+	"2b", "2B",
+	"3b", "3B",
+	"ss", "SS",
+	"lf", "LF",
+	"cf", "CF",
+	"rf", "RF",
+	"dh", "DH",
+	"ph", "PH",
+	"pr", "PR"
+    };
+
+    int i, tot;
+    tot = sizeof valid_pos / sizeof *valid_pos;
+    for( i = 0; i != tot; i++ )
+	if ( strcmp( str, valid_pos[i] ) == 0 )
+	    return( 1 );
+
+    return( 0 );
 }
 
     int

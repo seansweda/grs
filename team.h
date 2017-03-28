@@ -59,6 +59,7 @@ public :
 
 	void print_lineup(void);
 	void check_defense(void);
+	int verify_pos(const char*);
 	char *posout(int);
 	char *nout();
 	player *up();
