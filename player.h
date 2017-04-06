@@ -14,7 +14,6 @@ private :
 	char rtn[TEAMLEN];
 	char *pos;
 public :
-	player(char*);
 	player(char*, char*, char*, const char*);
 	int posn;
 	int ab;
@@ -30,6 +29,7 @@ public :
 	int cs;
 	int pal;
 	int par;
+
 	void hit(int);
 	void sout(FILE*);
 	char *nout();

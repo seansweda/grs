@@ -1,4 +1,5 @@
 #include "config.h"
+#include "list.h"
 
 #ifndef __EXTERN_H
 #define __EXTERN_H
@@ -12,6 +13,8 @@ extern FILE	*pbpfp,		// play-by-play output file
 		*output,	// where to direct output
 		*input;		// where to read data
 
+extern list *cmd;		// in-memory .cmd file
+
 extern char filename[PATH_MAX];	// prefix for all output files
 extern team *ibl[2];		// pointers to the two teams
 
@@ -21,5 +24,6 @@ extern void setup( int );
 extern int openfile( char* );
 
 extern char* stripcr( char*, int );
+extern char* sanitize( char**, int, char = ' ' );
 
 #endif

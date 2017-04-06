@@ -11,5 +11,5 @@
 #define TEAMLEN 4	// team abbreviation
 #define POSLEN 3	// position
 
-#define LINEWIDTH 75	// where to wrap
+#define LINEWIDTH 80	// where to wrap
 

@@ -1,4 +1,4 @@
 
-commit=`git describe --abbrev=6 --dirty --always`
+commit=`git describe --dirty --tags --always --long`
 echo "#define GIT \"${commit}\""
 

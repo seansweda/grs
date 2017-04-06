@@ -1,24 +1,13 @@
 #include "player.h"
 
 // Constructor function
-player::player( char* str )
-{
-    strcpy( name, str );
-    memset( team, '\0', TEAMLEN );
-    memset( rtn, '\0', TEAMLEN );
-    pos = (char*) calloc( 3, sizeof(char));
-    memset( pos, '\0', POSLEN );
-    ab = h = r = rbi = b2 = b3 = hr = bb = k = sb = cs = pal = par = 0;
-}
-
-// Better constructor function
 player::player( char* inname, char* inteam, char* inrtn, const char* inpos )
 {
-    strcpy( name, inname );
-    strcpy( team, inteam );
-    strcpy( rtn, inrtn );
-    pos = (char*) calloc( 3, sizeof(char));
-    strcpy( pos, inpos );
+    snprintf( name, NAMELEN, "%s", inname );
+    snprintf( team, TEAMLEN, "%s", inteam );
+    snprintf( rtn, TEAMLEN, "%s", inrtn );
+    pos = (char*) calloc( POSLEN, sizeof(char));
+    snprintf( pos, POSLEN, "%s", inpos );
     ab = h = r = rbi = b2 = b3 = hr = bb = k = sb = cs = pal = par = 0;
     posn = getpos( pos );
 }
@@ -80,8 +69,7 @@ player::new_pos( char *newpos )
 {
     // extend pos string
     pos = (char*) realloc( pos, strlen(pos) + strlen(newpos) + 2 );
-    strcat( pos, "-" );
-    strcat( pos, newpos );
+    snprintf( pos + strlen(pos), 4, "-%s", newpos );
     posn = getpos( newpos );
 }
 

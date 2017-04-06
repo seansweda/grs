@@ -1,9 +1,11 @@
 #include "frame.h"
+#include "commands.h"
+#include "list.h"
+#include "extern.h"
 
 // Constructor which initializes the static fields
-frame::frame(team *away, team *home, FILE *fp)
+frame::frame(team *away, team *home)
 {
-    undo = 0;		// if in the process of undo, set = 1
     cont = 1;		// continue reading commands?
     outs = 0;
     atbat = 0;
@@ -23,13 +25,12 @@ frame::frame(team *away, team *home, FILE *fp)
     bat = away;
     pit = home;
 
-    pbpfp = fp;
-
     event = NULL;
     location = NULL;
     baserunning = NULL;
     comment = NULL;
     error = NULL;
+    outputstr = NULL;
 
     runners = new queue;
 
@@ -49,6 +50,7 @@ frame::frame(char *str)
     baserunning = (char*) calloc(MAX_INPUT, sizeof(char));
     comment = (char*) calloc(MAX_INPUT, sizeof(char));
     error = (char*) calloc(LINEWIDTH, sizeof(char));
+    outputstr = (char*) calloc(MAX_INPUT, sizeof(char));
 
     // extra inning, grow the linescore
     if ( inning > linesize ) {
@@ -60,15 +62,14 @@ frame::frame(char *str)
     }
 
     sscanf( str, "%s %s %s", event, location, baserunning );
-    strcpy( event, stripcr( event, MAX_INPUT ) );
-    strcpy( location, stripcr( location, MAX_INPUT ) );
-    strcpy( baserunning, stripcr( baserunning, MAX_INPUT ) );
+    sanitize( &event, MAX_INPUT );
+    sanitize( &location, MAX_INPUT );
+    sanitize( &baserunning, MAX_INPUT );
 
     cont = 1;
     bat=ibl[atbat];
     pit=ibl[(atbat+1)%2];
 
-    count++;
 }
 
     int
@@ -87,34 +88,36 @@ frame::runadv()
 
     while ( *str ) {
 	if ( *str == 'b' ) {
+	    i = 0;
 	    runner = bat->up();
-	    i=0;
 	}
-	else
-	    runner = onbase[ i = (int)( *str - '0' ) ];
+	else {
+	    i = (int)( *str - '0' );
+	    runner = onbase[i];
+	}
 
 	if ( runner ) {				// If runner is onbase
 	    j = (int)( *(++str) - '0' );
 	    switch ( *str ) {
 		case 'o' :			// If runner made an out
 		    outs = outs + 1;
-		    if ( newbase[i] == runner && i )
+		    if ( newbase[i] == runner && i && i != j )
 			newbase[i] = NULL;
 		    break;
 		case 'h' :			// If runner scored a run
-		    if ( newbase[i] == runner && i )
+		    if ( newbase[i] == runner && i && i != j )
 			newbase[i] = NULL;
 		    break;
-		case '1' :			// If runner (batter) went to 1st
+		case '1' :			// If runner went to first
 		case '2' :			// If runner went to second
 		case '3' :			// If runner went to third
 		    newbase[j] = runner;
-		    if ( newbase[i] == runner && i )
+		    if ( newbase[i] == runner && i && i != j )
 			newbase[i] = NULL;
 		    break;
 		default :
-		    // if we get here, runchck didn't do its job!
-		    sprintf( error, "Fatal baserunning error: %s\n", baserunning );
+		    // if we get here, runcheck didn't do its job!
+		    snprintf( error, LINEWIDTH, "Fatal baserunning error: %s\n", baserunning );
 		    exit(1);
 	    }
 	}
@@ -166,12 +169,12 @@ frame::runstats( int fc )
 		case 'o' :		// If runner made an out
 		    pit->mound->out++;
 		    if ( (i == 0) && (fc > 0) ) {
-			sprintf( tempstr, "%s out", onbase[i]->nout() );
-			outbuf( pbpfp, tempstr, ", " );
+			snprintf( tempstr, MAX_INPUT, "%s out", onbase[i]->nout() );
+			outbuf( tempstr, ", " );
 		    }
 		    else if ( i > 0 ) {
-			sprintf( tempstr, "%s out", onbase[i]->nout() );
-			outbuf( pbpfp, tempstr, ", " );
+			snprintf( tempstr, MAX_INPUT, "%s out", onbase[i]->nout() );
+			outbuf( tempstr, ", " );
 		    }
 		    break;
 		case 'h' :		// If runner scored a run
@@ -181,19 +184,19 @@ frame::runstats( int fc )
 		    onbase[i]->r++;
 		    bat->score++;
 		    runs++;
-		    sprintf( tempstr, "%s scores", onbase[i]->nout() );
-		    outbuf( pbpfp, tempstr, ", " );
+		    snprintf( tempstr, MAX_INPUT, "%s scores", onbase[i]->nout() );
+		    outbuf( tempstr, ", " );
 		    break;
 		case '1' :		// If runner (batter) went to 1st
 		case '2' :		// If runner went to second
 		case '3' :		// If runner went to third
 		    if ( (i == 0) && (fc > 0) ) {
-			sprintf( tempstr, "%s %s", onbase[i]->nout(), b[j] );
-			outbuf( pbpfp, tempstr, ", " );
+			snprintf( tempstr, MAX_INPUT, "%s %s", onbase[i]->nout(), b[j] );
+			outbuf( tempstr, ", " );
 		    }
 		    else if ( i > 0 ) {
-			sprintf( tempstr, "%s %s", onbase[i]->nout(), b[j] );
-			outbuf( pbpfp, tempstr, ", " );
+			snprintf( tempstr, MAX_INPUT, "%s %s", onbase[i]->nout(), b[j] );
+			outbuf( tempstr, ", " );
 		    }
 		   break;
 		default : ;
@@ -202,7 +205,7 @@ frame::runstats( int fc )
 	str++;
     }
 
-    outbuf( pbpfp, "", ". " );
+    outbuf( "", ". " );
 
     // at this point we need fc binary
     if ( fc != 1 ) {
@@ -280,185 +283,193 @@ frame::help(char *str)
 }
 
     int
-frame::runchck(char *runstr)
-// Checks baserunning, removes double occurances.
+frame::base( const char c )
+{
+    switch( c ) {
+	case 'o':
+	    return 0;
+	case 'h':
+	    return 4;
+	case '1':
+	    return 1;
+	case '2':
+	    return 2;
+	case '3':
+	    return 3;
+	default:
+	    return 0;
+    }
+}
+
+    int
+frame::runcheck(char *runstr, int copy)
+// Checks baserunning, removes double occurances (first one wins).
+// copy 0 = just check
+// copy 1 = rewrite (default)
 {
     char *str, *temptr, *errptr;
-    int copy = 1, retval = 1;
-    int done[4];
 
-    for ( int j=0; j<=3; j++ )
-       done[j] = 0;
+    // -1       = not done
+    //  0       = out
+    //  1,2,3,4 = base advanced
+    int dest[4] = { -1, -1, -1, -1 };
 
     char temp[MAX_INPUT];
+    memset( temp, '\0', MAX_INPUT );
     char errstr[MAX_INPUT];
+    memset( errstr, '\0', MAX_INPUT );
 
     temptr = temp;
-    *temptr = '\0';
     errptr = errstr;
-    *errptr = '\0';
 
 #ifdef DEBUG
-    fprintf( stderr, "pre runchck: %s\n", runstr );
+    fprintf( stderr, "pre runcheck: %s\n", runstr );
 #endif
     str = runstr;
 
     while ( *str ) {
 	switch ( *str ) {
 	    case 'b':
-		copy = 1;
-		if ( !done[0] ) {
+		if ( dest[0] == -1 ) {
 		    switch ( *(str+1) ) {
 			case 'o':
 			case 'h':
 			case '1':
 			case '2':
 			case '3':
+			    dest[0] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( copy ) {
-			done[0] = 1;
-			strncat( temp, str, 2 );
+		    if ( dest[0] >= 0 ) {
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
-		    }
-		    else {
-			strncat( errstr, str, 2 );
-			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
 	    case '1':
-		copy = 1;
-		if ( !done[1] ) {
+		if ( !(onbase[1]) ) {
+		    snprintf( errptr, 3, "%s", str );
+		    errptr += 2;
+		}
+		else if ( dest[1] == -1 ) {
 		    switch ( *(str+1) ) {
-			case '1':
-			    copy = 0;
-			    done[1] = 1;
-			    break;
 			case 'o':
 			case 'h':
+			case '1':
 			case '2':
 			case '3':
+			    dest[1] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( !(onbase[1]) ) {
-			copy = 0;
-			retval = 0;
-		    }
-		    if ( copy ) {
-			done[1] = 1;
-			strncat( temp, str, 2 );
+		    if ( dest[1] >= 0 ) {
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
-		    }
-		    else if ( !done[1] ) {
-			strncat( errstr, str, 2 );
-			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
 	    case '2':
-		copy = 1;
-		if ( !done[2] ) {
+		if ( !(onbase[2]) ) {
+		    snprintf( errptr, 3, "%s", str );
+		    errptr += 2;
+		}
+		else if ( dest[2] == -1 ) {
 		    switch ( *(str+1) ) {
-			case '2':
-			    copy = 0;
-			    done[2] = 1;
-			    break;
 			case 'o':
 			case 'h':
+			case '2':
 			case '3':
+			    dest[2] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( !(onbase[2]) ) {
-			copy = 0;
-			retval = 0;
-		    }
-		    if ( copy ) {
-			done[2] = 1;
-			strncat( temp, str, 2 );
+		    if ( dest[2] >= 0 ) {
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
-		    }
-		    else if ( !done[2] ) {
-			strncat( errstr, str, 2 );
-			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
 	    case '3':
-		copy = 1;
-		if ( !done[3] ) {
+		if ( !(onbase[3]) ) {
+		    snprintf( errptr, 3, "%s", str );
+		    errptr += 3;
+		}
+		else if ( dest[3] == -1 ) {
 		    switch ( *(str+1) ) {
-			case '3':
-			    copy = 0;
-			    done[3] = 1;
-			    break;
 			case 'o':
 			case 'h':
+			case '3':
+			    dest[3] = base( *(str+1) );
 			    break;
 			default:
-			    copy = 0;
-			    retval = 0;
+			    snprintf( errptr, 3, "%s", str );
+			    errptr += 2;
 			    break;
 		    }
-		    if ( !(onbase[3]) ) {
-			copy = 0;
-			retval = 0;
-		    }
-		    if ( copy ) {
-			done[3] = 1;
-			strncat( temp, str, 2 );
+		    if ( dest[3] >= 0 ) {
+			snprintf( temptr, 3, "%s", str );
 			temptr += 2;
-			*temptr = '\0';
-		    }
-		    else if ( !done[3] ) {
-			strncat( errstr, str, 2 );
-			errptr += 2;
-			*errptr = '\0';
 		    }
 		}
 		break;
 	    default:
-		retval = 0;
-		strncat( errstr, str, 2 );
+		snprintf( errptr, 3, "%s", str );
 		errptr += 2;
-		*errptr = '\0';
 		break;
 	}
-	str+=2;
+	str += 2;
+
+	// break early if we have an error in check mode
+	if ( copy == 0 && strlen( errstr ) > 0 ) {
+	    break;
+	}
     }
 
-    if (retval)
-	strcpy( runstr, temp );		// cleaned up baserunning string
-
-	if ( outsonplay(runstr) + outs > 3 ) {
-	    sprintf( error, "Too many outs on play.\n" );
-	    retval = 0;
+    // prevent illegal advancement
+    int trail, lead;
+    for ( trail = 0; trail < 3; trail++ ) {
+	for ( lead = trail + 1; lead < 4; lead++ ) {
+	    if ( dest[trail] > 0 && dest[lead] > 0 ) {
+		// trailing runner past leading runner
+		if ( (dest[trail] > dest[lead])
+			// OR two at the same base
+			|| (dest[trail] < 4 && dest[trail] == dest[lead]) ) {
+		    snprintf( errstr, MAX_INPUT,
+			    "%s [illegal advancement]", temp );
+		}
+	    }
 	}
-    else
-	sprintf( error, "Baserunning error: %s\n", errstr );
+    }
+
+    if ( outsonplay( temp ) + outs > 3 ) {
+	snprintf( errstr, MAX_INPUT, "%s [too many outs on play]", runstr );
+    }
 
 #ifdef DEBUG
-    fprintf( stderr, "post runchck: %s\n", runstr );
+    fprintf( stderr, "post runcheck: %s (%s)\n", temp, errstr );
 #endif
-    return(retval);
+
+    if ( strlen( errstr ) == 0 ) {
+	if ( copy == 1 ) {
+	    // copy cleaned up baserunning string
+	    snprintf( runstr, MAX_INPUT, "%s", temp );
+	}
+	return( 1 );
+    }
+    else {
+	snprintf( error, LINEWIDTH, "Baserunning error: %s\n", errstr );
+	return( 0 );
+    }
 }
 
     void
@@ -470,93 +481,89 @@ frame::runcat(int adv)
     runcat(-1) advance 1 base if forced only (bb, hb, etc.)
     runcat(0) batter is out
     runcat(x) everyone advances x base(s)
+    runcat(string) append string
 */
 {
-    int test = 0;
     int i;
+    int test = 0;
+    size_t b = strlen(baserunning);
+
     char temp[MAX_INPUT];
-    char *temptr;
-
-    temptr=temp;
+    char *temptr = temp;
     *temptr='\0';
-
 
     switch (adv) {
     case 0 :					// batter out
-	    strcat(baserunning,"bo");
-	    break;
+	    snprintf( baserunning + b, 3, "%s", "bo" );
+	    return;
 
     case -1 :					// advance if forced
 	    if (!onbase[1])
-	       strcat(baserunning,"b1");
+		snprintf( baserunning + b, 3, "%s", "b1" );
 	    else if (!onbase[2])
-	       strcat(baserunning,"b112");
+		snprintf( baserunning + b, 5, "%s", "b112" );
 	    else if (!onbase[3])
-	       strcat(baserunning,"b11223");
+		snprintf( baserunning + b, 7, "%s", "b11223" );
 	    else
-	       strcat(baserunning,"b112233h");
-	    break;
-    //else {
+		snprintf( baserunning + b, 9, "%s", "b112233h" );
+	    return;
 
     case -2 :					// runners advance 1 base
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) {
-		    sprintf(temptr++,"%1d",i);
+		if (onbase[i]) {
+		    snprintf( temptr++, 2, "%1d", i );
 		    test=i+1;
 		    if (test >= 4)
-		       *temptr++='h';
+			snprintf( temptr++, 2, "h" );
 		    else
-		       sprintf(temptr++,"%1d",test);}
+			snprintf( temptr++, 2, "%1d", test );
+		}
 	    break;
 
     case -3 :
-    //	strcat(baserunning,"1o");
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) test=i;
-	    sprintf(temptr++,"%1d",test);
-	    sprintf(temptr++,"o");
+		if (onbase[i]) test=i;
+	    snprintf( temptr++, 2, "%1d", test );
+	    snprintf( temptr++, 2, "o" );
 	    break;
 
     case -4 :
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) test=i;
-	    sprintf(temptr++,"%1d",test);
+		if (onbase[i]) test=i;
+	    snprintf( temptr++, 2, "%1d", test );
 	    if (++test == 4)
-	       sprintf(temptr++,"h");
+		snprintf( temptr++, 2, "h" );
 	    else if (test > 0)
-	       sprintf(temptr++,"%1d",test);
+		snprintf( temptr++, 2, "%1d", test );
 	    break;
 
     default :
-	    *temptr++='b';
+	    snprintf( temptr++, 2, "b" );
 	    if (adv == 4)
-	       *temptr++='h';
+		snprintf( temptr++, 2, "h" );
 	    else
-	       sprintf(temptr++,"%1d",adv);
-
+		snprintf( temptr++, 2, "%1d", adv );
 	    for (i=1;i<=3;i++)
-	       if (onbase[i]) {
-		    sprintf(temptr++,"%1d",i);
+		if (onbase[i]) {
+		    snprintf( temptr++, 2, "%1d", i );
 		    test=i+adv;
 		    if (test >= 4)
-		       *temptr++='h';
+			snprintf( temptr++, 2, "h" );
 		    else
-		       sprintf(temptr++,"%1d",test);}
+			snprintf( temptr++, 2, "%1d", test );
+	       }
     } // switch
 
     *temptr='\0';
-    strcat(baserunning,temp);
+    snprintf( baserunning + b, MAX_INPUT, "%s", temp);
 }
 
-    int
-frame::three()
+    void
+frame::runcat( const char *str )
+// append string to baserunning
 {
-    if (baserunning[0] == '\0') {
-	sprintf(error,"%s must have baserunning data.",event);
-	return(0);
-    }
-    else
-	return(1);
+    size_t b = strlen(baserunning);
+    snprintf( baserunning + b, MAX_INPUT, "%s", str );
 }
 
     void
@@ -596,245 +603,107 @@ frame::cleanup()
 }
 
     int
+frame::validate( const char *str )
+{
+    // return 0 if invalid
+    // return 1 if valid
+    // return 3 if valid anytime (i.e. w/3 outs)
+
+    int i, tot;
+
+    tot = sizeof valid / sizeof *valid;
+    for( i = 0; i != tot; i++ )
+	if ( strcmp( str, valid[i] ) == 0 )
+	    return( 1 );
+
+    tot = sizeof valid3 / sizeof *valid3;
+    for( i = 0; i != tot; i++ )
+	if ( strcmp( str, valid3[i] ) == 0 )
+	    return( 3 );
+
+    if ( strlen( str ) == 0 )
+	return ( 3 );
+    else
+	return( 0 );
+}
+
+    int
 frame::decode()
 {
 #ifdef DEBUG
 	fprintf(stderr,"decode: %s %s %s\n", event, location, baserunning);
 #endif
-    if (event[0] == '\0') {
-	return(1);			// No event to decode, ignore.
-    }
 
-    if (runchck(location)) {		// Baserunning in location field?
-	strcpy( baserunning, location );
+    int result;
+
+    // Baserunning in location field?
+    if ( runcheck( location, 0 ) ) {
+	snprintf( baserunning, MAX_INPUT, "%s", location );
 	memset( location, '\0', MAX_INPUT );
     }
+    /*
     else {
-	memset( error, '\0', LINEWIDTH );	// clean up after runchck
+	memset( error, '\0', LINEWIDTH );// clean up after runcheck
     }
+    */
 
-    // these events are legal with three outs
-    if ( !(strcmp(event,"lh")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"la")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"un")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"en")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"eg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"cm")) ) {
-	return(1);
-    }
+    result = validate( event );
 
-    // the rest are not
-    if ( outs == 3 && !undo ) {
-	sprintf( error, "End of inning (3 outs).  Invalid command: %s\n", event );
-	return(0);
+    if ( result == 3 || (result == 1 && outs != 3) ) {
+	return( 1 );
     }
-    else if ( !(strcmp(event,"ph")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"pr")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"np")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"dr") ) || !(strcmp(event,"dc")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"so")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"kd")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"bb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"iw")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ci")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hp")) || !(strcmp(event,"hb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"wp")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"pb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"bk")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sb")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"th")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"di")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"cs")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"kc")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ks")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"pk")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"oa")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ri")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"1b")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"2b")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"3b")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hr")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"tp")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"gd")) || !(strcmp(event,"dp")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fd")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ld")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"lo")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fc")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"rg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"go")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sg")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"hf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"po")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fp")) || !(strcmp(event,"pf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"sh")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"lf")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"df")) || !(strcmp(event,"wt")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fo")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"er")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ea")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"nj")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"fa")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"in")) ) {
-	return(1);
-    }
-    else if ( !(strcmp(event,"ic")) ) {
-	return(1);
+    else if ( result == 1 && outs == 3 ) {
+	snprintf( error, LINEWIDTH, "End of inning (3 outs).  Invalid command: %s\n", event );
+	return( 0 );
     }
     else {
-	sprintf( error, "Invalid command: %s\n", event );
-	return(0);
+	snprintf( error, LINEWIDTH, "Invalid command: %s\n", event );
+	return( 0 );
     }
 }
 
     void
-frame::outbuf( FILE *fp, const char *str, const char *punc )
+frame::outbuf( const char *str, const char *punc )
 {
     int c;
+    char bigbuf[MAX_INPUT * 2];
     char tempstr[MAX_INPUT * 2];
-    char *ptr = tempstr;
+    char *ptr;
 
     if ( *punc == '\n' ) {
-	strncat( buffer, punc, 2 );
-	fputs( buffer, fp );
-	fputs( str, fp );
-	*buffer = (char) 0;
+	if ( strlen( buffer ) > 0 ) {
+	    snprintf( buffer + strlen(buffer), 2, "%s", punc );
+	    fputs( buffer, pbpfp );
+	}
+	fputs( str, pbpfp );
+	memset( buffer, '\0', MAX_INPUT * 2 );
     }
-    else if ( strlen(str) + strlen(buffer) > LINEWIDTH ) {
-	strncpy(tempstr, buffer, MAX_INPUT);
-	strncat(tempstr, punc, 2);
-	strncat(tempstr, str, MAX_INPUT);
+    else if ( *punc == '.' && strlen(buffer) > LINEWIDTH - 10 ) {
+	snprintf( tempstr, MAX_INPUT * 2, "%s%c\n", buffer, punc[0] );
+	fputs( tempstr, pbpfp );
+	snprintf( buffer, MAX_INPUT * 2, "%s", str );
+    }
+    else {
+	snprintf( bigbuf, MAX_INPUT * 2, "%s%s%s", buffer, punc, str );
 
-	while ( strlen(tempstr) > LINEWIDTH ) {
-	    c = 0;
-	    strncpy( buffer, tempstr, LINEWIDTH - 10 );
+	while ( strlen( bigbuf ) > LINEWIDTH - 5 ) {
+	    snprintf( tempstr, MAX_INPUT * 2, "%s", bigbuf );
 
-	    while ( c != (LINEWIDTH - 10) ) {
+	    c = LINEWIDTH - 15;
+	    ptr = tempstr + c;
+	    while ( !( isspace(*ptr) ) ) {
 		c++;
 		ptr++;
 	    }
-	    while ( !(isspace(*ptr)) )
-		buffer[c++] = *(ptr++);
 
-	    buffer[c] = '\0';
 	    ptr++;
+	    tempstr[c] = '\0';
 
-	    buffer = strcat( buffer, "\n" );
-	    fputs( buffer, fp );
-	    strncpy( tempstr, ptr, MAX_INPUT * 2 );
+	    snprintf( buffer, MAX_INPUT * 2, "%s\n", tempstr );
+	    fputs( buffer, pbpfp );
+	    snprintf( bigbuf, MAX_INPUT * 2, "%s", ptr );
 	}
-	strncpy( buffer, tempstr, MAX_INPUT );
-    }
-    else {
-	strncat( buffer, punc, 2 );
-	strncat( buffer, str, MAX_INPUT );
+	snprintf( buffer, MAX_INPUT * 2, "%s", bigbuf);
     }
 }
 
@@ -904,6 +773,54 @@ frame::batterout( char *brun )
     }
 }
 
+    int
+frame::get_spot()
+{
+    int val, loop;
+    char *spot;
+    spot = (char*) calloc(MAX_INPUT, sizeof(char));
+
+    loop = 1;
+    while ( loop ) {
+	fprintf( output, "Enter batting order of player: " );
+	memset( spot, '\0', MAX_INPUT );
+	fgets( spot, MAX_INPUT, input );
+	sanitize( &spot, POSLEN );
+	val = spot[0] - '0';
+	if ( strlen( spot ) == 1 && val >= 0 && val <= 9 )
+	    break;
+    }
+
+    free( spot );
+    return( val );
+}
+
+    void
+frame::putcmd()
+{
+    size_t o;
+    char *output;
+    output = (char*) calloc(MAX_INPUT, sizeof(char));
+    memset( output, '\0', MAX_INPUT );
+
+    snprintf( output, MAX_INPUT, "%s", event );
+    o = strlen( output );
+    if ( strlen(location) > 0 ) {
+	snprintf( output + o, MAX_INPUT - o, " %s", location );
+	o = strlen( output );
+    }
+    if ( strlen(baserunning) > 0 && strcmp( location, baserunning) ) {
+	snprintf( output + o, MAX_INPUT - o, " %s", baserunning );
+    }
+
+    cmd->add( output );
+    fprintf( cmdfp, "%s\n", output );
+    fflush( cmdfp );
+    // increment count when we write to cmd file
+    count++;
+    free( output );
+}
+
 frame::~frame()
 {
     if ( event ) {
@@ -915,5 +832,6 @@ frame::~frame()
 	free(baserunning);
 	free(comment);
 	free(error);
+	free(outputstr);
     }
 }
