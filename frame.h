@@ -9,7 +9,6 @@
 #include "pitcher.h"
 #include "team.h"
 #include "queue.h"
-#include "extern.h"
 
 class frame {
 private :
@@ -28,19 +27,17 @@ private :
 	void runstats( int fc = 0 );	// Does runners stats and pbp
 	void rbi();			// Does RBIs
 
-	int runchck( char* );		// Parses baserunner advances
-	void runcat( int );		// Does default baserunner advances
-	int three();			// Checks for three operands
+	int base( const char );		// return base code (e.g. b=0, h=4)
+	void runcat( int );		// does default baserunner advances
+	void runcat( const char* );	// append to baserunning
+	int runcheck( char*, int copy = 1 );	// parses baserunner advances
 
 	void batterup( int nobf = 1 );	// brings the next batter up
 
 	void cleanup();			// frees up memory for an undo
-	int backup( char*, char* );	// backs up one line in .cmd file
-					// returns 1 if it is a legal command
 public :
 
-	static int undo,
-		   cont,
+	static int cont,
 		   outs,
 		   atbat,
 		   inning,
@@ -52,17 +49,20 @@ public :
 	static player *onbase[4];	// array of pointers to batter & runners
 
 	frame( char* );
-	frame( team*, team*, FILE* );	// First constructor called
+	frame( team*, team* );		// First constructor called
 	int decode();			// decode the parsed command line
+	int validate( const char* );	// valid command?
 	int update();			// update the stats
 	void help( char* );		// Prints helpful? messages
 	void frameput();		// Outputs info useful to user
 	void who_stat( int, int );	// add stat to player @fielding pos
 	int outsonplay( char* );	// how many outs in this play
 	int batterout( char* );		// did the batter make an out?
+	int get_spot();			// prompt user for spot in order
+	char *outputstr;
 
 	static void print_linescore( FILE* );
-	void outbuf( FILE*, const char*, const char* = "\0" );
+	void outbuf( const char*, const char* = "\0" );
 	void putcmd();
 
 	~frame();

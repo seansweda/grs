@@ -2,6 +2,16 @@ This is the latest and greatest grs construction program.
 
 VERSION HISTORY
 -----------------------------------------------------------------------
+3.2.0	* lots of refactoring to make user input even more bullet-proof
+	* prohibit input of nonsense positions and illegal baserunning
+	* re-implement redo in memory
+	* fix bug exposed by gcc stack protector
+	* fix bug where passed balls (pb) were not recorded
+	* fix bug that prevented baserunning string from explicitly
+	  holding runner on a base (e.g. "wp 1233")
+
+3.1.1	* prevent undo infinite loop
+
 3.1.0	* track batters faced (BF)
 	* display current pitcher's IP & BF totals
 	* prevent overwriting of existing output files
@@ -12,92 +22,93 @@ VERSION HISTORY
 	* sanity check for outs on play
 	* pb was incorrectly crediting team with error
 
-3.0.0	* Changed to 2-line prompt.  Added score & half inning indicator.
-	* Added a lot of input verification code.  Eliminated a bunch of
-	potential buffer overruns.  User input is more bullet-proof now.
-	* Fixed a nasty bug caused by a fc with no out recorded.
-	* Fixed a nasty double-free which could cause undo to die.
-	* Fixed a nasty bug which would cause segfault if an error made but
-	no player could be found in the lineup at that position
-	* Error messages are much more helpful now.
-	* Fixed bug when escaping dr/dc with 0, was not recorded in .cmd
+3.0.0	* changed to 2-line prompt,  added score & half inning indicator
+	* added a lot of input verification code, eliminated a bunch of
+	  potential buffer overruns making user input more bullet-proof
+	* fixed a nasty bug caused by a fc with no out recorded
+	* fixed a nasty double-free which could cause undo to die
+	* fixed a nasty bug which would cause segfault on error where
+	  no player could be found in the lineup at that position
+	* error messages are much more helpful now
+	* fixed bug when escaping dr/dc with 0 was not recorded in .cmd
 	* pb & ci now result in unearned run prompt
 	* runners only advanced when forced on ci
-	* Team codes will be automatically converted to upper case.
-	* Added "in" & "ic" events for infield in comments
-	* baserunner staying at same base now legal, e.g. "22"
+	* team codes will be automatically converted to upper case
+	* added "in" & "ic" events for infield in comments
+	* baserunner staying at same base now legal (e.g. "22")
 	* fixed bug in assigning cs with other runners advancing
 	* "en" with less than 3 outs not allowed (use "eg")
 	* commands which fail baserunning checks are not recorded in .cmd,
-	also full baserunning now recorded in .cmd
+	  also full baserunning now recorded in .cmd
 
-2.7.2	Fixed several known bugs.  Made pbp output nicer.
+2.7.2	* fixed several known bugs
+	* made pbp output nicer
+	  (oldest release in version control)
 
-2.7.1	Added double steals.  Fixed bug which caused incorrect
-	first batter of the game.
+2.7.1	* added double steals
+	* fixed bug which caused incorrect first batter of the game
 
-2.7.0	(skipped various incarnations between versions)
-	Undo now universal, and hopefully bug-free.
+2.7.0	* undo now universal, and hopefully bug-free
 
-2.6.4	Fixed more bugs with -f flag.
+2.6.4	* fixed more bugs with -f flag.
 
-2.6.3	Added "nj" and "fa" codes.
+2.6.3	* added "nj" and "fa" codes.
 
-2.6.2	Bug fixes to 2.6.x, which was never released.  GRS now more
-	flexible in dealing with file input, using -a -h and -f.
+2.6.2	* bug fixes to 2.6.x, which was never released
+	* now more flexible in dealing with file input, using -a -h and -f.
 
-2.5.0	Prompts for unearned runs.
+2.5.0	* prompts for unearned runs
 
-2.4.4	bug fix for some stupid mistakes created in v2.4.2
+2.4.4	* bug fix for some stupid mistakes created in v2.4.2
 
-2.4.3	added a couple of event codes (kc, la, lh, fp), fixed W/L/S
-	code so that it is recorded in .cmd file
+2.4.3	* added event codes (kc, la, lh, fp)
+	* W/L/S code recorded in .cmd file
 
-2.4.2	added default baserunning for events that previously required
-	baserunning to be entered (cs, sb, dp, etc.)
+2.4.2	* added default baserunning for events that previously required
+	  baserunning to be entered (cs, sb, dp, etc.)
 
-2.4.1	changed a variable name that conflicts with Visual C++
+2.4.1	* changed a variable name that conflicts with Visual C++
 
-2.4.0	Made GRS adhere to unix rules of flags, operands.  Thus,
-	loading lineups now requires -f filename.  The output
-	file prefix is always the last item.  Now it is again
-	possible to re-direct output (e.g. grs test < oldcmd.cmd),
-	as GRS no longer assumes the output prefix will be
-	operand X.
+2.4.0	* Made GRS adhere to unix rules of flags, operands.  Thus,
+	  loading lineups now requires -f filename.  The output
+	  file prefix is always the last item.  Now it is again
+	  possible to re-direct output (e.g. grs test < oldcmd.cmd),
+	  as GRS no longer assumes the output prefix will be
+	  operand X.
 
-2.3.0	Fixed stupid bug in v2.2.0, where runner on base by error
-	would not get queued into the runners queue, thus causing
-	the dreaded "segmentation fault".
-	Also, added the -v flag to output the version of grs.
+2.3.0	* Fixed stupid bug in v2.2.0, where runner on base by error
+	  would not get queued into the runners queue, thus causing
+	  the dreaded "segmentation fault".
+	* added the -v flag to output the version of grs.
 
-2.2.0	Changed play-by-play output to remove redundancies, after
-	incessant whining by Richard Dunlap (Macon Peaches).  :-)
+2.2.0	* changed play-by-play output to remove redundancies, after
+	  incessant whining by Richard Dunlap (Macon Peaches)  :-)
 
-2.1.2	Fixed bug in "np" which would not output correct MLB team
-	for pitcher inserted by method added in version 2.1.0.
+2.1.2	* fixed bug in "np" which would not output correct MLB team
+	  for pitcher inserted by method added in version 2.1.0
 
-2.1.1	Fixed minor formatting problem with "cm".  Also added and
-	documented some additional event codes: "dp" and "hb".
+2.1.1	* fixed minor formatting problem with "cm"
+	* added additional event codes: "dp" and "hb"
 
-2.1.0	A "np" command will allow the user to optionally place the
-	pitcher in the batting order.
+2.1.0	* "np" will allow the user to optionally place the pitcher
+	  in the batting order
 
-2.0.3	Lineups may now be read in from an external file, but they
-	must be in the same format as they are written to the .cmd
-	file.
+2.0.3	* lineups may now be read in from an external file, but they
+	  must be in the same format as they are written to .cmd file
 
-2.0.2	Made redo quieter, by redirecting output to /dev/null.
+2.0.2	* made redo quieter by redirecting output to /dev/null
 
-2.0.1	User now prompted for wins, losses, and saves.
+2.0.1	* user now prompted for wins, losses, and saves
 
-2.0.0	Undo now a "redo" command.  Works better than undo.
+2.0.0	* undo now a "redo" command, works better than undo
 
-1.1.1	Starting pitchers now listed in .pbp file.
+1.1.1	* starting pitchers now listed in .pbp file
 
-1.1.0	Inherited runners now charged to correct pitcher.
+1.1.0	* inherited runners now charged to correct pitcher
 
-1.0.0	Undo semi-functional.  Also, the "eg" command works.
-	LOB now tabulated.
+1.0.0	* undo semi-functional
+	* "eg" command works
+	* LOB now tabulated
 
 0.90 the extra stats (E, PB, GIDP, etc.) no longer have to be entered
      manually, grs prints each stat in the following format:

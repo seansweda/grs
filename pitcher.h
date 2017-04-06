@@ -14,7 +14,6 @@ private :
 	char team[TEAMLEN];
 	char rtn[TEAMLEN];
 public :
-	pitcher(char*);
 	pitcher(char*, char*, char*, char);
 	int out;
 	int h;
@@ -24,17 +23,14 @@ public :
 	int k;
 	int hr;
 	int bf;
+
 	char throws;
 	void sout(FILE*);
 	char *nout();
 	char *tout();
 	void hit(int);
 	char dec;
-	~pitcher() {
-#ifdef DEBUG
-	    fprintf(stderr,"deleted %s\n",this->nout());
-#endif
-	}
+	~pitcher();
 };
 
 #endif

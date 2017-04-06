@@ -9,8 +9,6 @@
 #include "player.h"
 #include "pitcher.h"
 
-extern FILE *pbpfp,*stsfp,*cmdfp,*undofp,*output,*input;
-
 // Linked list of players
 struct pl_list {
 	int ord;
@@ -52,30 +50,33 @@ private :
 public :
 	team(int);
 	team(char*);
+
 	int make_lineups();
 	int make_lineups_pit();
-	void box_score(FILE*);
-	char *posout(int);
-	player *next_up();
-	player *up();
-	void insert(int, char**, const char* = "\0", const char* = "\0");
-	void pos_change(int, char**);
 	int new_pit();
+	void pos_change(int, char**);
+	void insert(int, char**, const char* = "\0", const char* = "\0");
+
+	void print_lineup(void);
+	void check_defense(void);
+	int verify_pos(const char*);
+	char *posout(int);
 	char *nout();
+	player *up();
+	player *next_up();
+	pitcher *mound;
+	int findord(player*);
+	player *findord(int);
+
 	int score;
 	int team_hits();
 	int errors;
 	int lob;
-	pitcher *mound;
-	player *findord(int);
-	void print_lineup(void);
-	void check_defense(void);
-	player *back_up();
 	void newstat(char*, int);
-	void printstat(FILE*, int);
-	int what_ord(player*);
 	void decisions();
 	void unearned(int);
+	void box_score(FILE*);
+	void printstat(FILE*, int);
 	~team();
 };
 
