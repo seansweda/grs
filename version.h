@@ -1,1 +1,1 @@
-#define VER "3.2 beta"
+#define VER "3.2"
