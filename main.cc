@@ -125,7 +125,7 @@ setup()
     ibl[0]->make_lineups_pit();
     ibl[1]->make_lineups_pit();
 
-    fprintf(output, "Enter one line description of game conditions.\n");
+    fprintf(output, "\nEnter one line description of game conditions.\n");
     memset( inputstr, '\0', MAX_INPUT );
     fgets( inputstr, MAX_INPUT, input );
     sanitize( &inputstr, MAX_INPUT, '\n' );

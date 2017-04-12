@@ -335,7 +335,7 @@ team::make_lineups()
 	newpl->head = new player( name, ibl, mlb, pos );
     }
 
-    //fprintf(output,"\n");
+    fprintf( output, "\n" );
     free( inputstr );
     free( name );
     free( mlb );
