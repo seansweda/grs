@@ -983,7 +983,7 @@ frame::update()
 	    exit( 1 );
 	}
 	old->start();
-	while ( strlen( old->peek() ) > 0 ) {
+	while ( strcmp( old->peek(), "\n" ) != 0 ) {
 	    fprintf( undofp, "%s\n", old->peek() );
 	    old->next();
 	}

@@ -34,7 +34,8 @@ list::peek()
 	return( this->cursor->cmd );
     }
     else {
-	return( "" );
+	// return newline to indicate NULL cursor (i.e. end of list)
+	return( "\n" );
     }
 }
 
@@ -94,11 +95,12 @@ list::dump()
 {
     fprintf( stderr, "list:" );
     this->start();
-    while ( strlen( this->peek() ) > 0 ) {
+    while ( this->cursor ) {
 	fprintf( stderr, " \'%s\'", this->peek() );
 	this->next();
     }
     fprintf( stderr, "\n" );
+    this->end();
 }
 
 list::~list()
