@@ -977,8 +977,9 @@ frame::update()
 	cleanup();
 
 	// write undo file
-	snprintf( outputstr, PATH_MAX, "%s.un1", filename );
-	if ( (undofp = fopen( outputstr, "w+" )) == NULL ) {
+	char un1[PATH_MAX];
+	snprintf( un1, PATH_MAX, "%s.un1", filename );
+	if ( (undofp = fopen( un1, "w+" )) == NULL ) {
 	    fprintf( stderr, "fatal error: could write %s\n", outputstr );
 	    exit( 1 );
 	}
@@ -991,7 +992,7 @@ frame::update()
 	delete( old );
 
 	// read from undo file
-	if ( (undofp = fopen( outputstr, "r" )) == NULL ) {
+	if ( (undofp = fopen( un1, "r" )) == NULL ) {
 	    fprintf( stderr, "fatal error: could read %s\n", outputstr );
 	    exit( 1 );
 	}
