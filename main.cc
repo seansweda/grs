@@ -80,7 +80,6 @@ openfile( char *prefix )
     if ( ( stsfp=fopen( file, "w+" ) ) == NULL )
 	result++;
     snprintf( file, PATH_MAX, "%s.%s", prefix, "cmd" );
-    file[PATH_MAX - 4] = '\0';
     if ( ( cmdfp=fopen( file, "w+" ) ) == NULL )
 	result++;
 
