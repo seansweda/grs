@@ -114,7 +114,7 @@ frame::update()
 #endif
 	putcmd();
 	if ( errflag && runs )
-	    pit->unearned(inning);
+	    pit->unearned(inning, 0);
 
 	snprintf( outputstr, MAX_INPUT, "%s %d %s %d\n",
 		ibl[0]->nout(),ibl[0]->score, ibl[1]->nout(),ibl[1]->score );
