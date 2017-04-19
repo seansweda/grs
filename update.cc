@@ -138,9 +138,11 @@ frame::update()
 	cmd->add( comment );
 	fprintf( cmdfp, "%s\n", comment );
 	fflush( cmdfp );
+	fprintf( output, "\n" );
 	frameput();
 	outbuf( comment );
-	if ( comment[strlen(outputstr) - 1] == '.' ) {
+	if ( comment[strlen(outputstr) - 1] == '.' ||
+		comment[strlen(outputstr) - 1] == ',' ) {
 	    outbuf( "", " ");
 	} else {
 	    outbuf( "", ". ");
