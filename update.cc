@@ -103,6 +103,11 @@ frame::update()
 	frameput();
 	return(1);
     }
+    else if ( !(strcmp( event, "xx" )) ) {
+	// quick exit
+	cont = 0;
+	return(1);
+    }
     else if ( !(strcmp( event, "eg" )) ) {
 #ifdef DEBUG
 	print_linescore(stderr);
