@@ -1,19 +1,10 @@
 GRS is a program for creating a game report for the Internet Baseball
-League.  GRS was written by Sean Sweda (sweda@ibl.org), with assistance
+League.  GRS was written by Sean Sweda <sweda@ibl.org>, with assistance
 from Greg Speegle, Richard Dunlap, and Christian Beliveau.  The source
-code is available at github <https://github.com/seansweda/grs> or via
-anonymous ftp <ftp://ftp.ibl.org/ibl/grs/>
+code is available at github <https://github.com/seansweda/grs>
 
-** please submit bug reports to sweda@ibl.org **
-
-
-COMPILING THE PROGRAM
-
-1) unpack the source ( tar -xzf grs.tgz )
-
-2) edit Makefile to your taste
-
-3) "make"
+** please submit bug reports on github **
+<https://github.com/seansweda/grs/issues>
 
 
 RUNNING THE PROGRAM
@@ -36,26 +27,22 @@ Usage: grs [ (-a afile) (-h hfile) | (-f cmdfile) ] outfile
 -o	Used to overwrite existing output files.
 	(v3.1 and later)
 
-If you use the -f flag to read in a file, make sure that the last
-event is NOT 'eg'.
-
 The last operand is always the output file prefix.  GRS will create
 the following files:
 
 <outfile>.sts	- the stats
 <outfile>.pbp	- the play-by-play
 <outfile>.cmd	- the commands you typed in
-<outfile>.un#	- a file GRS uses temporarily to process the undo command
-		  there may be several of these files after you are done
+<outfile>.un#	- a copy of .cmd created prior to executing undo
 
-The accompanying shell script, grscat (instructions at the end) will
-concatenate these files into one large file, if you so desire.
+The supplied shell script "grscat" (instructions at the end) can
+be used concatenate these files into one large file for GRS submission.
 
 WHAT IT DOESN'T DO
 
 GRS is not smart enough to figure out earned runs, you'll have to do that
 yourself when prompted.  There are some esoteric events which GRS does not
-handle gracefully, if you come across one please inform the author.
+handle gracefully, if you find one please submit a bug report.
 
 ENTERING THE LINEUPS
 
@@ -82,21 +69,24 @@ GRS accepts commands in the following syntax: (space delimited)
 event location baserunning
 
 event		- a 2 letter event code, all of which are listed below
-location	- many uses, eg. location of a hit (gcf), or fielding
-		  on the play (6-3);  also can be used to indicate a
+
+location	- many uses: e.g. location of a hit (gcf), or fielding
+		  on the play (6-3);  can also be used to indicate a
 		  special kind of play like a H&R or IFR, eg. 6-3(IFR)
 		  or IFR(6) or lcf(H&R), etc.
+
 baserunning	- in groups of 2, indicating where the player started,
-		  and where he ended up, eg. 12 means runner on 1st
+		  and where he ended up, eg. 12 means runner on first
 		  went to second.  Use the letter 'b' for the batter,
 		  'o' for out, and 'h' for home.  There are default
-		  advances programmed in, so you can skip the
-		  baserunning field if nobody advanced an extra base.
+		  advances programmed in so you can skip the baserunning
+		  field if nobody advanced an extra base.
 
 The location is optional for all events.  Some events require baserunning
-information.  When entering errors, only list the player who made the
-error in the location field. (e.g. er 3/rg6 b1 instead of er 6-3 b1 for a
-dropped throw by the firstbaseman)
+information.  When entering errors make sure to list the player who made
+the error as the first character in the location field.
+(ex: "er 3/rg6 b1" for a dropped throw by the firstbaseman)
+
 
 This is a list of the events that the GRS program accepts:
 
@@ -133,11 +123,9 @@ lh - list the home team's lineup
 un - undo
 
 	Undo will allow you to undo any event, including a lineup
-	change or the end of an inning.  You can even undo several
-	events at once.  Make sure that there is never an undo
-	command in a command file that you are reading in via the
-	-f flag, as the undo command is never recorded in the .cmd
-	file normally, and this will only serve to confuse GRS.
+	change or the end of an inning.  You can undo as many events
+	as you wish, until you reach the first batter of the game.
+	It is not possible to "undo" the starting lineups.
 
 en - end of inning
 eg - end of game
@@ -203,19 +191,13 @@ UNDO WARNING
 Undo is the most precarious part of our program, i.e. the most likely
 way to crash GRS.  The current status is:
 
-Undo seems to be 100% functional.
+Undo should to be 100% safe.
 
-NEVER, EVER, use the -f flag with an undo command imbedded in the
-input file!  the undo event is never recorded in a .cmd file, and GRS
-is not expecting it!  there will be grave (although quite comical)
-consequences if you ignore this.
-
-The moral of the story is, use undo at your own risk.  What is listed
-above is the "observed" pattern of activity of undo.  It *may* crash,
-possibly destroying your game report.  If you don't want to try undo,
-just end the game, then use copy-paste to re-input your commands
-(copy from the .cmd file).  Or even easier still, use the -f flag.
-
+The moral of the story is... use undo at your own risk.  What is listed
+above is the "observed" pattern of behavior for undo.  It *may* crash,
+possibly destroying your game report.  If you don't want to try undo
+simply end the game and use copy-paste to re-input your commands, or
+copy/edit the .cmd file and re-run grs using the -f flag.
 
 
 GRSCAT

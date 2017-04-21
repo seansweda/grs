@@ -335,7 +335,7 @@ team::make_lineups()
 	newpl->head = new player( name, ibl, mlb, pos );
     }
 
-    //fprintf(output,"\n");
+    fprintf( output, "\n" );
     free( inputstr );
     free( name );
     free( mlb );
@@ -900,7 +900,7 @@ team::decisions()
 }
 
     void
-team::unearned( int inning )
+team::unearned( int inning, int spacer )
 {
     int numout = 0;
     int ur = 0;
@@ -945,7 +945,8 @@ team::unearned( int inning )
 
 	curr = curr->next;
     }
-    fprintf( output, "\n" );
+    if ( spacer )
+	fprintf( output, "\n" );
     free( inputstr );
 }
 
