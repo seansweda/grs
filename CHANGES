@@ -2,6 +2,8 @@ This is the latest and greatest grs construction program.
 
 VERSION HISTORY
 -----------------------------------------------------------------------
+3.2.1	* fix undo bug exposed by empty string for game conditions
+
 3.2.0	* lots of refactoring to make user input even more bullet-proof
 	* prohibit input of nonsense positions and illegal baserunning
 	* re-implement redo in memory
