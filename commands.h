@@ -5,6 +5,7 @@ const char* valid3[] = {
     "un",
     "en",
     "eg",
+    "xx",
     "cm"
 };
 

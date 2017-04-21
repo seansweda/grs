@@ -103,13 +103,18 @@ frame::update()
 	frameput();
 	return(1);
     }
+    else if ( !(strcmp( event, "xx" )) ) {
+	// quick exit
+	cont = 0;
+	return(1);
+    }
     else if ( !(strcmp( event, "eg" )) ) {
 #ifdef DEBUG
 	print_linescore(stderr);
 #endif
 	putcmd();
 	if ( errflag && runs )
-	    pit->unearned(inning);
+	    pit->unearned(inning, 0);
 
 	snprintf( outputstr, MAX_INPUT, "%s %d %s %d\n",
 		ibl[0]->nout(),ibl[0]->score, ibl[1]->nout(),ibl[1]->score );
@@ -138,9 +143,11 @@ frame::update()
 	cmd->add( comment );
 	fprintf( cmdfp, "%s\n", comment );
 	fflush( cmdfp );
+	fprintf( output, "\n" );
 	frameput();
 	outbuf( comment );
-	if ( comment[strlen(outputstr) - 1] == '.' ) {
+	if ( comment[strlen(outputstr) - 1] == '.' ||
+		comment[strlen(outputstr) - 1] == ',' ) {
 	    outbuf( "", " ");
 	} else {
 	    outbuf( "", ". ");
@@ -977,13 +984,14 @@ frame::update()
 	cleanup();
 
 	// write undo file
-	snprintf( outputstr, PATH_MAX, "%s.un1", filename );
-	if ( (undofp = fopen( outputstr, "w+" )) == NULL ) {
+	char un1[PATH_MAX];
+	snprintf( un1, PATH_MAX, "%s.un1", filename );
+	if ( (undofp = fopen( un1, "w+" )) == NULL ) {
 	    fprintf( stderr, "fatal error: could write %s\n", outputstr );
 	    exit( 1 );
 	}
 	old->start();
-	while ( strlen( old->peek() ) > 0 ) {
+	while ( strcmp( old->peek(), "\n" ) != 0 ) {
 	    fprintf( undofp, "%s\n", old->peek() );
 	    old->next();
 	}
@@ -991,7 +999,7 @@ frame::update()
 	delete( old );
 
 	// read from undo file
-	if ( (undofp = fopen( outputstr, "r" )) == NULL ) {
+	if ( (undofp = fopen( un1, "r" )) == NULL ) {
 	    fprintf( stderr, "fatal error: could read %s\n", outputstr );
 	    exit( 1 );
 	}

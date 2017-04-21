@@ -74,7 +74,7 @@ public :
 	int lob;
 	void newstat(char*, int);
 	void decisions();
-	void unearned(int);
+	void unearned(int, int = 1);
 	void box_score(FILE*);
 	void printstat(FILE*, int);
 	~team();
